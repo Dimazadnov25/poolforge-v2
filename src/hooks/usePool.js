@@ -126,7 +126,7 @@ export function usePool() {
   const swapSolToUsdc = useCallback(async (usdcNeeded) => {
     if (!wallet?.publicKey || !connection) return
     try {
-      const amountIn = Math.floor(usdcNeeded * 1.05 * poolState.currentPrice * 1e9 / poolState.currentPrice)
+      const amountIn = Math.floor(usdcNeeded * 1e9 / poolState.currentPrice * 1.1)
       const swapResp = await fetch('/api/jupiter-swap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
