@@ -59,9 +59,9 @@ export function usePool() {
   useEffect(() => {
     const fetchPrice = async () => {
       try {
-        const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd')
+        const r = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=solusdt')
         const d = await r.json()
-        setSolPrice(d.solana.usd)
+        setSolPrice(parseFloat(d.price))
       } catch (e) {}
     }
     fetchPrice()
