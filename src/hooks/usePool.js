@@ -57,17 +57,10 @@ export function usePool() {
   }, [connection])
 
   useEffect(() => {
-    const fetchPrice = async () => {
-      try {
-        const r = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=solusdt')
-        const d = await r.json()
-        setSolPrice(parseFloat(d.price))
-      } catch (e) {}
+    if (poolState?.currentPrice) {
+      setSolPrice(poolState.currentPrice)
     }
-    fetchPrice()
-    const interval = setInterval(fetchPrice, 10000)
-    return () => clearInterval(interval)
-  }, [])
+  }, [poolState])
 
   const loadPositions = useCallback(async () => {
     if (!wallet?.publicKey || !connection) return
