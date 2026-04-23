@@ -126,8 +126,8 @@ export function usePool() {
   const swapSolToUsdc = useCallback(async (usdcNeeded) => {
     if (!wallet?.publicKey || !connection) return
     try {
-      const lamportsNeeded = Math.floor(usdcNeeded * 1e6)
-      const quoteResp = await fetch(`https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=${lamportsNeeded}&slippageBps=50`)
+      const amountIn = Math.floor(usdcNeeded * 1.05 * poolState.currentPrice * 1e9 / poolState.currentPrice)
+      const quoteResp = await fetch(`https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=${amountIn}&slippageBps=100`)
       const quote = await quoteResp.json()
       const swapResp = await fetch('https://quote-api.jup.ag/v6/swap', {
         method: 'POST',
@@ -144,7 +144,7 @@ export function usePool() {
       const latest = await connection.getLatestBlockhash()
       await connection.confirmTransaction({ signature: sig, blockhash: latest.blockhash, lastValidBlockHeight: latest.lastValidBlockHeight }, 'confirmed')
     } catch (e) { throw new Error('Swap failed: ' + e.message) }
-  }, [wallet, connection])
+  }, [wallet, connection, poolState])
 
   const openPosition = useCallback(async ({ priceLower, priceUpper, solAmount }) => {
     if (!wallet?.publicKey || !connection) return
@@ -242,7 +242,7 @@ export function usePool() {
     } finally {
       setLoading(false)
     }
-  }, [wallet, connection, poolState, refreshBalances, loadPositions])
+  }, [wallet, connection, poolState, refreshBalances, loadPositions, swapSolToUsdc])
 
   const addLiquidity = useCallback(async (mintAddress, solAmount) => {
     if (!wallet?.publicKey || !connection) return
@@ -250,9 +250,14 @@ export function usePool() {
       setLoading(true)
       const mint = new PublicKey(mintAddress)
       const positionPDA = getPositionPDA(mint)
+      const positionTokenAccount = await getATA(mint, wallet.publicKey)
+      const tokenOwnerA = await getATA(WSOL, wallet.publicKey)
+      const tokenOwnerB = await getATA(USDC_MINT, wallet.publicKey)
       const posInfo = await connection.getAccountInfo(positionPDA)
       const tickLower = posInfo.data.readInt32LE(88)
       const tickUpper = posInfo.data.readInt32LE(92)
+      const tickArrayLower = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLower, poolState.tickSpacing))
+      const tickArrayUpper = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpper, poolState.tickSpacing))
       const lamports = Math.floor(solAmount * 1e9)
       const sqrtP = Math.sqrt(poolState.currentPrice * 1e-3)
       const sqrtPl = Math.sqrt(Math.pow(1.0001, tickLower) * 1000 * 1e-3)
@@ -267,49 +272,6 @@ export function usePool() {
         await swapSolToUsdc(usdcNeeded - usdcHave + 1)
         await new Promise(r => setTimeout(r, 2000))
       }
-      const positionTokenAccount = await getATA(mint, wallet.publicKey)
-      const tokenOwnerA = await getATA(WSOL, wallet.publicKey)
-      const tokenOwnerB = await getATA(USDC_MINT, wallet.publicKey)
-      const tickArrayLower = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLower, poolState.tickSpacing))
-      const tickArrayUpper = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpper, poolState.tickSpacing))
-    if (!wallet?.publicKey || !connection) return
-    try {
-      setLoading(true)
-      const mint = new PublicKey(mintAddress)
-      const positionPDA = getPositionPDA(mint)
-      const posInfo = await connection.getAccountInfo(positionPDA)
-      const tickLower = posInfo.data.readInt32LE(88)
-      const tickUpper = posInfo.data.readInt32LE(92)
-      const lamportsCheck = Math.floor(solAmount * 1e9)
-      const sqrtPcheck = Math.sqrt(poolState.currentPrice * 1e-3)
-      const sqrtPlcheck = Math.sqrt(Math.pow(1.0001, tickLower) * 1000 * 1e-3)
-      const sqrtPucheck = Math.sqrt(Math.pow(1.0001, tickUpper) * 1000 * 1e-3)
-      const liqCheck = Math.floor(lamportsCheck * sqrtPcheck * sqrtPucheck / (sqrtPucheck - sqrtPcheck))
-      const usdcNeeded = liqCheck * (sqrtPcheck - sqrtPlcheck) / 1e6
-      const usdcATA2 = await getATA(USDC_MINT, wallet.publicKey)
-      const usdcInfo2 = await connection.getParsedAccountInfo(usdcATA2)
-      const usdcHave = usdcInfo2?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
-      if (usdcHave < usdcNeeded * 0.95) {
-        await swapSolToUsdc(usdcNeeded - usdcHave + 1)
-        await new Promise(r => setTimeout(r, 2000))
-      }
-      const mint2 = new PublicKey(mintAddress)
-      const positionPDA = getPositionPDA(mint)
-      const positionTokenAccount = await getATA(mint, wallet.publicKey)
-      const tokenOwnerA = await getATA(WSOL, wallet.publicKey)
-      const tokenOwnerB = await getATA(USDC_MINT, wallet.publicKey)
-      const posInfo = await connection.getAccountInfo(positionPDA)
-      const tickLower = posInfo.data.readInt32LE(88)
-      const tickUpper = posInfo.data.readInt32LE(92)
-      const tickArrayLower = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLower, poolState.tickSpacing))
-      const tickArrayUpper = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpper, poolState.tickSpacing))
-      const lamports = Math.floor(solAmount * 1e9)
-      const decAdj = 1e-3
-      const sqrtP = Math.sqrt(poolState.currentPrice * decAdj)
-      const sqrtPl = Math.sqrt(Math.pow(1.0001, tickLower) * 1000 * decAdj)
-      const sqrtPu = Math.sqrt(Math.pow(1.0001, tickUpper) * 1000 * decAdj)
-      const liquidityAmount = Math.floor(lamports * sqrtP * sqrtPu / (sqrtPu - sqrtP))
-      const usdcRaw = Math.floor(liquidityAmount * (sqrtP - sqrtPl) * 1e6)
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
       const tx = new Transaction({ recentBlockhash: blockhash, feePayer: wallet.publicKey })
       const wsolInfo = await connection.getAccountInfo(tokenOwnerA)
@@ -342,7 +304,7 @@ export function usePool() {
     } finally {
       setLoading(false)
     }
-  }, [wallet, connection, poolState, refreshBalances])
+  }, [wallet, connection, poolState, refreshBalances, swapSolToUsdc])
 
   const collectFees = useCallback(async (mintAddress) => {
     if (!wallet?.publicKey || !connection) return
