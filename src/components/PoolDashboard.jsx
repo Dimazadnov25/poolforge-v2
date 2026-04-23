@@ -58,8 +58,7 @@ export default function PoolDashboard() {
       )}
 
       {pool.error && <div className="error-banner">{pool.error}</div>}
-      {pool.txStatus && <div className={	x-status tx-status--}>{pool.txStatus}</div>}
-
+{pool.txStatus && <div className={'tx-status tx-status--' + pool.txStatus}>{pool.txStatus}</div>}
       {wallet.connected ? (
         <>
           {pool.positions.length > 0 && (
