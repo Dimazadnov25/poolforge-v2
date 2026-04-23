@@ -250,6 +250,51 @@ export function usePool() {
       setLoading(true)
       const mint = new PublicKey(mintAddress)
       const positionPDA = getPositionPDA(mint)
+      const posInfo = await connection.getAccountInfo(positionPDA)
+      const tickLower = posInfo.data.readInt32LE(88)
+      const tickUpper = posInfo.data.readInt32LE(92)
+      const lamports = Math.floor(solAmount * 1e9)
+      const sqrtP = Math.sqrt(poolState.currentPrice * 1e-3)
+      const sqrtPl = Math.sqrt(Math.pow(1.0001, tickLower) * 1000 * 1e-3)
+      const sqrtPu = Math.sqrt(Math.pow(1.0001, tickUpper) * 1000 * 1e-3)
+      const liquidityAmount = Math.floor(lamports * sqrtP * sqrtPu / (sqrtPu - sqrtP))
+      const usdcRaw = Math.floor(liquidityAmount * (sqrtP - sqrtPl) * 1e6)
+      const usdcNeeded = usdcRaw / 1e6
+      const usdcATA2 = await getATA(USDC_MINT, wallet.publicKey)
+      const usdcInfo2 = await connection.getParsedAccountInfo(usdcATA2)
+      const usdcHave = usdcInfo2?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
+      if (usdcHave < usdcNeeded * 0.95) {
+        await swapSolToUsdc(usdcNeeded - usdcHave + 1)
+        await new Promise(r => setTimeout(r, 2000))
+      }
+      const positionTokenAccount = await getATA(mint, wallet.publicKey)
+      const tokenOwnerA = await getATA(WSOL, wallet.publicKey)
+      const tokenOwnerB = await getATA(USDC_MINT, wallet.publicKey)
+      const tickArrayLower = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLower, poolState.tickSpacing))
+      const tickArrayUpper = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpper, poolState.tickSpacing))
+    if (!wallet?.publicKey || !connection) return
+    try {
+      setLoading(true)
+      const mint = new PublicKey(mintAddress)
+      const positionPDA = getPositionPDA(mint)
+      const posInfo = await connection.getAccountInfo(positionPDA)
+      const tickLower = posInfo.data.readInt32LE(88)
+      const tickUpper = posInfo.data.readInt32LE(92)
+      const lamportsCheck = Math.floor(solAmount * 1e9)
+      const sqrtPcheck = Math.sqrt(poolState.currentPrice * 1e-3)
+      const sqrtPlcheck = Math.sqrt(Math.pow(1.0001, tickLower) * 1000 * 1e-3)
+      const sqrtPucheck = Math.sqrt(Math.pow(1.0001, tickUpper) * 1000 * 1e-3)
+      const liqCheck = Math.floor(lamportsCheck * sqrtPcheck * sqrtPucheck / (sqrtPucheck - sqrtPcheck))
+      const usdcNeeded = liqCheck * (sqrtPcheck - sqrtPlcheck) / 1e6
+      const usdcATA2 = await getATA(USDC_MINT, wallet.publicKey)
+      const usdcInfo2 = await connection.getParsedAccountInfo(usdcATA2)
+      const usdcHave = usdcInfo2?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
+      if (usdcHave < usdcNeeded * 0.95) {
+        await swapSolToUsdc(usdcNeeded - usdcHave + 1)
+        await new Promise(r => setTimeout(r, 2000))
+      }
+      const mint2 = new PublicKey(mintAddress)
+      const positionPDA = getPositionPDA(mint)
       const positionTokenAccount = await getATA(mint, wallet.publicKey)
       const tokenOwnerA = await getATA(WSOL, wallet.publicKey)
       const tokenOwnerB = await getATA(USDC_MINT, wallet.publicKey)
