@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 import PoolDashboard from './components/PoolDashboard'
 import '@solana/wallet-adapter-react-ui/styles.css'
 
-const RPC = 'https://mainnet.helius-rpc.com/?api-key=e129ef66-4dde-4f0d-bc1b-e4197604806d'
+const RPC = 'import.meta.env.VITE_RPC_URL'
 
 export default function App() {
   const wallets = useMemo(() => [new PhantomWalletAdapter()], [])
