@@ -1,24 +1,24 @@
-﻿import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { useState, useCallback } from 'react';
-import { usePool } from '../hooks/usePool';
-import PoolStats from './PoolStats';
-import PositionDetails from './PositionDetails';
-import OpenPositionForm from './OpenPositionForm';
+﻿import { useWallet } from '@solana/wallet-adapter-react'
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import { useState, useCallback } from 'react'
+import { usePool } from '../hooks/usePool'
+import PoolStats from './PoolStats'
+import PositionDetails from './PositionDetails'
+import OpenPositionForm from './OpenPositionForm'
 
 export default function PoolDashboard() {
-  const wallet = useWallet();
-  const pool = usePool();
-  const [positionData, setPositionData] = useState({});
+  const wallet = useWallet()
+  const pool = usePool()
+  const [positionData, setPositionData] = useState({})
 
   const handlePositionUpdate = useCallback((mint, details) => {
-    setPositionData(prev => ({ ...prev, [mint]: details }));
-  }, []);
+    setPositionData(prev => ({ ...prev, [mint]: details }))
+  }, [])
 
   const totalEarned = Object.values(positionData).reduce((acc, d) => {
-    if (!d) return acc;
-    return acc + (parseFloat(d.feeOwedA || 0) / 1e9) * (pool.solPrice || 0) + parseFloat(d.feeOwedB || 0) / 1e6;
-  }, 0);
+    if (!d) return acc
+    return acc + (parseFloat(d.feeOwedA || 0) / 1e9) * (pool.solPrice || 0) + parseFloat(d.feeOwedB || 0) / 1e6
+  }, 0)
 
   return (
     <div className="app">
@@ -42,7 +42,7 @@ export default function PoolDashboard() {
 
       {pool.solPrice && (
         <div className="price-ticker">
-          SOL <strong></strong>
+          SOL <strong>${pool.solPrice.toFixed(2)}</strong>
           <span className="fee-badge">0.05% fee tier</span>
         </div>
       )}
@@ -51,15 +51,17 @@ export default function PoolDashboard() {
 
       {wallet.connected && (
         <div className="balances">
-          <span>SOL: <strong>{pool.solBalance?.toFixed(4) ?? '—'}</strong></span>
-          <span>USDC: <strong>{pool.usdcBalance?.toFixed(2) ?? '—'}</strong></span>
-          {totalEarned > 0 && <span>Earned: <strong style={{color:'var(--green)'}}></strong></span>}
+          <span>SOL: <strong>{pool.solBalance != null ? pool.solBalance.toFixed(4) : '—'}</strong></span>
+          <span>USDC: <strong>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : '—'}</strong></span>
+          {totalEarned > 0 && <span>Earned: <strong style={{color:'var(--green)'}}>${totalEarned.toFixed(4)}</strong></span>}
         </div>
       )}
 
       {pool.error && <div className="error-banner">{pool.error}</div>}
-   {pool.txStatus && <div className={'tx-status tx-status--' + pool.txStatus}>{pool.txStatus}</div>}
-        <>
+      {pool.txStatus && <div className={'tx-status tx-status--' + pool.txStatus}>{pool.txStatus}</div>}
+
+      {wallet.connected ? (
+        <div>
           {pool.positions.length > 0 && (
             <div className="positions-list" style={{marginBottom:'1rem'}}>
               {pool.positions.map(p => (
@@ -83,7 +85,7 @@ export default function PoolDashboard() {
             onOpen={pool.openPosition}
             loading={pool.loading}
           />
-        </>
+        </div>
       ) : (
         <div className="connect-cta">
           <p>Connect your Phantom wallet to manage SOL/USDC liquidity</p>
@@ -91,5 +93,5 @@ export default function PoolDashboard() {
         </div>
       )}
     </div>
-  );
+  )
 }
