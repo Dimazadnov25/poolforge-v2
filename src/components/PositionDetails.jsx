@@ -41,8 +41,8 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
         <span className={'badge ' + (isInRange ? 'badge-green' : 'badge-red')}>{isInRange ? 'IN RANGE' : 'OUT OF RANGE'}</span>
       </div>
       <div className="position-grid">
-        <span className="label">Min Price</span><span className="value">${details.priceLower.toFixed(2)}</span>
-        <span className="label">Max Price</span><span className="value">${details.priceUpper.toFixed(2)}</span>
+        <span className="label">Min Price</span><span className="value" style={{color:'#06b6d4'}}>${details.priceLower.toFixed(2)}</span>
+        <span className="label">Max Price</span><span className="value" style={{color:'#06b6d4'}}>${details.priceUpper.toFixed(2)}</span>
         <span className="label">Current Price</span><span className="value" style={{color:'var(--green)'}}>${poolState?.currentPrice?.toFixed(2) || '-'}</span>
         <span className="label">Position Value</span><span className="value" style={{color:'var(--green)'}}>${positionValueUSD.toFixed(2)} USD</span>
         <span className="label">Earned</span><span className="value" style={{color:'var(--green)'}}>${earnedUSD.toFixed(4)} USD</span>
