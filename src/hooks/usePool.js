@@ -316,7 +316,7 @@ export function usePool() {
       ], data: Buffer.from([9]) }))
       setTxStatus('signing')
       const signed = await wallet.signTransaction(tx)
-      const sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: false })
+      const sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true })
       await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, 'confirmed')
       setTxStatus('confirmed')
       await refreshBalances()
