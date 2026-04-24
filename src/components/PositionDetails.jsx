@@ -40,12 +40,20 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
         <span className="position-mint">{position.mint.slice(0,6)}...{position.mint.slice(-4)}</span>
         <span className={'badge ' + (isInRange ? 'badge-green' : 'badge-red')}>{isInRange ? 'IN RANGE' : 'OUT OF RANGE'}</span>
       </div>
+      <div style={{display:'flex', justifyContent:'space-between', marginBottom:'0.75rem'}}>
+        <div>
+          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>Value</div>
+          <div style={{color:'var(--green)', fontWeight:'bold', fontSize:'1.1rem'}}>${positionValueUSD.toFixed(2)}</div>
+        </div>
+        <div style={{textAlign:'right'}}>
+          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>Earned</div>
+          <div style={{color:'var(--green)', fontWeight:'bold', fontSize:'1.1rem'}}>${earnedUSD.toFixed(4)}</div>
+        </div>
+      </div>
       <div className="position-grid">
         <span className="label">Min Price</span><span className="value" style={{color:'#06b6d4'}}>${details.priceLower.toFixed(2)}</span>
         <span className="label">Max Price</span><span className="value" style={{color:'#06b6d4'}}>${details.priceUpper.toFixed(2)}</span>
         <span className="label">Current Price</span><span className="value" style={{color:'var(--green)'}}>${poolState?.currentPrice?.toFixed(2) || '-'}</span>
-        <span className="label">Position Value</span><span className="value" style={{color:'var(--green)'}}>${positionValueUSD.toFixed(2)}</span>
-        <span className="label">Earned</span><span className="value" style={{color:'var(--green)'}}>${earnedUSD.toFixed(4)}</span>
       </div>
       <div>
         <button className="btn btn-blue" onClick={() => { const amt = prompt('SOL amount to add:'); if (amt && onAddLiquidity) onAddLiquidity(position.mint, parseFloat(amt)) }}>Add Liquidity</button>
