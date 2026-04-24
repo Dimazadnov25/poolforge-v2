@@ -157,8 +157,7 @@ export function usePool() {
       const sqrtPu = Math.sqrt(priceUpper * decAdj)
       const liquidityAmount = Math.floor(lamports * sqrtP * sqrtPu / (sqrtPu - sqrtP))
       const usdcRaw = Math.floor(liquidityAmount * (sqrtP - sqrtPl) / 1e6)
-      const usdcNeeded = usdcRaw
-      await checkAndSwapUsdc(usdcNeeded)
+      
       const openDisc = Buffer.from([135, 128, 47, 77, 15, 152, 240, 49])
       const openData = Buffer.alloc(17)
       openDisc.copy(openData, 0)
@@ -243,8 +242,7 @@ export function usePool() {
       const sqrtPu = Math.sqrt(Math.pow(1.0001, tickUpper) * 1000 * 1e-3)
       const liquidityAmount = Math.floor(lamports * sqrtP * sqrtPu / (sqrtPu - sqrtP))
       const usdcRaw = Math.floor(liquidityAmount * (sqrtP - sqrtPl) * 1e6)
-      const usdcNeeded = usdcRaw / 1e6
-      await checkAndSwapUsdc(usdcNeeded)
+      
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
       const tx = new Transaction({ recentBlockhash: blockhash, feePayer: wallet.publicKey })
       const wsolInfo = await connection.getAccountInfo(tokenOwnerA)
