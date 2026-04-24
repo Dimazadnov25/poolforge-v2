@@ -53,7 +53,7 @@ export default function PoolDashboard() {
         <div className="balances">
           <span>SOL: <strong>{pool.solBalance != null ? pool.solBalance.toFixed(4) : '—'}</strong></span>
           <span>USDC: <strong>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : '—'}</strong></span>
-          {totalEarned > 0 && <span>Earned: <strong style={{color:'var(--green)'}}>${totalEarned.toFixed(4)}</strong></span>}
+          
         </div>
       )}
 
