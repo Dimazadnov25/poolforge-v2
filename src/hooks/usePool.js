@@ -309,23 +309,20 @@ const updateFees = useCallback(async (mintAddress) => {
       setLoading(false)
     }
   }, [wallet, connection, poolState])
-  const collectFees = useCallback(async (mintAddress) => {
+    const collectFees = useCallback(async (mintAddress) => {
     if (!wallet?.publicKey || !connection) return
     try {
       setLoading(true)
       const mint = new PublicKey(mintAddress)
-      const positionPDA = getPositionPDA(mint)
+      const [positionPDA] = PublicKey.findProgramAddressSync([Buffer.from('position'), mint.toBuffer()], WHIRLPOOL_PROGRAM)
       const positionTokenAccount = await getATA(mint, wallet.publicKey)
       const tokenOwnerA = await getATA(WSOL, wallet.publicKey)
       const tokenOwnerB = await getATA(USDC_MINT, wallet.publicKey)
-      const disc = Buffer.from([207, 117, 95, 191, 229, 180, 226, 15])
-      const data = Buffer.alloc(9)
-      disc.copy(data, 0)
-      data.writeUInt8(0, 8)
+      const disc = Buffer.from([207,117,95,191,229,180,226,15,0])
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
       const tx = new Transaction({ recentBlockhash: blockhash, feePayer: wallet.publicKey })
-      const wsolExists = await connection.getAccountInfo(tokenOwnerA)
-      if (!wsolExists) {
+      const wsolInfo = await connection.getAccountInfo(tokenOwnerA)
+      if (!wsolInfo) {
         tx.add({ programId: ASSOC_PROGRAM, keys: [
           { pubkey: wallet.publicKey, isSigner: true, isWritable: true },
           { pubkey: tokenOwnerA, isSigner: false, isWritable: true },
@@ -337,19 +334,19 @@ const updateFees = useCallback(async (mintAddress) => {
       }
       tx.add(new TransactionInstruction({ programId: WHIRLPOOL_PROGRAM, keys: [
         { pubkey: SOL_USDC_WHIRLPOOL, isSigner: false, isWritable: true },
-        { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
-        { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
-        { pubkey: MEMO, isSigner: false, isWritable: false },
         { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
         { pubkey: positionPDA, isSigner: false, isWritable: true },
         { pubkey: positionTokenAccount, isSigner: false, isWritable: false },
-        { pubkey: tokenOwnerA, isSigner: false, isWritable: true },
-        { pubkey: tokenOwnerB, isSigner: false, isWritable: true },
-        { pubkey: VAULT_A, isSigner: false, isWritable: true },
-        { pubkey: VAULT_B, isSigner: false, isWritable: true },
         { pubkey: WSOL, isSigner: false, isWritable: false },
         { pubkey: USDC_MINT, isSigner: false, isWritable: false },
-      ], data }))
+        { pubkey: tokenOwnerA, isSigner: false, isWritable: true },
+        { pubkey: VAULT_A, isSigner: false, isWritable: true },
+        { pubkey: tokenOwnerB, isSigner: false, isWritable: true },
+        { pubkey: VAULT_B, isSigner: false, isWritable: true },
+        { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
+        { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
+        { pubkey: MEMO, isSigner: false, isWritable: false },
+      ], data: disc }))
       tx.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [
         { pubkey: tokenOwnerA, isSigner: false, isWritable: true },
         { pubkey: wallet.publicKey, isSigner: false, isWritable: true },
