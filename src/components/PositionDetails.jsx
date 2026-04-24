@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from 'react'
 
-export default function PositionDetails({ position, poolState, fetchPosition, onClose, onCollect, onAddLiquidity, onRebalance, onUpdate }) {
+export default function PositionDetails({ position, poolState, fetchPosition, onClose, onCollect, onAddLiquidity, onRebalance, onUpdate, onUpdateFees }) {
   const [details, setDetails] = useState(null)
 
   useEffect(() => {
@@ -43,6 +43,7 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
       <div>
         <button className="btn btn-blue" onClick={() => { const amt = prompt('SOL amount to add:'); if (amt && onAddLiquidity) onAddLiquidity(position.mint, parseFloat(amt)) }}>Add Liquidity</button>
         <button className="btn btn-green" onClick={() => onCollect && onCollect(position.mint)}>Collect Fees</button>
+        <button className="btn btn-blue" onClick={() => onUpdateFees && onUpdateFees(position.mint)}>Refresh Fees</button>
         <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint)}>Rebalance 3%</button>
         <button className="btn btn-red" onClick={() => onClose && onClose(position.mint)}>Close Position</button>
       </div>
