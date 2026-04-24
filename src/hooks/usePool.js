@@ -469,15 +469,15 @@ const updateFees = useCallback(async (mintAddress) => {
     }
   }, [wallet, connection, decreaseLiquidity, refreshBalances])
 
-  const rebalancePosition = useCallback(async (mintAddress) => {
+  const rebalancePosition = useCallback(async (mintAddress, rangeWidth = 0.03) => {
     if (!wallet?.publicKey || !connection) return
     try {
       setLoading(true)
       setTxStatus('rebalancing')
       await closePosition(mintAddress)
       const currentPrice = poolState.currentPrice
-      const newPriceLower = parseFloat((currentPrice * 0.97).toFixed(2))
-      const newPriceUpper = parseFloat((currentPrice * 1.03).toFixed(2))
+      const newPriceLower = parseFloat((currentPrice * (1 - rangeWidth)).toFixed(2))
+      const newPriceUpper = parseFloat((currentPrice * (1 + rangeWidth)).toFixed(2))
       const solBal = await connection.getBalance(wallet.publicKey)
       const solAmount = Math.max(0.001, (solBal - 0.05e9) / 1e9)
       await openPosition({ priceLower: newPriceLower, priceUpper: newPriceUpper, solAmount })
