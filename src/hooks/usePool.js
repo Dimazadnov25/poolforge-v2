@@ -214,6 +214,7 @@ export function usePool() {
       setTxStatus('confirmed')
       await refreshBalances()
       await loadPositions()
+      setTimeout(() => loadPositions(), 3000)
     } catch (e) {
       setError(e.message)
       setTxStatus(null)
