@@ -44,8 +44,8 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
         <span className="label">Min Price</span><span className="value" style={{color:'#06b6d4'}}>${details.priceLower.toFixed(2)}</span>
         <span className="label">Max Price</span><span className="value" style={{color:'#06b6d4'}}>${details.priceUpper.toFixed(2)}</span>
         <span className="label">Current Price</span><span className="value" style={{color:'var(--green)'}}>${poolState?.currentPrice?.toFixed(2) || '-'}</span>
-        <span className="label">Position Value</span><span className="value" style={{color:'var(--green)'}}>${positionValueUSD.toFixed(2)} USD</span>
-        <span className="label">Earned</span><span className="value" style={{color:'var(--green)'}}>${earnedUSD.toFixed(4)} USD</span>
+        <span className="label">Position Value</span><span className="value" style={{color:'var(--green)'}}>${positionValueUSD.toFixed(2)}</span>
+        <span className="label">Earned</span><span className="value" style={{color:'var(--green)'}}>${earnedUSD.toFixed(4)}</span>
       </div>
       <div>
         <button className="btn btn-blue" onClick={() => { const amt = prompt('SOL amount to add:'); if (amt && onAddLiquidity) onAddLiquidity(position.mint, parseFloat(amt)) }}>Add Liquidity</button>
