@@ -156,8 +156,8 @@ export function usePool() {
       const sqrtPl = Math.sqrt(priceLower * decAdj)
       const sqrtPu = Math.sqrt(priceUpper * decAdj)
       const liquidityAmount = Math.floor(lamports * sqrtP * sqrtPu / (sqrtPu - sqrtP))
-      const usdcRaw = Math.floor(liquidityAmount * (sqrtP - sqrtPl) * 1e6)
-      const usdcNeeded = usdcRaw / 1e6
+      const usdcRaw = Math.floor(liquidityAmount * (sqrtP - sqrtPl) / 1e6)
+      const usdcNeeded = usdcRaw
       await checkAndSwapUsdc(usdcNeeded)
       const openDisc = Buffer.from([135, 128, 47, 77, 15, 152, 240, 49])
       const openData = Buffer.alloc(17)
