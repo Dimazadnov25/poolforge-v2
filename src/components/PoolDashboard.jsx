@@ -47,7 +47,7 @@ export default function PoolDashboard() {
         </div>
       )}
 
-      {pool.poolState && <PoolStats pool={pool.poolState} />}
+      
 
       {wallet.connected && (
         <div className="balances">
