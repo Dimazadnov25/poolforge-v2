@@ -423,7 +423,7 @@ export function usePool() {
       ], data: disc }))
       setTxStatus('signing')
       const signed = await wallet.signTransaction(tx)
-      const sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: false })
+      const sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true })
       await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, 'confirmed')
       setTxStatus('confirmed')
       setPositions(prev => prev.filter(p => p.mint !== mintAddress))
