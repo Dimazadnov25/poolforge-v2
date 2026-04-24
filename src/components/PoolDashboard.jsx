@@ -74,6 +74,7 @@ export default function PoolDashboard() {
                   onCollect={pool.collectFees}
                   onAddLiquidity={pool.addLiquidity}
                   onRebalance={pool.rebalancePosition}
+                  onUpdateFees={pool.updateFees}
                   onUpdate={handlePositionUpdate}
                 />
               ))}
