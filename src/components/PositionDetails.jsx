@@ -59,7 +59,9 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
         <button className="btn btn-blue" onClick={() => { const amt = prompt('SOL amount to add:'); if (amt && onAddLiquidity) onAddLiquidity(position.mint, parseFloat(amt)) }}>Add Liquidity</button>
         <button className="btn btn-green" onClick={() => onCollect && onCollect(position.mint)}>Collect Fees</button>
         <button className="btn btn-blue" onClick={handleRefreshFees} disabled={refreshing}>{refreshing ? 'Refreshing...' : 'Refresh Fees'}</button>
-        <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint)}>Rebalance 3%</button>
+        <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.03)}>Rebalance 3%</button>
+        <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.02)}>Rebalance 2%</button>
+        <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.01)}>Rebalance 1%</button>
         <button className="btn btn-red" onClick={() => onClose && onClose(position.mint)}>Close Position</button>
       </div>
     </div>
