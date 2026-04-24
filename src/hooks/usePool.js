@@ -285,8 +285,9 @@ const updateFees = useCallback(async (mintAddress) => {
       if (!posInfo) return
       const tickLower = posInfo.data.readInt32LE(88)
       const tickUpper = posInfo.data.readInt32LE(92)
-      const tl = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLower, poolState.tickSpacing))
-      const tu = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpper, poolState.tickSpacing))
+      const tickSpacing = poolState?.tickSpacing || 4
+      const tl = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLower, tickSpacing))
+      const tu = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpper, tickSpacing))
       const disc = Buffer.from([154, 230, 250, 13, 236, 209, 75, 223])
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
       const tx = new Transaction({ recentBlockhash: blockhash, feePayer: wallet.publicKey })
