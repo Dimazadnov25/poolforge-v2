@@ -2,6 +2,7 @@
 
 export default function PositionDetails({ position, poolState, fetchPosition, onClose, onCollect, onAddLiquidity, onRebalance, onUpdate, onUpdateFees }) {
   const [details, setDetails] = useState(null)
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     if (position?.mint) {
@@ -23,6 +24,13 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
   const earnedUSDC = parseFloat(details.feeOwedB || 0) / 1e6
   const earnedUSD = earnedSOL * (poolState?.currentPrice || 0) + earnedUSDC
 
+  const handleRefreshFees = async () => {
+    if (!onUpdateFees) return
+    setRefreshing(true)
+    await onUpdateFees(position.mint)
+    setRefreshing(false)
+  }
+
   return (
     <div className="position-card">
       <div className="position-header">
@@ -43,7 +51,7 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
       <div>
         <button className="btn btn-blue" onClick={() => { const amt = prompt('SOL amount to add:'); if (amt && onAddLiquidity) onAddLiquidity(position.mint, parseFloat(amt)) }}>Add Liquidity</button>
         <button className="btn btn-green" onClick={() => onCollect && onCollect(position.mint)}>Collect Fees</button>
-        <button className="btn btn-blue" onClick={async () => { if (onUpdateFees) { const btn=document.activeElement; btn.textContent="Refreshing..."; btn.disabled=true; await onUpdateFees(position.mint); btn.textContent="Refresh Fees"; btn.disabled=false; } }}>Refresh Fees</button>
+        <button className="btn btn-blue" onClick={handleRefreshFees} disabled={refreshing}>{refreshing ? 'Refreshing...' : 'Refresh Fees'}</button>
         <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint)}>Rebalance 3%</button>
         <button className="btn btn-red" onClick={() => onClose && onClose(position.mint)}>Close Position</button>
       </div>
