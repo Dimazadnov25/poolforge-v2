@@ -28,6 +28,7 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
     if (!onUpdateFees) return
     setRefreshing(true)
     await onUpdateFees(position.mint)
+    await new Promise(r => setTimeout(r, 3000))
     const updated = await fetchPosition(position.mint)
     if (updated) { setDetails(updated); if (onUpdate) onUpdate(position.mint, updated) }
     setRefreshing(false)
