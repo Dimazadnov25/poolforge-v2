@@ -127,9 +127,9 @@ export function usePool() {
     if (!wallet?.publicKey || !connection) return
     try {
       const amountIn = Math.floor((usdcNeeded + 1) * 1e6)
-      const quoteResp = await fetch(`https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=${amountIn}&slippageBps=100`)
+      const quoteResp = await fetch(`https://lite.jup.ag/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=${amountIn}&slippageBps=100`)
       const quote = await quoteResp.json()
-      const swapResp = await fetch('https://quote-api.jup.ag/v6/swap', {
+      const swapResp = await fetch('https://lite.jup.ag/v1/swap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quoteResponse: quote, userPublicKey: wallet.publicKey.toBase58(), wrapAndUnwrapSol: true })
