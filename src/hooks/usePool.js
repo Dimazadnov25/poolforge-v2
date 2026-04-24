@@ -76,7 +76,7 @@ export function usePool() {
         const poolAddr = new PublicKey(info.data.slice(8, 40))
         if (poolAddr.toBase58() !== SOL_USDC_WHIRLPOOL.toBase58()) continue
         const liq = info.data.readBigUInt64LE(72)
-        if (liq === 0n) continue
+        // if (liq === 0n) continue
         result.push({ mint: mint.toBase58(), pda: pda.toBase58() })
       }
       setPositions(result)
