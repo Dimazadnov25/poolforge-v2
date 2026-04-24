@@ -269,8 +269,10 @@ export function usePool() {
       const usdcInfo2 = await connection.getParsedAccountInfo(usdcATA2)
       const usdcHave = usdcInfo2?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
       if (usdcHave < usdcNeeded * 0.95) {
-        await swapSolToUsdc(usdcNeeded - usdcHave + 1)
-        await new Promise(r => setTimeout(r, 2000))
+      if (usdcHave < usdcNeeded * 0.95) {
+        const needed = (usdcNeeded - usdcHave + 1).toFixed(2)
+        window.open('https://jup.ag/swap/SOL-USDC?amount=' + needed, '_blank')
+        throw new Error('Not enough USDC. Need ' + needed + ' USDC. Swap on Jupiter and try again.')
       }
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
       const tx = new Transaction({ recentBlockhash: blockhash, feePayer: wallet.publicKey })
