@@ -357,7 +357,7 @@ const updateFees = useCallback(async (mintAddress) => {
       ], data: Buffer.from([9]) }))
       setTxStatus('signing')
       const signed = await wallet.signTransaction(tx)
-      const sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true })
+      const sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: false })
       await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, 'confirmed')
       setTxStatus('confirmed')
       await refreshBalances()
