@@ -279,7 +279,6 @@ export function usePool() {
 const updateFees = useCallback(async (mintAddress) => {
     if (!wallet?.publicKey || !connection) return
     try {
-      setLoading(true)
       const mint = new PublicKey(mintAddress)
       const pda = getPositionPDA(mint)
       const posInfo = await connection.getAccountInfo(pda)
