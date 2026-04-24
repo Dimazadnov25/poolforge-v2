@@ -294,6 +294,17 @@ export function usePool() {
       data.writeUInt8(0, 8)
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
       const tx = new Transaction({ recentBlockhash: blockhash, feePayer: wallet.publicKey })
+      const wsolExists = await connection.getAccountInfo(tokenOwnerA)
+      if (!wsolExists) {
+        tx.add({ programId: ASSOC_PROGRAM, keys: [
+          { pubkey: wallet.publicKey, isSigner: true, isWritable: true },
+          { pubkey: tokenOwnerA, isSigner: false, isWritable: true },
+          { pubkey: wallet.publicKey, isSigner: false, isWritable: false },
+          { pubkey: WSOL, isSigner: false, isWritable: false },
+          { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+          { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
+        ], data: Buffer.from([]) })
+      }
       tx.add(new TransactionInstruction({ programId: WHIRLPOOL_PROGRAM, keys: [
         { pubkey: SOL_USDC_WHIRLPOOL, isSigner: false, isWritable: true },
         { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
