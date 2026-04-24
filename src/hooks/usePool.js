@@ -198,9 +198,9 @@ export function usePool() {
           { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
         ], data: Buffer.from([]) })
       }
-      tx2.add(SystemProgram.transfer({ fromPubkey: wallet.publicKey, toPubkey: tokenOwnerA, lamports: Math.floor(lamports * 1.2) }))
+      tx2.add(SystemProgram.transfer({ fromPubkey: wallet.publicKey, toPubkey: tokenOwnerA, lamports: Math.floor(lamports * 1.05) }))
       tx2.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [{ pubkey: tokenOwnerA, isSigner: false, isWritable: true }], data: Buffer.from([17]) }))
-      tx2.add(buildIncreaseLiquidityIx(wallet.publicKey, positionPDA, positionTokenAccount, SOL_USDC_WHIRLPOOL, tokenOwnerA, tokenOwnerB, VAULT_A, VAULT_B, tickArrayLower, tickArrayUpper, liquidityAmount, Math.floor(lamports * 1.2), Math.floor(usdcRaw * 1.2)))
+      tx2.add(buildIncreaseLiquidityIx(wallet.publicKey, positionPDA, positionTokenAccount, SOL_USDC_WHIRLPOOL, tokenOwnerA, tokenOwnerB, VAULT_A, VAULT_B, tickArrayLower, tickArrayUpper, liquidityAmount, Math.floor(lamports * 1.05), Math.floor(usdcRaw * 1.05)))
       tx2.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [
         { pubkey: tokenOwnerA, isSigner: false, isWritable: true },
         { pubkey: wallet.publicKey, isSigner: false, isWritable: true },
@@ -258,9 +258,9 @@ export function usePool() {
           { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
         ], data: Buffer.from([]) })
       }
-      tx.add(SystemProgram.transfer({ fromPubkey: wallet.publicKey, toPubkey: tokenOwnerA, lamports: Math.floor(lamports * 1.2) }))
+      tx.add(SystemProgram.transfer({ fromPubkey: wallet.publicKey, toPubkey: tokenOwnerA, lamports: Math.floor(lamports * 1.05) }))
       tx.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [{ pubkey: tokenOwnerA, isSigner: false, isWritable: true }], data: Buffer.from([17]) }))
-      tx.add(buildIncreaseLiquidityIx(wallet.publicKey, positionPDA, positionTokenAccount, SOL_USDC_WHIRLPOOL, tokenOwnerA, tokenOwnerB, VAULT_A, VAULT_B, tickArrayLower, tickArrayUpper, liquidityAmount, Math.floor(lamports * 1.2), Math.floor(usdcRaw * 1.2)))
+      tx.add(buildIncreaseLiquidityIx(wallet.publicKey, positionPDA, positionTokenAccount, SOL_USDC_WHIRLPOOL, tokenOwnerA, tokenOwnerB, VAULT_A, VAULT_B, tickArrayLower, tickArrayUpper, liquidityAmount, Math.floor(lamports * 1.05), Math.floor(usdcRaw * 1.05)))
       tx.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [
         { pubkey: tokenOwnerA, isSigner: false, isWritable: true },
         { pubkey: wallet.publicKey, isSigner: false, isWritable: true },
