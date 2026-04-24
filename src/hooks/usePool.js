@@ -496,6 +496,6 @@ const updateFees = useCallback(async (mintAddress) => {
     positions, loading, error, txStatus,
     openPosition, addLiquidity, collectFees,
     decreaseLiquidity, closePosition, rebalancePosition,
-    fetchPosition, loadPositions, refreshBalances,
+    fetchPosition, loadPositions, refreshBalances, updateFees,
   }
 }
