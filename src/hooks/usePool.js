@@ -123,28 +123,16 @@ export function usePool() {
     } catch (e) { return null }
   }, [connection, poolState])
 
-  const swapSolToUsdc = useCallback(async (usdcNeeded) => {
-    if (!wallet?.publicKey || !connection) return
-    try {
-      const amountIn = Math.floor((usdcNeeded + 1) * 1e6)
-      const quoteResp = await fetch(`https://lite.jup.ag/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=${amountIn}&slippageBps=100`)
-      const quote = await quoteResp.json()
-      const swapResp = await fetch('https://lite.jup.ag/v1/swap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quoteResponse: quote, userPublicKey: wallet.publicKey.toBase58(), wrapAndUnwrapSol: true })
-      })
-      const { swapTransaction } = await swapResp.json()
-      const { VersionedTransaction } = await import('@solana/web3.js')
-      const tx = VersionedTransaction.deserialize(Buffer.from(swapTransaction, 'base64'))
-      setTxStatus('signing')
-      const signed = await wallet.signTransaction(tx)
-      setTxStatus('sending')
-      const sig = await connection.sendRawTransaction(signed.serialize())
-      const latest = await connection.getLatestBlockhash()
-      await connection.confirmTransaction({ signature: sig, blockhash: latest.blockhash, lastValidBlockHeight: latest.lastValidBlockHeight }, 'confirmed')
-    } catch (e) { throw new Error('Swap failed: ' + e.message) }
-  }, [wallet, connection, poolState])
+  const checkAndSwapUsdc = useCallback(async (usdcNeeded) => {
+    const usdcATA = await getATA(USDC_MINT, wallet.publicKey)
+    const usdcInfo = await connection.getParsedAccountInfo(usdcATA)
+    const usdcHave = usdcInfo?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
+    if (usdcHave < usdcNeeded * 0.95) {
+      const needed = (usdcNeeded - usdcHave + 1).toFixed(2)
+      window.open('https://jup.ag/swap/SOL-USDC?amount=' + needed, '_blank')
+      throw new Error('Not enough USDC. Need ' + needed + ' USDC. Swap on Jupiter and try again.')
+    }
+  }, [wallet, connection])
 
   const openPosition = useCallback(async ({ priceLower, priceUpper, solAmount }) => {
     if (!wallet?.publicKey || !connection) return
@@ -163,24 +151,14 @@ export function usePool() {
       const tickArrayLower = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLower, poolState.tickSpacing))
       const tickArrayUpper = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpper, poolState.tickSpacing))
       const lamports = Math.floor(solAmount * 1e9)
-      const sqrtPcheck = Math.sqrt(poolState.currentPrice * 1e-3)
-      const sqrtPlcheck = Math.sqrt(priceLower * 1e-3)
-      const sqrtPucheck = Math.sqrt(priceUpper * 1e-3)
-      const liqCheck = Math.floor(lamports * sqrtPcheck * sqrtPucheck / (sqrtPucheck - sqrtPcheck))
-      const usdcNeeded = liqCheck * (sqrtPcheck - sqrtPlcheck) / 1e6
-      const usdcATA2 = await getATA(USDC_MINT, wallet.publicKey)
-      const usdcInfo2 = await connection.getParsedAccountInfo(usdcATA2)
-      const usdcHave = usdcInfo2?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
-      if (usdcHave < usdcNeeded * 0.95) {
-        await swapSolToUsdc(usdcNeeded - usdcHave + 1)
-        await new Promise(r => setTimeout(r, 2000))
-      }
       const decAdj = 1e-3
       const sqrtP = Math.sqrt(poolState.currentPrice * decAdj)
       const sqrtPl = Math.sqrt(priceLower * decAdj)
       const sqrtPu = Math.sqrt(priceUpper * decAdj)
       const liquidityAmount = Math.floor(lamports * sqrtP * sqrtPu / (sqrtPu - sqrtP))
       const usdcRaw = Math.floor(liquidityAmount * (sqrtP - sqrtPl) * 1e6)
+      const usdcNeeded = usdcRaw / 1e6
+      await checkAndSwapUsdc(usdcNeeded)
       const openDisc = Buffer.from([135, 128, 47, 77, 15, 152, 240, 49])
       const openData = Buffer.alloc(17)
       openDisc.copy(openData, 0)
@@ -242,7 +220,7 @@ export function usePool() {
     } finally {
       setLoading(false)
     }
-  }, [wallet, connection, poolState, refreshBalances, loadPositions, swapSolToUsdc])
+  }, [wallet, connection, poolState, refreshBalances, loadPositions, checkAndSwapUsdc])
 
   const addLiquidity = useCallback(async (mintAddress, solAmount) => {
     if (!wallet?.publicKey || !connection) return
@@ -265,15 +243,7 @@ export function usePool() {
       const liquidityAmount = Math.floor(lamports * sqrtP * sqrtPu / (sqrtPu - sqrtP))
       const usdcRaw = Math.floor(liquidityAmount * (sqrtP - sqrtPl) * 1e6)
       const usdcNeeded = usdcRaw / 1e6
-      const usdcATA2 = await getATA(USDC_MINT, wallet.publicKey)
-      const usdcInfo2 = await connection.getParsedAccountInfo(usdcATA2)
-      const usdcHave = usdcInfo2?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
-      if (usdcHave < usdcNeeded * 0.95) {
-      if (usdcHave < usdcNeeded * 0.95) {
-        const needed = (usdcNeeded - usdcHave + 1).toFixed(2)
-        window.open('https://jup.ag/swap/SOL-USDC?amount=' + needed, '_blank')
-        throw new Error('Not enough USDC. Need ' + needed + ' USDC. Swap on Jupiter and try again.')
-      }
+      await checkAndSwapUsdc(usdcNeeded)
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
       const tx = new Transaction({ recentBlockhash: blockhash, feePayer: wallet.publicKey })
       const wsolInfo = await connection.getAccountInfo(tokenOwnerA)
@@ -306,7 +276,7 @@ export function usePool() {
     } finally {
       setLoading(false)
     }
-  }, [wallet, connection, poolState, refreshBalances, swapSolToUsdc])
+  }, [wallet, connection, poolState, refreshBalances, checkAndSwapUsdc])
 
   const collectFees = useCallback(async (mintAddress) => {
     if (!wallet?.publicKey || !connection) return
