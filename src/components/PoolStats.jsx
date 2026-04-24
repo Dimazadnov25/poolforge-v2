@@ -1,14 +1,10 @@
 export default function PoolStats({ pool }) {
   if (!pool) return null
   return (
-    <div className="pool-stats" style={{gridTemplateColumns:'1fr 1fr'}}>
+    <div className="pool-stats" style={{gridTemplateColumns:'1fr'}}>
       <div className="stat-card">
         <div className="stat-label">Price</div>
         <div className="stat-value">${pool.currentPrice?.toFixed(4)}</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-label">Fee Rate</div>
-        <div className="stat-value">{(pool.feeRate * 100).toFixed(2)}%</div>
       </div>
     </div>
   )
