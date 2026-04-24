@@ -278,7 +278,39 @@ export function usePool() {
       setLoading(false)
     }
   }, [wallet, connection, poolState, refreshBalances, checkAndSwapUsdc])
-
+const updateFees = useCallback(async (mintAddress) => {
+    if (!wallet?.publicKey || !connection) return
+    try {
+      setLoading(true)
+      const mint = new PublicKey(mintAddress)
+      const pda = getPositionPDA(mint)
+      const posInfo = await connection.getAccountInfo(pda)
+      if (!posInfo) return
+      const tickLower = posInfo.data.readInt32LE(88)
+      const tickUpper = posInfo.data.readInt32LE(92)
+      const tl = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLower, poolState.tickSpacing))
+      const tu = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpper, poolState.tickSpacing))
+      const disc = Buffer.from([154, 230, 250, 13, 236, 209, 75, 223])
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
+      const tx = new Transaction({ recentBlockhash: blockhash, feePayer: wallet.publicKey })
+      tx.add(new TransactionInstruction({ programId: WHIRLPOOL_PROGRAM, keys: [
+        { pubkey: SOL_USDC_WHIRLPOOL, isSigner: false, isWritable: true },
+        { pubkey: pda, isSigner: false, isWritable: true },
+        { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
+        { pubkey: tl, isSigner: false, isWritable: false },
+        { pubkey: tu, isSigner: false, isWritable: false },
+      ], data: disc }))
+      setTxStatus('signing')
+      const signed = await wallet.signTransaction(tx)
+      const sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: true })
+      await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, 'confirmed')
+      setTxStatus('confirmed')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [wallet, connection, poolState])
   const collectFees = useCallback(async (mintAddress) => {
     if (!wallet?.publicKey || !connection) return
     try {
