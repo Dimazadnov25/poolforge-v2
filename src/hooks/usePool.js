@@ -79,7 +79,10 @@ export function usePool() {
       })
       const result = []
       for (const n of nfts) {
-        const mint = new PublicKey(n.account.data.parsed.info.mint)
+        const rawData = n.account.data
+        const mintBytes = rawData.slice(0, 32)
+        const mint = new PublicKey(mintBytes)
+        console.log('checking mint:', mint.toBase58().slice(0,8))
         const pda = getPositionPDA(mint)
         const info = await connection.getAccountInfo(pda)
         if (!info || info.owner.toBase58() !== WHIRLPOOL_PROGRAM.toBase58()) continue
