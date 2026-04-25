@@ -5,6 +5,7 @@ import { usePool } from '../hooks/usePool'
 import PoolStats from './PoolStats'
 import PositionDetails from './PositionDetails'
 import OpenPositionForm from './OpenPositionForm'
+import StakeDashboard from './StakeDashboard'
 
 export default function PoolDashboard() {
   const wallet = useWallet()
@@ -80,6 +81,7 @@ export default function PoolDashboard() {
               ))}
             </div>
           )}
+          <StakeDashboard solPrice={pool.solPrice} />
           <OpenPositionForm
             pool={pool.poolState}
             solPrice={pool.solPrice}
