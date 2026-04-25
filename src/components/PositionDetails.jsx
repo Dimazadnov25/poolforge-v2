@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from 'react'
 
-export default function PositionDetails({ position, poolState, fetchPosition, onClose, onCollect, onAddLiquidity, onRebalance, onUpdate, onUpdateFees }) {
+export default function PositionDetails({ position, poolState, solBalance, fetchPosition, onClose, onCollect, onAddLiquidity, onRebalance, onUpdate, onUpdateFees }) {
   const [details, setDetails] = useState(null)
   const [addAmount, setAddAmount] = useState('')
   const [refreshing, setRefreshing] = useState(false)
@@ -56,6 +56,7 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
       </div>
       <div>
         <div style={{display:'flex',gap:'0.5rem',marginBottom:'0.5rem'}}><button onClick={()=>{const max=Math.max(0,(pool?.solBalance||0)-0.01);setAddAmount(max.toFixed(4))}} style={{padding:"0.2rem 0.4rem",borderRadius:"6px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",cursor:"pointer",fontSize:"0.7rem"}}>MAX</button>
+          <button onClick={()=>setAddAmount(Math.max(0,(solBalance||0)-0.01).toFixed(4))} style={{padding:"0.2rem 0.4rem",borderRadius:"6px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",cursor:"pointer",fontSize:"0.7rem",marginBottom:"0.25rem"}}>MAX</button>
           <input type="number" value={addAmount} onChange={e=>setAddAmount(e.target.value)} placeholder="SOL" style={{width:'80px',padding:'0.3rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)'}}/><button className="btn btn-blue" onClick={() => { if (addAmount && onAddLiquidity) { onAddLiquidity(position.mint, parseFloat(addAmount)); setAddAmount('') } }}>Add Liquidity</button></div>
         <button className="btn btn-green" onClick={() => onCollect && onCollect(position.mint)}>Collect Fees</button>
         <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.03)}>Rebalance 3%</button>
