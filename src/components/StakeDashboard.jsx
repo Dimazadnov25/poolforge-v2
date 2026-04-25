@@ -6,10 +6,9 @@ const JUPSOL_MINT = 'jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v'
 const JUPSOL_APY = 6.4
 
 async function getATA(mint, owner) {
-  const { PublicKey: PK } = await import('@solana/web3.js')
-  const ASSOC = new PK('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
-  const TOKEN = new PK('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
-  const [ata] = PK.findProgramAddressSync(
+  const ASSOC = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
+  const TOKEN = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
+  const [ata] = PublicKey.findProgramAddressSync(
     [owner.toBuffer(), TOKEN.toBuffer(), mint.toBuffer()],
     ASSOC
   )
@@ -54,23 +53,34 @@ export default function StakeDashboard({ solPrice }) {
     return () => clearInterval(interval)
   }, [wallet?.publicKey, connection])
 
-  const handleStake = async () => {
-    if (!solAmount) return
-    const amountLamports = Math.floor(parseFloat(solAmount) * 1e9)
-    window.open(
-      `https://jup.ag/swap/SOL-jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v?inAmount=${amountLamports}`,
-      '_blank'
-    )
+  const doSwap = async (inputMint, outputMint) => {
+    if (!solAmount || !wallet?.publicKey) return
+    try {
+      setLoading(true)
+      const amountLamports = Math.floor(parseFloat(solAmount) * 1e9)
+      const resp = await fetch('/api/jupiter-stake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputMint, outputMint, amount: amountLamports, userPublicKey: wallet.publicKey.toBase58() })
+      })
+      const data = await resp.json()
+      if (data.error) throw new Error(data.error)
+      const { VersionedTransaction } = await import('@solana/web3.js')
+      const tx = VersionedTransaction.deserialize(Buffer.from(data.swapTransaction, 'base64'))
+      const signed = await wallet.signTransaction(tx)
+      const sig = await connection.sendRawTransaction(signed.serialize())
+      const latest = await connection.getLatestBlockhash()
+      await connection.confirmTransaction({ signature: sig, blockhash: latest.blockhash, lastValidBlockHeight: latest.lastValidBlockHeight }, 'confirmed')
+      setSolAmount('')
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleUnstake = async () => {
-    if (!solAmount) return
-    const amountLamports = Math.floor(parseFloat(solAmount) * 1e9)
-    window.open(
-      `https://jup.ag/swap/jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v-SOL?inAmount=${amountLamports}`,
-      '_blank'
-    )
-  }
+  const handleStake = () => doSwap('So11111111111111111111111111111111111111112', 'jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v')
+  const handleUnstake = () => doSwap('jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v', 'So11111111111111111111111111111111111111112')
 
   const jupsolValueUSD = jupsolBalance && jupsolPrice ? jupsolBalance * jupsolPrice : 0
   const yearlyYield = jupsolValueUSD * (JUPSOL_APY / 100)
@@ -78,7 +88,6 @@ export default function StakeDashboard({ solPrice }) {
   return (
     <div className="card" style={{marginTop:'1rem'}}>
       <h3 style={{marginBottom:'1rem', color:'var(--text)'}}>SOL Staking</h3>
-
       <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1rem', background:'var(--surface)', borderRadius:'12px', padding:'1rem'}}>
         <div>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>jupSOL Balance</div>
@@ -91,13 +100,11 @@ export default function StakeDashboard({ solPrice }) {
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>~${yearlyYield.toFixed(2)}/year</div>
         </div>
       </div>
-
       {jupsolPrice && (
         <div style={{marginBottom:'1rem', color:'var(--muted)', fontSize:'0.8rem', textAlign:'center'}}>
           1 jupSOL = ${jupsolPrice.toFixed(4)}
         </div>
       )}
-
       <div style={{marginBottom:'1rem'}}>
         <div style={{color:'var(--muted)', fontSize:'0.75rem', marginBottom:'0.25rem'}}>SOL Amount</div>
         <input
@@ -108,18 +115,16 @@ export default function StakeDashboard({ solPrice }) {
           style={{width:'100%', padding:'0.5rem', borderRadius:'8px', border:'1px solid var(--border)', background:'var(--surface)', color:'var(--text)', fontSize:'1rem'}}
         />
       </div>
-
       <div style={{display:'flex', gap:'0.5rem'}}>
-        <button className="btn btn-blue" onClick={handleStake} style={{flex:1}} disabled={!solAmount}>
-          SOL → jupSOL
+        <button className="btn btn-blue" onClick={handleStake} style={{flex:1}} disabled={loading || !solAmount}>
+          {loading ? '...' : 'SOL → jupSOL'}
         </button>
-        <button className="btn btn-secondary" onClick={handleUnstake} style={{flex:1}} disabled={!solAmount}>
-          jupSOL → SOL
+        <button className="btn btn-secondary" onClick={handleUnstake} style={{flex:1}} disabled={loading || !solAmount}>
+          {loading ? '...' : 'jupSOL → SOL'}
         </button>
       </div>
-
       <div style={{marginTop:'0.75rem', color:'var(--muted)', fontSize:'0.7rem', textAlign:'center'}}>
-        Swap via Jupiter • Kein Private Key • Alles über Phantom
+        Kein Private Key • Alles über Phantom
       </div>
     </div>
   )
