@@ -430,6 +430,7 @@ export function usePool() {
   }, [wallet, connection, poolState, refreshBalances, loadPositions])
 
   const addLiquidity = useCallback(async (mintAddress, solAmount) => {
+    alert('addLiquidity called: ' + mintAddress + ' ' + solAmount)
     if (!wallet?.publicKey || !connection) return
     try {
       setLoading(true)
