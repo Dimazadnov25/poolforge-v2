@@ -46,8 +46,7 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
           <div style={{color:'var(--green)', fontWeight:'bold', fontSize:'2rem'}}>${positionValueUSD.toFixed(2)}</div>
         </div>
         <div style={{textAlign:'right'}}>
-          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>Earned</div>
-          <div style={{color:'var(--green)', fontWeight:'bold', fontSize:'2rem'}}>${earnedUSD.toFixed(4)}</div>
+          
         </div>
       </div>
       <div className="position-grid">
