@@ -69,7 +69,10 @@ export function usePool() {
       const nfts = tokens.value.filter(a => {
         try {
           const data = a.account.data
-          if (Buffer.isBuffer(data)) return data.readBigUInt64LE(64) === 1n
+          if (data instanceof Uint8Array || Buffer.isBuffer(data)) {
+            const view = new DataView(data.buffer, data.byteOffset, data.byteLength)
+            return view.getBigUint64(64, true) === 1n
+          }
           return data.parsed?.info?.tokenAmount?.amount === '1'
         } catch(e) { return false }
       })
