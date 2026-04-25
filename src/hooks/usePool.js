@@ -229,7 +229,9 @@ export function usePool() {
       setTxStatus('confirmed')
       await refreshBalances()
     } catch (e) {
+      console.error('addLiquidity error:', e)
       setError(e.message)
+      alert('Error: ' + e.message)
     } finally {
       setLoading(false)
     }
