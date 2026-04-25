@@ -63,10 +63,7 @@ export function usePool() {
   const loadPositions = useCallback(async () => {
     if (!wallet?.publicKey || !connection) return
     try {
-      console.log('loadPositions START', wallet.publicKey.toBase58())
-      const tokens = await connection.getTokenAccountsByOwner(wallet.publicKey, { programId: TOKEN_PROGRAM })
-      console.log('tokens found:', tokens.value.length)
-      tokens.value.forEach((a,i)=>{const d=a.account.data;const view=new DataView(d.buffer,d.byteOffset,d.byteLength);const amt=view.getBigUint64(64,true);console.log('token',i,'amount:',amt.toString())})
+            const tokens = await connection.getTokenAccountsByOwner(wallet.publicKey, { programId: TOKEN_PROGRAM })
       const nfts = tokens.value.filter(a => {
         try {
           const data = a.account.data
@@ -82,7 +79,6 @@ export function usePool() {
         const rawData = n.account.data
         const mintBytes = rawData.slice(0, 32)
         const mint = new PublicKey(mintBytes)
-        console.log('checking mint:', mint.toBase58().slice(0,8))
         const pda = getPositionPDA(mint)
         const info = await connection.getAccountInfo(pda)
         if (!info || info.owner.toBase58() !== WHIRLPOOL_PROGRAM.toBase58()) continue
@@ -92,7 +88,6 @@ export function usePool() {
         if (liq === 0n) continue
         result.push({ mint: mint.toBase58(), pda: pda.toBase58() })
       }
-      console.log('positions found:', result.length)
       setPositions(result)
     } catch (e) {}
   }, [wallet, connection])
