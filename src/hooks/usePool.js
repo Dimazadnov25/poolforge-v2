@@ -66,7 +66,7 @@ export function usePool() {
       console.log('loadPositions START', wallet.publicKey.toBase58())
       const tokens = await connection.getTokenAccountsByOwner(wallet.publicKey, { programId: TOKEN_PROGRAM })
       console.log('tokens found:', tokens.value.length)
-      if(tokens.value.length>0){const d=tokens.value[0].account.data;console.log('data type:',typeof d, d?.constructor?.name, d instanceof Uint8Array)}
+      tokens.value.forEach((a,i)=>{const d=a.account.data;const view=new DataView(d.buffer,d.byteOffset,d.byteLength);const amt=view.getBigUint64(64,true);console.log('token',i,'amount:',amt.toString())})
       const nfts = tokens.value.filter(a => {
         try {
           const data = a.account.data
