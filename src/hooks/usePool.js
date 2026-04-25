@@ -318,8 +318,21 @@ const updateFees = useCallback(async (mintAddress) => {
       const tokenOwnerA = await getATA(WSOL, wallet.publicKey)
       const tokenOwnerB = await getATA(USDC_MINT, wallet.publicKey)
       const disc = Buffer.from([207,117,95,191,229,180,226,15,0])
+      const posInfoU = await connection.getAccountInfo(positionPDA)
+      const tickLowerU = posInfoU.data.readInt32LE(88)
+      const tickUpperU = posInfoU.data.readInt32LE(92)
+      const tsU = poolState?.tickSpacing || 4
+      const tlU = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLowerU, tsU))
+      const tuU = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpperU, tsU))
+      const updateDisc = Buffer.from([154, 230, 250, 13, 236, 209, 75, 223])
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
       const tx = new Transaction({ recentBlockhash: blockhash, feePayer: wallet.publicKey })
+      tx.add(new TransactionInstruction({ programId: WHIRLPOOL_PROGRAM, keys: [
+        { pubkey: SOL_USDC_WHIRLPOOL, isSigner: false, isWritable: true },
+        { pubkey: positionPDA, isSigner: false, isWritable: true },
+        { pubkey: tlU, isSigner: false, isWritable: false },
+        { pubkey: tuU, isSigner: false, isWritable: false },
+      ], data: updateDisc }))
       const wsolInfo = await connection.getAccountInfo(tokenOwnerA)
       if (!wsolInfo) {
         tx.add({ programId: ASSOC_PROGRAM, keys: [
