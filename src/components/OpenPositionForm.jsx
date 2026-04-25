@@ -19,7 +19,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
       <div style={{marginBottom:'1rem'}}>
         <div style={{color:'var(--muted)', fontSize:'0.75rem', marginBottom:'0.5rem'}}>Range Width</div>
         <div style={{display:'flex', gap:'0.5rem'}}>
-          {[1,2,3,5].map(r => (
+          {[0.5,1,2,3,5].map(r => (
             <button
               key={r}
               className={'btn ' + (range === r ? 'btn-blue' : 'btn-secondary')}
