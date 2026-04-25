@@ -44,7 +44,7 @@ export default function PoolDashboard() {
       {pool.solPrice && (
         <div className="price-ticker">
           SOL <strong style={{color:'#06b6d4', fontSize:'2rem'}}>${pool.solPrice.toFixed(2)}</strong>
-          <span className="fee-badge">0.05% fee tier</span>
+          
         </div>
       )}
 
