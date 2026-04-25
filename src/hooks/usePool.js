@@ -294,7 +294,6 @@ const updateFees = useCallback(async (mintAddress) => {
       tx.add(new TransactionInstruction({ programId: WHIRLPOOL_PROGRAM, keys: [
         { pubkey: SOL_USDC_WHIRLPOOL, isSigner: false, isWritable: true },
         { pubkey: pda, isSigner: false, isWritable: true },
-        { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
         { pubkey: tl, isSigner: false, isWritable: false },
         { pubkey: tu, isSigner: false, isWritable: false },
       ], data: disc }))
