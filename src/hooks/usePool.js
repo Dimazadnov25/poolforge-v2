@@ -63,7 +63,9 @@ export function usePool() {
   const loadPositions = useCallback(async () => {
     if (!wallet?.publicKey || !connection) return
     try {
+      console.log('loadPositions START', wallet.publicKey.toBase58())
       const tokens = await connection.getTokenAccountsByOwner(wallet.publicKey, { programId: TOKEN_PROGRAM })
+      console.log('tokens found:', tokens.value.length)
       const nfts = tokens.value.filter(a => {
         try {
           const data = a.account.data
@@ -83,6 +85,7 @@ export function usePool() {
         if (liq === 0n) continue
         result.push({ mint: mint.toBase58(), pda: pda.toBase58() })
       }
+      console.log('positions found:', result.length)
       setPositions(result)
     } catch (e) {}
   }, [wallet, connection])
