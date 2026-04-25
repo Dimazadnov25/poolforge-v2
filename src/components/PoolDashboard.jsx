@@ -82,7 +82,7 @@ export default function PoolDashboard() {
             </div>
           )}
           <StakeDashboard solPrice={pool.solPrice} />
-          <button className="btn btn-green" style={{width:"100%",marginBottom:"1rem",fontSize:"1.1rem",padding:"0.75rem"}} onClick={async () => { for(const p of pool.positions){ await pool.updateFees(p.mint); await new Promise(r=>setTimeout(r,3000)); const d=await pool.fetchPosition(p.mint); if(d){ const sol=(parseFloat(d.feeOwedA||0)/1e9).toFixed(6); const usdc=(parseFloat(d.feeOwedB||0)/1e6).toFixed(4); if(confirm("Collect fees?\nSOL: "+sol+"\nUSDC: "+usdc)){ await pool.collectFees(p.mint) } } } }} disabled={pool.loading || pool.positions.length===0}>🌾 HARVEST ALL FEES</button>
+          <button className="btn btn-green" style={{width:"100%",marginBottom:"1rem",fontSize:"1.1rem",padding:"0.75rem"}} onClick={async () => { for(const p of pool.positions){ await pool.updateFees(p.mint); await new Promise(r=>setTimeout(r,5000)); const d=await pool.fetchPosition(p.mint); if(d){ const sol=(parseFloat(d.feeOwedA||0)/1e9).toFixed(6); const usdc=(parseFloat(d.feeOwedB||0)/1e6).toFixed(4); if(confirm("Collect fees?\nSOL: "+sol+"\nUSDC: "+usdc)){ await pool.collectFees(p.mint) } } } }} disabled={pool.loading || pool.positions.length===0}>🌾 HARVEST ALL FEES</button>
           <OpenPositionForm
             pool={pool.poolState}
             solPrice={pool.solPrice}
