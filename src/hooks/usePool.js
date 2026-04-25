@@ -433,8 +433,9 @@ export function usePool() {
     console.log('addLiquidity wallet:', wallet?.publicKey?.toBase58(), 'connection:', !!connection)
     try {
       setLoading(true)
-      alert('poolState: ' + JSON.stringify(poolState?.currentPrice))
+      console.log('poolState ok:', poolState?.currentPrice)
       const mint = new PublicKey(mintAddress)
+      console.log('mint ok:', mint.toBase58().slice(0,8))
       const positionPDA = getPositionPDA(mint)
       const positionTokenAccount = await getATA(mint, wallet.publicKey)
       const tokenOwnerA = await getATA(WSOL, wallet.publicKey)
