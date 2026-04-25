@@ -100,8 +100,8 @@ export function usePool() {
       const liq = info.data.readBigUInt64LE(72)
       const tickLower = info.data.readInt32LE(88)
       const tickUpper = info.data.readInt32LE(92)
-      const feeOwedA = info.data.readBigUInt64LE(112)
-      const feeOwedB = info.data.readBigUInt64LE(136)
+      const feeOwedA = info.data.readBigUInt64LE(100)
+      const feeOwedB = info.data.readBigUInt64LE(124)
       const priceLower = Math.pow(1.0001, tickLower) * 1000
       const priceUpper = Math.pow(1.0001, tickUpper) * 1000
       const curPrice = poolState?.currentPrice || 88
