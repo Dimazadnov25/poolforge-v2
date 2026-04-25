@@ -32,7 +32,7 @@ export default function StakeDashboard({ solPrice, solBalance }) {
       } catch (e) {}
     }
     fetchPrice()
-    const interval = setInterval(fetchPrice, 30000)
+    const interval = setInterval(fetchPrice, 10000)
     return () => clearInterval(interval)
   }, [])
 
