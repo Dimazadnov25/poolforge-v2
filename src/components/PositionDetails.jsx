@@ -52,7 +52,6 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
       </div>
       <div className="position-grid">
         <span className="label">Min Price</span><span className="value" style={{color:isInRange ? '#06b6d4' : '#ef4444', fontSize:'1.5rem', fontWeight:'bold'}}>${details.priceLower.toFixed(2)}</span>
-        <span className="label" style={{color:"#06b6d4",fontWeight:"bold"}}>Current</span><span className="value" style={{color:"#06b6d4",fontWeight:"bold"}}>${pool?.solPrice?.toFixed(2)}</span>
         <span className="label">Max Price</span><span className="value" style={{color:isInRange ? '#06b6d4' : '#ef4444', fontSize:'1.5rem', fontWeight:'bold'}}>${details.priceUpper.toFixed(2)}</span>
       </div>
       <div>
