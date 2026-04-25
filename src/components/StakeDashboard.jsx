@@ -15,7 +15,7 @@ async function getATA(mint, owner) {
   return ata
 }
 
-export default function StakeDashboard({ solPrice }) {
+export default function StakeDashboard({ solPrice, solBalance }) {
   const { connection } = useConnection()
   const wallet = useWallet()
   const [jupsolBalance, setJupsolBalance] = useState(null)
@@ -106,7 +106,7 @@ export default function StakeDashboard({ solPrice }) {
         </div>
       )}
       <div style={{marginBottom:'1rem'}}>
-        <div style={{color:'var(--muted)', fontSize:'0.75rem', marginBottom:'0.25rem'}}>SOL Amount</div>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.25rem'}}><div style={{color:'var(--muted)',fontSize:'0.75rem'}}>SOL Amount</div><button onClick={()=>setSolAmount(Math.max(0,(solBalance||0)-0.01).toFixed(4))} style={{padding:'0.2rem 0.4rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',cursor:'pointer',fontSize:'0.7rem'}}>MAX</button></div>
         <input
           type="number"
           value={solAmount}
