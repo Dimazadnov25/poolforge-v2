@@ -82,6 +82,7 @@ export default function PoolDashboard() {
             </div>
           )}
           <StakeDashboard solPrice={pool.solPrice} />
+          <button className="btn btn-green" style={{width:"100%",marginBottom:"1rem",fontSize:"1.1rem",padding:"0.75rem"}} onClick={async () => { for(const p of pool.positions){ await pool.collectFees(p.mint) } }} disabled={pool.loading || pool.positions.length===0}>🌾 HARVEST ALL FEES</button>
           <OpenPositionForm
             pool={pool.poolState}
             solPrice={pool.solPrice}
