@@ -28,8 +28,7 @@ export default function StakeDashboard({ solPrice }) {
       try {
         const r = await fetch('/api/jupsol-price')
         const d = await r.json()
-        const price = d?.data?.['jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v']?.price
-        if (price) setJupsolPrice(parseFloat(price))
+        if (d.solPerJupsol) setJupsolPrice(d.solPerJupsol)
       } catch (e) {}
     }
     fetchPrice()
@@ -82,8 +81,8 @@ export default function StakeDashboard({ solPrice }) {
   const handleStake = () => doSwap('So11111111111111111111111111111111111111112', 'jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v')
   const handleUnstake = () => doSwap('jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v', 'So11111111111111111111111111111111111111112')
 
-  const jupsolValueUSD = jupsolBalance && jupsolPrice ? jupsolBalance * jupsolPrice : 0
-  const jupsolValueSOL = jupsolBalance && jupsolPrice && solPrice ? jupsolBalance * jupsolPrice / solPrice : 0
+  const jupsolValueSOL = jupsolBalance && jupsolPrice ? jupsolBalance * jupsolPrice : 0
+  const jupsolValueUSD = jupsolValueSOL && solPrice ? jupsolValueSOL * solPrice : 0
   const yearlyYield = jupsolValueUSD * (JUPSOL_APY / 100)
 
   return (
