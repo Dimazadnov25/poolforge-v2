@@ -2,6 +2,7 @@
 
 export default function PositionDetails({ position, poolState, fetchPosition, onClose, onCollect, onAddLiquidity, onRebalance, onUpdate, onUpdateFees }) {
   const [details, setDetails] = useState(null)
+  const [addAmount, setAddAmount] = useState('')
   const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
@@ -54,7 +55,7 @@ export default function PositionDetails({ position, poolState, fetchPosition, on
         <span className="label">Max Price</span><span className="value" style={{color:isInRange ? '#06b6d4' : '#ef4444', fontSize:'1.5rem', fontWeight:'bold'}}>${details.priceUpper.toFixed(2)}</span>
       </div>
       <div>
-        <button className="btn btn-blue" onClick={() => { const amt = prompt('SOL amount to add:'); if (amt && onAddLiquidity) onAddLiquidity(position.mint, parseFloat(amt)) }}>Add Liquidity</button>
+        <div style={{display:'flex',gap:'0.5rem',marginBottom:'0.5rem'}}><input type="number" value={addAmount} onChange={e=>setAddAmount(e.target.value)} placeholder="SOL" style={{width:'80px',padding:'0.3rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)'}}/><button className="btn btn-blue" onClick={() => { if (addAmount && onAddLiquidity) { onAddLiquidity(position.mint, parseFloat(addAmount)); setAddAmount('') } }}>Add Liquidity</button></div>
         <button className="btn btn-green" onClick={() => onCollect && onCollect(position.mint)}>Collect Fees</button>
         <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.03)}>Rebalance 3%</button>
         <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.02)}>Rebalance 2%</button>
