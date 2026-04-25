@@ -42,7 +42,6 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
       <div style={{marginBottom:'1rem'}}>
         <div style={{color:'var(--muted)', fontSize:'0.75rem', marginBottom:'0.25rem'}}>SOL Amount</div>
         <button onClick={()=>{const max=Math.max(0,(pool.solBalance||0)-0.01);setSolAmount(max.toFixed(4))}} style={{padding:"0.25rem 0.5rem",borderRadius:"6px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",cursor:"pointer",fontSize:"0.75rem",marginBottom:"0.25rem"}}>MAX</button>
-        <button onClick={()=>{const max=Math.max(0,(pool.solBalance||0)-0.01);setSolAmount(max.toFixed(4))}} style={{padding:"0.25rem 0.5rem",borderRadius:"6px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",cursor:"pointer",fontSize:"0.75rem",marginBottom:"0.25rem"}}>MAX</button>
         <input
           type="number"
           value={solAmount}
