@@ -63,8 +63,14 @@ export function usePool() {
   const loadPositions = useCallback(async () => {
     if (!wallet?.publicKey || !connection) return
     try {
-      const tokens = await connection.getTokenAccountsByOwner(wallet.publicKey, { programId: TOKEN_PROGRAM }, { encoding: 'jsonParsed' })
-      const nfts = tokens.value.filter(a => a.account.data.parsed.info.tokenAmount.amount === '1')
+      const tokens = await connection.getTokenAccountsByOwner(wallet.publicKey, { programId: TOKEN_PROGRAM })
+      const nfts = tokens.value.filter(a => {
+        try {
+          const data = a.account.data
+          if (Buffer.isBuffer(data)) return data.readBigUInt64LE(64) === 1n
+          return data.parsed?.info?.tokenAmount?.amount === '1'
+        } catch(e) { return false }
+      })
       const result = []
       for (const n of nfts) {
         const mint = new PublicKey(n.account.data.parsed.info.mint)
