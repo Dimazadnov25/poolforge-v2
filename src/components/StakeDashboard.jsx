@@ -26,7 +26,7 @@ export default function StakeDashboard({ solPrice }) {
   useEffect(() => {
     const fetchJupsolPrice = async () => {
       try {
-        const r = await fetch('https://api.jup.ag/price/v2?ids=jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v')
+        const r = await fetch('https://price.jup.ag/v4/price?ids=jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v')
         const d = await r.json()
         const price = d?.data?.['jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v']?.price
         if (price) setJupsolPrice(parseFloat(price))
