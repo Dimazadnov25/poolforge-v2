@@ -313,8 +313,6 @@ const updateFees = useCallback(async (mintAddress) => {
     if (!wallet?.publicKey || !connection) return
     try {
       setLoading(true)
-      await updateFees(mintAddress)
-      await new Promise(r => setTimeout(r, 2000))
       const mint = new PublicKey(mintAddress)
       const [positionPDA] = PublicKey.findProgramAddressSync([Buffer.from('position'), mint.toBuffer()], WHIRLPOOL_PROGRAM)
       const positionTokenAccount = await getATA(mint, wallet.publicKey)
