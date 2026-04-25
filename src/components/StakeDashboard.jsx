@@ -91,7 +91,7 @@ export default function StakeDashboard({ solPrice }) {
       <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1rem', background:'var(--surface)', borderRadius:'12px', padding:'1rem'}}>
         <div>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>jupSOL Balance</div>
-          <div style={{color:'var(--green)', fontWeight:'bold', fontSize:'1.5rem'}}>{jupsolBalance != null ? jupsolBalance.toFixed(4) : '—'}</div>
+          <div style={{color:'var(--green)', fontWeight:'bold', fontSize:'1.5rem'}}>{jupsolBalance != null ? jupsolBalance.toFixed(6) : '—'}</div>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>${jupsolValueUSD.toFixed(4)} USD</div>
         </div>
         <div style={{textAlign:'right'}}>
