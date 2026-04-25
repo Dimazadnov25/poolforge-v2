@@ -24,16 +24,16 @@ export default function StakeDashboard({ solPrice }) {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const fetchJupsolPrice = async () => {
+    const fetchPrice = async () => {
       try {
-        const r = await fetch('https://price.jup.ag/v4/price?ids=jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v')
+        const r = await fetch('/api/jupsol-price')
         const d = await r.json()
         const price = d?.data?.['jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v']?.price
         if (price) setJupsolPrice(parseFloat(price))
       } catch (e) {}
     }
-    fetchJupsolPrice()
-    const interval = setInterval(fetchBalance, 15000)
+    fetchPrice()
+    const interval = setInterval(fetchPrice, 30000)
     return () => clearInterval(interval)
   }, [])
 
@@ -83,6 +83,7 @@ export default function StakeDashboard({ solPrice }) {
   const handleUnstake = () => doSwap('jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v', 'So11111111111111111111111111111111111111112')
 
   const jupsolValueUSD = jupsolBalance && jupsolPrice ? jupsolBalance * jupsolPrice : 0
+  const jupsolValueSOL = jupsolBalance && jupsolPrice && solPrice ? jupsolBalance * jupsolPrice / solPrice : 0
   const yearlyYield = jupsolValueUSD * (JUPSOL_APY / 100)
 
   return (
@@ -93,6 +94,7 @@ export default function StakeDashboard({ solPrice }) {
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>jupSOL Balance</div>
           <div style={{color:'var(--green)', fontWeight:'bold', fontSize:'1.5rem'}}>{jupsolBalance != null ? jupsolBalance.toFixed(6) : '—'}</div>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>${jupsolValueUSD.toFixed(4)} USD</div>
+          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>{jupsolValueSOL > 0 ? jupsolValueSOL.toFixed(6) + ' SOL' : '—'}</div>
         </div>
         <div style={{textAlign:'right'}}>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>APY</div>
