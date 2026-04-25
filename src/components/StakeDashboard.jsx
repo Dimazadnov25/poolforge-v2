@@ -91,10 +91,9 @@ export default function StakeDashboard({ solPrice }) {
       <h3 style={{marginBottom:'1rem', color:'var(--text)'}}>SOL Staking</h3>
       <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1rem', background:'var(--surface)', borderRadius:'12px', padding:'1rem'}}>
         <div>
-          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>jupSOL Balance</div>
-          <div style={{color:'var(--green)', fontWeight:'bold', fontSize:'1.5rem'}}>{jupsolBalance != null ? jupsolBalance.toFixed(6) : '—'}</div>
+          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>Staked SOL</div>
+          <div style={{color:'var(--green)', fontWeight:'bold', fontSize:'1.5rem'}}>{jupsolValueSOL > 0 ? jupsolValueSOL.toFixed(6) : '—'} SOL</div>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>${jupsolValueUSD.toFixed(4)} USD</div>
-          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>{jupsolValueSOL > 0 ? jupsolValueSOL.toFixed(6) + ' SOL' : '—'}</div>
         </div>
         <div style={{textAlign:'right'}}>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>APY</div>
