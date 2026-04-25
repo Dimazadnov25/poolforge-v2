@@ -449,7 +449,7 @@ export function usePool() {
       const sqrtPl = Math.sqrt(Math.pow(1.0001, tickLower) * 1000 * 1e-3)
       const sqrtPu = Math.sqrt(Math.pow(1.0001, tickUpper) * 1000 * 1e-3)
       const liquidityAmount = Math.floor(lamports * sqrtP * sqrtPu / (sqrtPu - sqrtP))
-      const usdcRaw = Math.floor(liquidityAmount * (sqrtP - sqrtPl) / 1e6)
+      const usdcRaw = Math.floor(liquidityAmount * (sqrtP - sqrtPl) * 1e6)
       const { blockhash: bh2, lastValidBlockHeight: lv2 } = await connection.getLatestBlockhash()
       const tx2 = new Transaction({ recentBlockhash: bh2, feePayer: wallet.publicKey })
       const wsolInfo = await connection.getAccountInfo(tokenOwnerA)
