@@ -431,7 +431,7 @@ export function usePool() {
       tx2.add(SystemProgram.transfer({ fromPubkey: wallet.publicKey, toPubkey: tokenOwnerA, lamports: transferLamports }))
       tx2.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [{ pubkey: tokenOwnerA, isSigner: false, isWritable: true }], data: Buffer.from([17]) }))
       console.log("openPos liq:", liquidityAmount, "solMax:", Math.floor(lamports*1.1), "usdcMax:", Math.floor(usdcRaw*1.05), "usdcRaw:", usdcRaw)
-      tx2.add(buildIncreaseLiquidityIx(wallet.publicKey, positionPDA, positionTokenAccount, SOL_USDC_WHIRLPOOL, tokenOwnerA, tokenOwnerB, VAULT_A, VAULT_B, tickArrayLowerActual, tickArrayUpperActual, liquidityAmount, transferLamports, Math.floor(usdcRaw * 10), getTickArrayAddress(SOL_USDC_WHIRLPOOL, startCurrentActual)))
+      tx2.add(buildIncreaseLiquidityIx(wallet.publicKey, positionPDA, positionTokenAccount, SOL_USDC_WHIRLPOOL, tokenOwnerA, tokenOwnerB, VAULT_A, VAULT_B, tickArrayLowerActual, tickArrayUpperActual, liquidityAmount, transferLamports, Math.floor(usdcRaw * 10), tickArrayCurrentActual))
       tx2.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [
         { pubkey: tokenOwnerA, isSigner: false, isWritable: true },
         { pubkey: wallet.publicKey, isSigner: false, isWritable: true },
