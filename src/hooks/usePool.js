@@ -404,7 +404,8 @@ export function usePool() {
           { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
         ], data: Buffer.from([]) })
       }
-      tx2.add(SystemProgram.transfer({ fromPubkey: wallet.publicKey, toPubkey: tokenOwnerA, lamports: Math.floor(lamports * 1.1) }))
+      const transferLamports = Math.min(Math.floor(lamports * 1.1), Math.floor((await connection.getBalance(wallet.publicKey)) - 0.015 * 1e9))
+      tx2.add(SystemProgram.transfer({ fromPubkey: wallet.publicKey, toPubkey: tokenOwnerA, lamports: transferLamports }))
       tx2.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [{ pubkey: tokenOwnerA, isSigner: false, isWritable: true }], data: Buffer.from([17]) }))
       tx2.add(buildIncreaseLiquidityIx(wallet.publicKey, positionPDA, positionTokenAccount, SOL_USDC_WHIRLPOOL, tokenOwnerA, tokenOwnerB, VAULT_A, VAULT_B, tickArrayLower, tickArrayUpper, liquidityAmount, Math.floor(lamports * 1.1), Math.floor(usdcRaw * 1.05)))
       tx2.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [
