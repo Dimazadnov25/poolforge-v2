@@ -60,7 +60,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
       <div style={{marginBottom:'0.75rem'}}>
         <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.25rem'}}>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>SOL Amount</div>
-          <button onClick={handleMax} style={{padding:'0.2rem 0.4rem', borderRadius:'6px', border:'1px solid var(--border)', background:'var(--surface)', color:'var(--text)', cursor:'pointer', fontSize:'0.7rem'}}>MAX</button>
+          <button type="button" onClick={handleMax} style={{padding:'0.2rem 0.4rem', borderRadius:'6px', border:'1px solid var(--border)', background:'var(--surface)', color:'var(--text)', cursor:'pointer', fontSize:'0.7rem'}}>MAX</button>
         </div>
         <input
           type="number"
