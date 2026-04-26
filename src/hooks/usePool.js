@@ -348,8 +348,23 @@ export function usePool() {
       setLoading(true)
       setError(null)
       const { Keypair } = await import('@solana/web3.js')
-      const tickLower = priceToTick(priceLower, poolState.tickSpacing)
-      const tickUpper = priceToTick(priceUpper, poolState.tickSpacing)
+      const tickLowerRaw = priceToTick(priceLower, poolState.tickSpacing)
+      const tickUpperRaw = priceToTick(priceUpper, poolState.tickSpacing)
+      const ts = poolState.tickSpacing
+      const tia = ts * 88
+      const curArray = Math.floor(poolState.currentTick / tia) * tia
+      const lowerEnd = Math.floor(tickLowerRaw / tia) * tia + tia
+      const upperStart = Math.floor(tickUpperRaw / tia) * tia
+      let tickLower = tickLowerRaw
+      let tickUpper = tickUpperRaw
+      if (poolState.currentTick >= tickLowerRaw && poolState.currentTick < tickUpperRaw) {
+        if (lowerEnd <= poolState.currentTick || upperStart > poolState.currentTick) {
+          tickLower = Math.round(Math.max(tickLowerRaw, curArray) / ts) * ts
+          tickUpper = Math.round(Math.min(tickUpperRaw, curArray + tia - ts) / ts) * ts
+          if (tickLower >= poolState.currentTick) tickLower = curArray
+          if (tickUpper <= poolState.currentTick) tickUpper = curArray + tia - ts
+        }
+      }
       const positionMintKeypair = Keypair.generate()
       const positionMint = positionMintKeypair.publicKey
       const positionPDA = getPositionPDA(positionMint)
