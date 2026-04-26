@@ -391,7 +391,14 @@ export function usePool() {
       setTxStatus('sending')
       const sig1 = await connection.sendRawTransaction(signed1.serialize(), { skipPreflight: true })
       await connection.confirmTransaction({ signature: sig1, blockhash: bh1, lastValidBlockHeight: lv1 }, 'confirmed')
-      await new Promise(r => setTimeout(r, 1000))
+      await new Promise(r => setTimeout(r, 2000))
+      // Re-read ticks from position after TX1
+      const posInfoCheck = await connection.getAccountInfo(positionPDA)
+      const tickLowerActual = posInfoCheck ? posInfoCheck.data.readInt32LE(88) : tickLower
+      const tickUpperActual = posInfoCheck ? posInfoCheck.data.readInt32LE(92) : tickUpper
+      const tickArrayLowerActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLowerActual, poolState.tickSpacing))
+      const tickArrayUpperActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpperActual, poolState.tickSpacing))
+      console.log('actual ticks:', tickLowerActual, tickUpperActual)
       const { blockhash: bh2, lastValidBlockHeight: lv2 } = await connection.getLatestBlockhash()
       const tx2 = new Transaction({ recentBlockhash: bh2, feePayer: wallet.publicKey })
       const wsolInfo = await connection.getAccountInfo(tokenOwnerA)
@@ -409,7 +416,7 @@ export function usePool() {
       tx2.add(SystemProgram.transfer({ fromPubkey: wallet.publicKey, toPubkey: tokenOwnerA, lamports: transferLamports }))
       tx2.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [{ pubkey: tokenOwnerA, isSigner: false, isWritable: true }], data: Buffer.from([17]) }))
       console.log("openPos liq:", liquidityAmount, "solMax:", Math.floor(lamports*1.1), "usdcMax:", Math.floor(usdcRaw*1.05), "usdcRaw:", usdcRaw)
-      tx2.add(buildIncreaseLiquidityIx(wallet.publicKey, positionPDA, positionTokenAccount, SOL_USDC_WHIRLPOOL, tokenOwnerA, tokenOwnerB, VAULT_A, VAULT_B, tickArrayLower, tickArrayUpper, liquidityAmount, transferLamports, Math.floor(usdcRaw * 10)))
+      tx2.add(buildIncreaseLiquidityIx(wallet.publicKey, positionPDA, positionTokenAccount, SOL_USDC_WHIRLPOOL, tokenOwnerA, tokenOwnerB, VAULT_A, VAULT_B, tickArrayLowerActual, tickArrayUpperActual, liquidityAmount, transferLamports, Math.floor(usdcRaw * 10)))
       tx2.add(new TransactionInstruction({ programId: TOKEN_PROGRAM, keys: [
         { pubkey: tokenOwnerA, isSigner: false, isWritable: true },
         { pubkey: wallet.publicKey, isSigner: false, isWritable: true },
