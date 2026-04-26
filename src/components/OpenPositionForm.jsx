@@ -88,7 +88,11 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
 
   return (
     <div className="card" style={{marginTop:'1rem'}}>
-      <h3 style={{marginBottom:'1rem'}}>Open Position</h3>
+      <h3 style={{marginBottom:'0.5rem'}}>Open Position</h3>
+      <div style={{display:'flex',gap:'1rem',marginBottom:'0.75rem',padding:'0.5rem',borderRadius:'8px',background:'var(--surface)',fontSize:'0.8rem'}}>
+        <span style={{color:'var(--muted)'}}>SOL: <span style={{color:'var(--text)',fontWeight:'bold'}}>{(pool?.solBalance||0).toFixed(4)}</span></span>
+        <span style={{color:'var(--muted)'}}>USDC: <span style={{color:'var(--text)',fontWeight:'bold'}}>{(pool?.usdcBalance||0).toFixed(2)}</span></span>
+      </div>
 
       <div style={{marginBottom:'0.75rem'}}>
         <div style={{color:'var(--muted)', fontSize:'0.75rem', marginBottom:'0.25rem'}}>Range</div>
