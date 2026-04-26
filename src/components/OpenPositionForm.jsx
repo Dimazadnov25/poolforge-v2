@@ -22,12 +22,15 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
     return liq * (sqrtP - sqrtPl) / 1e6
   }
 
-  const handleMax = () => {
+  const handleMax = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
     const max = Math.max(0, (pool?.solBalance || 0) - 0.01)
     setSolAmount(max.toFixed(4))
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
     if (!solAmount || !onOpen) return
     onOpen({ priceLower, priceUpper, solAmount: parseFloat(solAmount) })
   }
@@ -44,7 +47,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
         <div style={{color:'var(--muted)', fontSize:'0.75rem', marginBottom:'0.25rem'}}>Range</div>
         <div style={{display:'flex', gap:'0.5rem', flexWrap:'wrap'}}>
           {[0.5,1,2,3,5].map(r => (
-            <button key={r} onClick={() => setRange(r)}
+            <button type="button" key={r} onClick={() => setRange(r)}
               className={range === r ? 'btn btn-blue' : 'btn btn-secondary'}
               style={{padding:'0.25rem 0.5rem', fontSize:'0.8rem'}}>
               {r}%
@@ -86,7 +89,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
         </div>
       )}
 
-      <button className="btn btn-blue" onClick={handleSubmit} disabled={loading || !solAmount} style={{width:'100%'}}>
+      <button type="button" className="btn btn-blue" onClick={handleSubmit} disabled={loading || !solAmount} style={{width:'100%'}}>
         {loading ? 'Opening...' : 'Open Position'}
       </button>
     </div>
