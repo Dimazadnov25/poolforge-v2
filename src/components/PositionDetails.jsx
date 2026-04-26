@@ -67,8 +67,10 @@ export default function PositionDetails({ position, poolState, solBalance, fetch
             placeholder="SOL"
             style={{flex:1, padding:'0.3rem', borderRadius:'6px', border:'1px solid var(--border)', background:'var(--surface)', color:'var(--text)'}}
           />
-          <button type="button" onClick={(e) => { e.stopPropagation(); setAddAmount(Math.max(0, (solBalance||0) - 0.01).toFixed(4)) }}
-            style={{padding:'0.2rem 0.4rem', borderRadius:'6px', border:'1px solid var(--border)', background:'var(--surface)', color:'var(--text)', cursor:'pointer', fontSize:'0.7rem'}}>MAX</button>
+          <div style={{display:'flex',gap:'0.25rem'}}>
+            <button type="button" onClick={(e)=>{e.stopPropagation();setAddAmount(Math.max(0,(solBalance||0)-0.01).toFixed(4))}} style={{padding:'0.2rem 0.4rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',cursor:'pointer',fontSize:'0.7rem'}}>MAX SOL</button>
+            <button type="button" onClick={(e)=>{e.stopPropagation();if(!details||!poolState?.currentPrice) return;const p=poolState.currentPrice;const pl=details.priceLower;const pu=details.priceUpper;const sqrtP=Math.sqrt(p*1e-3);const sqrtPl=Math.sqrt(pl*1e-3);const sqrtPu=Math.sqrt(pu*1e-3);const usdcAvail=poolState?.usdcBalance||0;const liq=usdcAvail*1e6/(sqrtP-sqrtPl);const solNeeded=liq*(1/sqrtP-1/sqrtPu)/1e9;setAddAmount(Math.min(solNeeded,Math.max(0,(solBalance||0)-0.01)).toFixed(4))}} style={{padding:'0.2rem 0.4rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',cursor:'pointer',fontSize:'0.7rem'}}>MAX USDC</button>
+          </div>
         </div>
         <button type="button" className="btn btn-blue" style={{width:'100%'}}
           onClick={(e) => { e.stopPropagation(); if (addAmount && onAddLiquidity) { onAddLiquidity(position.mint, parseFloat(addAmount)); setAddAmount('') } }}>
