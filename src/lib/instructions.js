@@ -34,12 +34,13 @@ export function buildIncreaseLiquidityIx(
   const USDC = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
   const MEMO = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
   const disc = Buffer.from([133, 29, 89, 223, 69, 238, 176, 10]);
-  const data = Buffer.alloc(40);
+  const data = Buffer.alloc(41);
   disc.copy(data, 0);
   data.writeBigUInt64LE(BigInt(liquidityAmount) & 0xFFFFFFFFFFFFFFFFn, 8);
   data.writeBigUInt64LE((BigInt(liquidityAmount) >> 64n) & 0xFFFFFFFFFFFFFFFFn, 16);
   data.writeBigUInt64LE(BigInt(Math.floor(tokenMaxA)), 24);
   data.writeBigUInt64LE(18446744073709551615n, 32);
+  data.writeUInt8(0, 40);
   return new TransactionInstruction({
     programId: WHIRLPOOL_PROGRAM,
     keys: [
