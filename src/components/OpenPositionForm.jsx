@@ -2,6 +2,7 @@
 
 export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
   const [solAmount, setSolAmount] = useState('')
+  const [usdcNeeded, setUsdcNeeded] = useState(null)
   const [range, setRange] = useState(3)
 
   const currentPrice = pool?.currentPrice || solPrice || 0
@@ -41,7 +42,20 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
       </div>
       <div style={{marginBottom:'1rem'}}>
         <div style={{color:'var(--muted)', fontSize:'0.75rem', marginBottom:'0.25rem'}}>SOL Amount</div>
-        <button onClick={()=>{const max=Math.max(0,(pool.solBalance||0)-0.01);setSolAmount(max.toFixed(4))}} style={{padding:"0.25rem 0.5rem",borderRadius:"6px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",cursor:"pointer",fontSize:"0.75rem",marginBottom:"0.25rem"}}>MAX</button>
+        <button onClick={()=>{const max=Math.max(0,(pool.solBalance||0)-0.01)
+        setSolAmount(max.toFixed(4))
+        if(pool.poolState?.currentPrice && rangePercent){
+          const p=pool.poolState.currentPrice
+          const pl=p*(1-rangePercent/100)
+          const pu=p*(1+rangePercent/100)
+          const sqrtP=Math.sqrt(p*1e-3)
+          const sqrtPl=Math.sqrt(pl*1e-3)
+          const sqrtPu=Math.sqrt(pu*1e-3)
+          const lam=max*1e9
+          const liq=lam*sqrtP*sqrtPu/(sqrtPu-sqrtP)
+          const usdc=liq*(sqrtP-sqrtPl)/1e6
+          setUsdcNeeded(usdc)
+        }}} style={{padding:"0.25rem 0.5rem",borderRadius:"6px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",cursor:"pointer",fontSize:"0.75rem",marginBottom:"0.25rem"}}>MAX</button>
         <input
           type="number"
           value={solAmount}
