@@ -1,8 +1,37 @@
 ﻿import { useState } from 'react'
+import { useWallet, useConnection } from '@solana/wallet-adapter-react'
 
 export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
   const [solAmount, setSolAmount] = useState('')
   const [range, setRange] = useState(3)
+  const [swapping, setSwapping] = useState(false)
+  const { connection } = useConnection()
+  const wallet = useWallet()
+
+  const doSwap = async (inputMint, outputMint, amount) => {
+    if (!wallet?.publicKey) return
+    try {
+      setSwapping(true)
+      const amountLamports = Math.floor(amount * (inputMint === 'So11111111111111111111111111111111111111112' ? 1e9 : 1e6))
+      const resp = await fetch('/api/jupiter-stake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputMint, outputMint, amount: amountLamports, userPublicKey: wallet.publicKey.toBase58() })
+      })
+      const data = await resp.json()
+      if (data.error) throw new Error(data.error)
+      const { VersionedTransaction } = await import('@solana/web3.js')
+      const tx = VersionedTransaction.deserialize(Buffer.from(data.swapTransaction, 'base64'))
+      const signed = await wallet.signTransaction(tx)
+      const sig = await connection.sendRawTransaction(signed.serialize())
+      const latest = await connection.getLatestBlockhash()
+      await connection.confirmTransaction({ signature: sig, blockhash: latest.blockhash, lastValidBlockHeight: latest.lastValidBlockHeight }, 'confirmed')
+    } catch (e) {
+      alert('Swap Fehler: ' + e.message)
+    } finally {
+      setSwapping(false)
+    }
+  }
 
   const currentPrice = pool?.poolState?.currentPrice || pool?.currentPrice || solPrice || 0
   const priceLower = currentPrice * (1 - range / 100)
