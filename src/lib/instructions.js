@@ -38,13 +38,18 @@ export function buildIncreaseLiquidityIx(
     tickArrayCurrent.toBase58() !== tickArrayLower.toBase58() &&
     tickArrayCurrent.toBase58() !== tickArrayUpper.toBase58();
 
-  const data = Buffer.alloc(41);
+  // remaining_accounts_info: None=0x00, Some=[0x01, slices_len=1, accounts_type=2(SupplementalTickArrays), length=1]
+  const remainingInfo = hasCurrent
+    ? Buffer.from([0x01, 0x01, 0x00, 0x02, 0x01, 0x01])
+    : Buffer.from([0x00]);
+
+  const data = Buffer.alloc(8 + 16 + 8 + 8 + remainingInfo.length);
   disc.copy(data, 0);
   data.writeBigUInt64LE(BigInt(liquidityAmount) & 0xFFFFFFFFFFFFFFFFn, 8);
   data.writeBigUInt64LE((BigInt(liquidityAmount) >> 64n) & 0xFFFFFFFFFFFFFFFFn, 16);
   data.writeBigUInt64LE(BigInt(Math.floor(tokenMaxA)), 24);
   data.writeBigUInt64LE(18446744073709551615n, 32);
-  data.writeUInt8(hasCurrent ? 1 : 0, 40);
+  remainingInfo.copy(data, 40);
 
   const keys = [
     { pubkey: whirlpool, isSigner: false, isWritable: true },
