@@ -26,6 +26,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
       const sig = await connection.sendRawTransaction(signed.serialize())
       const latest = await connection.getLatestBlockhash()
       await connection.confirmTransaction({ signature: sig, blockhash: latest.blockhash, lastValidBlockHeight: latest.lastValidBlockHeight }, 'confirmed')
+      if (pool?.refreshBalances) await pool.refreshBalances()
     } catch (e) {
       alert('Swap Fehler: ' + e.message)
     } finally {

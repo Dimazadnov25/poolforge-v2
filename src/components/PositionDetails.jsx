@@ -27,6 +27,7 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
       const sig = await connection.sendRawTransaction(signed.serialize())
       const latest = await connection.getLatestBlockhash()
       await connection.confirmTransaction({ signature: sig, blockhash: latest.blockhash, lastValidBlockHeight: latest.lastValidBlockHeight }, 'confirmed')
+      setTimeout(() => window.location.reload(), 2000)
     } catch (e) {
       alert('Swap Fehler: ' + e.message)
     } finally {
