@@ -22,7 +22,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
     return liq * (sqrtP - sqrtPl) / 1e6
   }
 
-  cconst handleMaxSol = (e) => {
+  const handleMaxSol = (e) => {
     e.preventDefault()
     e.stopPropagation()
     const max = Math.max(0, (pool?.solBalance || 0) - 0.01)
