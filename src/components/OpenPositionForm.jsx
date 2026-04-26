@@ -21,6 +21,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
   }
 
   const handleMax = () => {
+    console.log("pool:", JSON.stringify({sol:pool?.solBalance, usdc:pool?.usdcBalance, price:pool?.poolState?.currentPrice}))
     const max = Math.max(0, (pool?.solBalance || 0) - 0.01)
     setSolAmount(max.toFixed(4))
     setUsdcNeeded(calcUsdcNeeded(max, range))
