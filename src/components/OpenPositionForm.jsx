@@ -44,9 +44,9 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
         <div style={{color:'var(--muted)', fontSize:'0.75rem', marginBottom:'0.25rem'}}>SOL Amount</div>
         <button onClick={()=>{const max=Math.max(0,(pool.solBalance||0)-0.01)
         setSolAmount(max.toFixed(4))
-        if(pool.poolState?.currentPrice && rangePercent){
+        if(pool.poolState?.currentPrice && range){
           const p=pool.poolState.currentPrice
-          const pl=p*(1-rangePercent/100)
+          const pl=p*(1-range/100)
           const pu=p*(1+rangePercent/100)
           const sqrtP=Math.sqrt(p*1e-3)
           const sqrtPl=Math.sqrt(pl*1e-3)
