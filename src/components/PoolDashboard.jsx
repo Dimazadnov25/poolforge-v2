@@ -71,6 +71,7 @@ export default function PoolDashboard() {
                   position={p}
                   poolState={pool.poolState}
                   solBalance={pool.solBalance}
+                  usdcBalance={pool.usdcBalance}
                   fetchPosition={pool.fetchPosition}
                   onClose={pool.closePosition}
                   onCollect={pool.collectFees}
