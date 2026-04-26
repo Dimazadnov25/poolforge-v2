@@ -41,7 +41,7 @@ export function buildIncreaseLiquidityIx(
   data.writeBigUInt64LE(BigInt(Math.floor(tokenMaxA)), 24);
   data.writeBigUInt64LE(18446744073709551615n, 32);
   data.writeUInt8(0, 40);
-  return new TransactionInstruction({
+  const ix = new TransactionInstruction({
     programId: WHIRLPOOL_PROGRAM,
     keys: [
       { pubkey: whirlpool, isSigner: false, isWritable: true },
