@@ -1,9 +1,38 @@
 ﻿import { useEffect, useState } from 'react'
+import { useWallet, useConnection } from '@solana/wallet-adapter-react'
 
-export default function PositionDetails({ position, poolState, solBalance, usdcBalance, fetchPosition, onClose, onCollect, onAddLiquidity, onRebalance, onUpdate, onUpdateFees }) {
+export default function PositionDetails({ position, poolState, solBalance, usdcBalance, solPrice, fetchPosition, onClose, onCollect, onAddLiquidity, onRebalance, onUpdate, onUpdateFees }) {
   const [details, setDetails] = useState(null)
   const [addAmount, setAddAmount] = useState('')
   const [refreshing, setRefreshing] = useState(false)
+  const [swapping, setSwapping] = useState(false)
+  const { connection } = useConnection()
+  const wallet = useWallet()
+
+  const doSwap = async (inputMint, outputMint, amount) => {
+    if (!wallet?.publicKey) return
+    try {
+      setSwapping(true)
+      const amountLamports = Math.floor(amount * (inputMint === 'So11111111111111111111111111111111111111112' ? 1e9 : 1e6))
+      const resp = await fetch('/api/jupiter-stake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputMint, outputMint, amount: amountLamports, userPublicKey: wallet.publicKey.toBase58() })
+      })
+      const data = await resp.json()
+      if (data.error) throw new Error(data.error)
+      const { VersionedTransaction } = await import('@solana/web3.js')
+      const tx = VersionedTransaction.deserialize(Buffer.from(data.swapTransaction, 'base64'))
+      const signed = await wallet.signTransaction(tx)
+      const sig = await connection.sendRawTransaction(signed.serialize())
+      const latest = await connection.getLatestBlockhash()
+      await connection.confirmTransaction({ signature: sig, blockhash: latest.blockhash, lastValidBlockHeight: latest.lastValidBlockHeight }, 'confirmed')
+    } catch (e) {
+      alert('Swap Fehler: ' + e.message)
+    } finally {
+      setSwapping(false)
+    }
+  }
 
   useEffect(() => {
     if (position?.mint) {
@@ -84,6 +113,8 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
           const ok=hasSOL&&hasUSDC;
           return <div style={{marginBottom:'0.25rem',padding:'0.4rem',borderRadius:'8px',border:'2px solid '+(ok?'#22c55e':'#ef4444'),background:ok?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.1)',color:ok?'#22c55e':'#ef4444',fontSize:'0.75rem',textAlign:'center'}}>
             SOL: {solNeeded.toFixed(4)} {hasSOL?'✅':'❌'} | USDC: {usdcNeeded.toFixed(2)} {hasUSDC?'✅':'❌'}
+            {!hasSOL && <div style={{marginTop:'0.25rem'}}><button type="button" onClick={()=>doSwap('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v','So11111111111111111111111111111111111111112',(solNeeded+0.01-(solBalance||0)+0.005))} disabled={swapping} style={{padding:'0.2rem 0.5rem',borderRadius:'6px',background:'#ef4444',color:'white',border:'none',cursor:'pointer',fontSize:'0.7rem'}}>{swapping?'...':'USDC → SOL swappen'}</button></div>}
+            {!hasUSDC && <div style={{marginTop:'0.25rem'}}><button type="button" onClick={()=>doSwap('So11111111111111111111111111111111111111112','EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',(usdcNeeded-(usdcBalance||0))/( solPrice||86)*1.01)} disabled={swapping} style={{padding:'0.2rem 0.5rem',borderRadius:'6px',background:'#ef4444',color:'white',border:'none',cursor:'pointer',fontSize:'0.7rem'}}>{swapping?'...':'SOL → USDC swappen'}</button></div>}
           </div>
         })()}
         <button type="button" className="btn btn-blue" style={{width:'100%'}}
