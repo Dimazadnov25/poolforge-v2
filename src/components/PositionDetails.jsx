@@ -1,61 +1,10 @@
-﻿import { useEffect, useState } from 'react'
-
-export default function PositionDetails({ position, poolState, solBalance, fetchPosition, onClose, onCollect, onAddLiquidity, onRebalance, onUpdate, onUpdateFees }) {
-  const [details, setDetails] = useState(null)
-  const [addAmount, setAddAmount] = useState('')
-  const [refreshing, setRefreshing] = useState(false)
-
-  useEffect(() => {
-    if (position?.mint) {
-      const load = () => fetchPosition(position.mint).then(d => {
-        setDetails(d)
-        if (onUpdate) onUpdate(position.mint, d)
-      })
-      load()
-      const interval = setInterval(load, 60000)
-      return () => clearInterval(interval)
-    }
-  }, [position, fetchPosition])
-
-  if (!details) return <div className="position-card"><p style={{color:'var(--muted)'}}>Loading...</p></div>
-
-  const isInRange = poolState?.currentPrice >= details.priceLower && poolState?.currentPrice <= details.priceUpper
-  const positionValueUSD = (details.solAmount || 0) * (poolState?.currentPrice || 0) + (details.usdcAmount || 0)
-  const earnedSOL = parseFloat(details.feeOwedA || 0) / 1e9
-  const earnedUSDC = parseFloat(details.feeOwedB || 0) / 1e6
-  const earnedUSD = earnedSOL * (poolState?.currentPrice || 0) + earnedUSDC
-
-  const handleRefreshFees = async () => {
-    if (!onUpdateFees) return
-    setRefreshing(true)
-    await onUpdateFees(position.mint)
-    await new Promise(r => setTimeout(r, 3000))
-    const updated = await fetchPosition(position.mint)
-    if (updated) { setDetails(updated); if (onUpdate) onUpdate(position.mint, updated) }
-    setRefreshing(false)
-  }
-
-  return (
-    <div className="position-card">
-      <div className="position-header">
-        <span className="position-mint">{position.mint.slice(0,6)}...{position.mint.slice(-4)}</span>
-        <span className={'badge ' + (isInRange ? 'badge-green' : 'badge-red')}>{isInRange ? 'IN RANGE' : 'OUT OF RANGE'}</span>
-      </div>
-      <div style={{display:'flex', justifyContent:'space-between', marginBottom:'0.75rem'}}>
-        <div>
-          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>Value</div>
-          <div style={{color:'var(--green)', fontWeight:'bold', fontSize:'2rem'}}>${positionValueUSD.toFixed(2)}</div>
+<div style={{marginBottom:'0.5rem'}}>
+        <div style={{display:'flex',gap:'0.5rem',alignItems:'center',marginBottom:'0.25rem'}}>
+          <input type="number" value={addAmount} onChange={e=>setAddAmount(e.target.value)} placeholder="SOL" style={{flex:1,padding:'0.3rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)'}}/>
+          <button type="button" onClick={(e)=>{e.stopPropagation();setAddAmount(Math.max(0,(solBalance||0)-0.01).toFixed(4))}} style={{padding:'0.2rem 0.4rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',cursor:'pointer',fontSize:'0.7rem'}}>MAX</button>
         </div>
-        <div style={{textAlign:'right'}}>
-          
-        </div>
-      </div>
-      <div className="position-grid">
-        <span className="label">Min Price</span><span className="value" style={{color:isInRange ? '#06b6d4' : '#ef4444', fontSize:'1.5rem', fontWeight:'bold'}}>${details.priceLower.toFixed(2)}</span>
-        <span className="label">Max Price</span><span className="value" style={{color:isInRange ? '#06b6d4' : '#ef4444', fontSize:'1.5rem', fontWeight:'bold'}}>${details.priceUpper.toFixed(2)}</span>
-      </div>
-      <div>
-        <div style={{display:'flex',flexDirection:'column',gap:'0.5rem',marginBottom:'0.5rem'}}><div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}><button type="button" onClick={(e)=>{e.stopPropagation();setAddAmount(Math.max(0,(solBalance||0)-0.01).toFixed(4))}} style={{padding:"0.2rem 0.4rem",borderRadius:"6px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",cursor:"pointer",fontSize:"0.7rem"}}>MAX SOL</button><input type="number" value={addAmount} onChange={e=>setAddAmount(e.target.value)} placeholder="SOL" style={{width:'80px',padding:'0.3rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)'}}/></div><button className="btn btn-blue" onClick={(e)=>{e.stopPropagation();if(addAmount&&onAddLiquidity){onAddLiquidity(position.mint,parseFloat(addAmount));setAddAmount('')}}}>Add Liquidity</button></div>
+        <button type="button" className="btn btn-blue" style={{width:'100%'}} onClick={(e)=>{e.stopPropagation();if(addAmount&&onAddLiquidity){onAddLiquidity(position.mint,parseFloat(addAmount));setAddAmount('')}}}>Add Liquidity</button>
+      </div><div style={{display:'flex',flexDirection:'column',gap:'0.5rem',marginBottom:'0.5rem'}}><div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}><button type="button" onClick={(e)=>{e.stopPropagation();setAddAmount(Math.max(0,(solBalance||0)-0.01).toFixed(4))}} style={{padding:"0.2rem 0.4rem",borderRadius:"6px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",cursor:"pointer",fontSize:"0.7rem"}}>MAX SOL</button><input type="number" value={addAmount} onChange={e=>setAddAmount(e.target.value)} placeholder="SOL" style={{width:'80px',padding:'0.3rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)'}}/></div><button className="btn btn-blue" onClick={(e)=>{e.stopPropagation();if(addAmount&&onAddLiquidity){onAddLiquidity(position.mint,parseFloat(addAmount));setAddAmount('')}}}>Add Liquidity</button></div>
         <button className="btn btn-green" onClick={() => onCollect && onCollect(position.mint)}>Collect Fees</button>
         <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.03)}>Rebalance 3%</button>
         <button className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.02)}>Rebalance 2%</button>
