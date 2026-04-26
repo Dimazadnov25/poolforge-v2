@@ -414,6 +414,7 @@ export function usePool() {
       const tickArrayLowerActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, startLowerActual)
       const tickArrayUpperActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, startUpperActual)
       console.log('TX2 tick arrays ready')
+      try {
       const { blockhash: bh2, lastValidBlockHeight: lv2 } = await connection.getLatestBlockhash()
       const tx2 = new Transaction({ recentBlockhash: bh2, feePayer: wallet.publicKey })
       const wsolInfo = await connection.getAccountInfo(tokenOwnerA)
@@ -438,6 +439,7 @@ export function usePool() {
         { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
       ], data: Buffer.from([9]) }))
       console.log('TX2 signing, instructions:', tx2.instructions.length)
+      } catch(e2) { console.error('TX2 BUILD ERROR:', e2.message, e2.stack) }
       setTxStatus('signing')
       const signed2 = await wallet.signTransaction(tx2)
       setTxStatus('sending')
