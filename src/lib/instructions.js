@@ -40,7 +40,7 @@ export function buildIncreaseLiquidityIx(
 
   // remaining_accounts_info: None=0x00, Some=[0x01, slices_len=1, accounts_type=2(SupplementalTickArrays), length=1]
   const remainingInfo = hasCurrent
-    ? Buffer.from([0x01, 0x01, 0x00, 0x02, 0x01, 0x01])
+    ? Buffer.from([0x01, 0x01, 0x06, 0x01])
     : Buffer.from([0x00]);
 
   const data = Buffer.alloc(8 + 16 + 8 + 8 + remainingInfo.length);
