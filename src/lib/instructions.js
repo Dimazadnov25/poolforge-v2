@@ -48,7 +48,7 @@ export function buildIncreaseLiquidityIx(
       { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
       { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false },
       { pubkey: MEMO, isSigner: false, isWritable: false },
-      { pubkey: wallet, isSigner: true, isWritable: false },
+      { pubkey: wallet, isSigner: true, isWritable: true },
       { pubkey: positionPDA, isSigner: false, isWritable: true },
       { pubkey: positionTokenAccount, isSigner: false, isWritable: false },
       { pubkey: WSOL, isSigner: false, isWritable: false },
