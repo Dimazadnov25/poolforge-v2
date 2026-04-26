@@ -401,7 +401,7 @@ export function usePool() {
       setTxStatus('sending')
       const sig1 = await connection.sendRawTransaction(signed1.serialize(), { skipPreflight: true })
       await connection.confirmTransaction({ signature: sig1, blockhash: bh1, lastValidBlockHeight: lv1 }, 'confirmed')
-      await new Promise(r => setTimeout(r, 2000))
+      await new Promise(r => setTimeout(r, 5000))
       const poolInfoCheck = await connection.getAccountInfo(SOL_USDC_WHIRLPOOL)
       const currentTickNow = poolInfoCheck.data.readInt32LE(81)
       const posInfoCheck = await connection.getAccountInfo(positionPDA)
