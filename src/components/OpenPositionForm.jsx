@@ -41,14 +41,9 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
     const sqrtPl = Math.sqrt(pl * 1e-3)
     const sqrtPu = Math.sqrt(pu * 1e-3)
     const liq = usdcAvailable * 1e6 / (sqrtP - sqrtPl)
-    const solNeeded = liq * (1/sqrtP - 1/sqrtPu) / 1e9
+    const solNeeded = liq * (1 / sqrtP - 1 / sqrtPu) / 1e9
     const solAvail = Math.max(0, (pool?.solBalance || 0) - 0.01)
     setSolAmount(Math.min(solNeeded, solAvail).toFixed(4))
-  }
-    e.preventDefault()
-    e.stopPropagation()
-    const max = Math.max(0, (pool?.solBalance || 0) - 0.01)
-    setSolAmount(max.toFixed(4))
   }
 
   const handleSubmit = (e) => {
@@ -85,9 +80,9 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
       <div style={{marginBottom:'0.75rem'}}>
         <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.25rem'}}>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>SOL Amount</div>
-          <div style={{display:'flex',gap:'0.25rem'}}>
-            <button type="button" onClick={handleMaxSol} style={{padding:'0.2rem 0.4rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',cursor:'pointer',fontSize:'0.7rem'}}>MAX SOL</button>
-            <button type="button" onClick={handleMaxUsdc} style={{padding:'0.2rem 0.4rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',cursor:'pointer',fontSize:'0.7rem'}}>MAX USDC</button>
+          <div style={{display:'flex', gap:'0.25rem'}}>
+            <button type="button" onClick={handleMaxSol} style={{padding:'0.2rem 0.4rem', borderRadius:'6px', border:'1px solid var(--border)', background:'var(--surface)', color:'var(--text)', cursor:'pointer', fontSize:'0.7rem'}}>MAX SOL</button>
+            <button type="button" onClick={handleMaxUsdc} style={{padding:'0.2rem 0.4rem', borderRadius:'6px', border:'1px solid var(--border)', background:'var(--surface)', color:'var(--text)', cursor:'pointer', fontSize:'0.7rem'}}>MAX USDC</button>
           </div>
         </div>
         <input
