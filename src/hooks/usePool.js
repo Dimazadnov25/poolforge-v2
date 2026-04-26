@@ -356,10 +356,7 @@ export function usePool() {
       let tickUpper = tickUpperRaw
       const slRaw = Math.floor(tickLowerRaw / tia) * tia
       const suRaw = Math.floor(tickUpperRaw / tia) * tia
-      if (slRaw === suRaw) {
-        tickLower = slRaw
-        tickUpper = slRaw + tia
-      }
+      // For same-array ranges, use original ticks - pass same array for both
       const positionMintKeypair = Keypair.generate()
       const positionMint = positionMintKeypair.publicKey
       const positionPDA = getPositionPDA(positionMint)
@@ -412,7 +409,7 @@ export function usePool() {
       const startCurrentActual = getStartTickIndex(currentTickNow, poolState.tickSpacing)
       console.log('ticks:', tickLowerActual, tickUpperActual, 'current:', currentTickNow, 'arrays:', startLowerActual, startUpperActual, startCurrentActual)
       const tickArrayLowerActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, startLowerActual)
-      const tickArrayUpperActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, startUpperActual)
+      const tickArrayUpperActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, startLowerActual === startUpperActual ? startLowerActual : startUpperActual)
       console.log('TX2 tick arrays ready')
       const { blockhash: bh2, lastValidBlockHeight: lv2 } = await connection.getLatestBlockhash()
       const tx2 = new Transaction({ recentBlockhash: bh2, feePayer: wallet.publicKey })
