@@ -72,6 +72,20 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
             <button type="button" onClick={(e)=>{e.stopPropagation();if(!details||!poolState?.currentPrice) return;const p=poolState.currentPrice;const pl=details.priceLower;const pu=details.priceUpper;const sqrtP=Math.sqrt(p*1e-3);const sqrtPl=Math.sqrt(pl*1e-3);const sqrtPu=Math.sqrt(pu*1e-3);const usdcAvail=usdcBalance||0;const liq=usdcAvail*1e6/(sqrtP-sqrtPl);const solNeeded=liq*(1/sqrtP-1/sqrtPu)/1e9;setAddAmount(Math.min(solNeeded,Math.max(0,(solBalance||0)-0.01)).toFixed(4))}} style={{padding:'0.2rem 0.4rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',cursor:'pointer',fontSize:'0.7rem'}}>MAX USDC</button>
           </div>
         </div>
+        {addAmount && details && poolState?.currentPrice && (() => {
+          const p=poolState.currentPrice;const pl=details.priceLower;const pu=details.priceUpper;
+          const sqrtP=Math.sqrt(p*1e-3);const sqrtPl=Math.sqrt(pl*1e-3);const sqrtPu=Math.sqrt(pu*1e-3);
+          const lam=parseFloat(addAmount)*1e9;
+          const liq=lam*sqrtP*sqrtPu/(sqrtPu-sqrtP);
+          const usdcNeeded=liq*(sqrtP-sqrtPl)/1e6;
+          const solNeeded=parseFloat(addAmount);
+          const hasSOL=(solBalance||0)>=solNeeded+0.01;
+          const hasUSDC=(usdcBalance||0)>=usdcNeeded;
+          const ok=hasSOL&&hasUSDC;
+          return <div style={{marginBottom:'0.25rem',padding:'0.4rem',borderRadius:'8px',border:'2px solid '+(ok?'#22c55e':'#ef4444'),background:ok?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.1)',color:ok?'#22c55e':'#ef4444',fontSize:'0.75rem',textAlign:'center'}}>
+            SOL: {solNeeded.toFixed(4)} {hasSOL?'✅':'❌'} | USDC: {usdcNeeded.toFixed(2)} {hasUSDC?'✅':'❌'}
+          </div>
+        })()}
         <button type="button" className="btn btn-blue" style={{width:'100%'}}
           onClick={(e) => { e.stopPropagation(); if (addAmount && onAddLiquidity) { onAddLiquidity(position.mint, parseFloat(addAmount)); setAddAmount('') } }}>
           Add Liquidity
