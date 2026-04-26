@@ -437,6 +437,7 @@ export function usePool() {
         { pubkey: wallet.publicKey, isSigner: false, isWritable: true },
         { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
       ], data: Buffer.from([9]) }))
+      console.log('TX2 signing, instructions:', tx2.instructions.length)
       setTxStatus('signing')
       const signed2 = await wallet.signTransaction(tx2)
       setTxStatus('sending')
