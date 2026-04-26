@@ -402,13 +402,17 @@ export function usePool() {
       const sig1 = await connection.sendRawTransaction(signed1.serialize(), { skipPreflight: true })
       await connection.confirmTransaction({ signature: sig1, blockhash: bh1, lastValidBlockHeight: lv1 }, 'confirmed')
       await new Promise(r => setTimeout(r, 2000))
-      // Re-read ticks from position after TX1
+      const poolInfoCheck = await connection.getAccountInfo(SOL_USDC_WHIRLPOOL)
+      const currentTickNow = poolInfoCheck.data.readInt32LE(81)
       const posInfoCheck = await connection.getAccountInfo(positionPDA)
       const tickLowerActual = posInfoCheck ? posInfoCheck.data.readInt32LE(88) : tickLower
       const tickUpperActual = posInfoCheck ? posInfoCheck.data.readInt32LE(92) : tickUpper
-      const tickArrayLowerActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickLowerActual, poolState.tickSpacing))
-      const tickArrayUpperActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, getStartTickIndex(tickUpperActual, poolState.tickSpacing))
-      console.log('actual ticks:', tickLowerActual, tickUpperActual)
+      const startLowerActual = getStartTickIndex(tickLowerActual, poolState.tickSpacing)
+      const startUpperActual = getStartTickIndex(tickUpperActual, poolState.tickSpacing)
+      const startCurrentActual = getStartTickIndex(currentTickNow, poolState.tickSpacing)
+      console.log('ticks:', tickLowerActual, tickUpperActual, 'current:', currentTickNow, 'arrays:', startLowerActual, startUpperActual, startCurrentActual)
+      const tickArrayLowerActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, startLowerActual)
+      const tickArrayUpperActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, startUpperActual)
       const { blockhash: bh2, lastValidBlockHeight: lv2 } = await connection.getLatestBlockhash()
       const tx2 = new Transaction({ recentBlockhash: bh2, feePayer: wallet.publicKey })
       const wsolInfo = await connection.getAccountInfo(tokenOwnerA)
