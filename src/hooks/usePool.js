@@ -413,6 +413,7 @@ export function usePool() {
       console.log('ticks:', tickLowerActual, tickUpperActual, 'current:', currentTickNow, 'arrays:', startLowerActual, startUpperActual, startCurrentActual)
       const tickArrayLowerActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, startLowerActual)
       const tickArrayUpperActual = getTickArrayAddress(SOL_USDC_WHIRLPOOL, startUpperActual)
+      console.log('TX2 tick arrays ready')
       const { blockhash: bh2, lastValidBlockHeight: lv2 } = await connection.getLatestBlockhash()
       const tx2 = new Transaction({ recentBlockhash: bh2, feePayer: wallet.publicKey })
       const wsolInfo = await connection.getAccountInfo(tokenOwnerA)
