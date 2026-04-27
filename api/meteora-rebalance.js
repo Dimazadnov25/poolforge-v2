@@ -1,7 +1,7 @@
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 
 const RPC = process.env.VITE_RPC_URL;
-const PRIVATE_KEY = JSON.parse(process.env.REBALANCE_PRIVATE_KEY);
+const PRIVATE_KEY = JSON.parse(process.env.REBALANCE_PRIVATE_KEY.replace(/\s/g, ''));
 
 // Dein Haupt-Wallet (besitzt die Position)
 const OWNER = new PublicKey("BFU5gQ5jYq534vSDKGnBSNffwtoTZFkeo68WJmviVVzj");
