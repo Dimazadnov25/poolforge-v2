@@ -11,7 +11,8 @@ const BIN_SPREAD = 10;
 export default async function handler(req, res) {
   try {
     const connection = new Connection(RPC, "confirmed");
-    const poolAddress = req.body?.poolAddress;
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+const poolAddress = body?.poolAddress;
     if (!poolAddress) {
       return res.status(400).json({ error: "poolAddress fehlt" });
     }
