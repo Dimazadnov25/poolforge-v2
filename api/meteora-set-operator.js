@@ -1,6 +1,5 @@
-import { Connection, PublicKey, Transaction, TransactionInstruction, SystemProgram } from "@solana/web3.js";
+import { Connection, PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
 
-const POOL_ADDRESS = "5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6";
 const POSITION_ADDRESS = "K5K1WgzUgtsW2DS29M6pDzGTjJcUP5tWxrQYc2r2QNi";
 const OWNER = "BFU5gQ5jYq534vSDKGnBSNffwtoTZFkeo68WJmviVVzj";
 const OPERATOR = "CEZLAd4XHjVNmJUfQujfVSd6g1NZX1QiuH6WCC7B4r61";
@@ -15,13 +14,8 @@ export default async function handler(req, res) {
     const operatorPubkey = new PublicKey(OPERATOR);
     const positionPubkey = new PublicKey(POSITION_ADDRESS);
 
-    // updatePositionOperator instruction discriminator
-    const discriminator = Buffer.from([202, 185, 224, 11, 168, 176, 197, 18]);
-    
-    const data = Buffer.concat([
-      discriminator,
-      operatorPubkey.toBuffer()
-    ]);
+    const discriminator = Buffer.from([202, 184, 103, 143, 180, 191, 116, 217]);
+    const data = Buffer.concat([discriminator, operatorPubkey.toBuffer()]);
 
     const instruction = new TransactionInstruction({
       programId: DLMM_PROGRAM,
