@@ -1,4 +1,4 @@
-import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction, SystemProgram } from "@solana/web3.js";
 import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 const POOL_ADDRESS = "5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6";
@@ -10,10 +10,24 @@ const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 const BIN_SPREAD = 4;
 
 const DISC_REMOVE = Buffer.from([80, 85, 209, 72, 24, 206, 177, 108]);
-const DISC_CLAIM = Buffer.from([169, 32, 79, 137, 136, 232, 70, 137]);
+
+function getBinArrayPDA(poolPubkey, binArrayIdx) {
+  const idxBuffer = Buffer.alloc(4);
+  idxBuffer.writeInt32LE(binArrayIdx);
+  const [pda] = PublicKey.findProgramAddressSync(
+    [Buffer.from("bin_array"), poolPubkey.toBuffer(), idxBuffer],
+    DLMM_PROGRAM
+  );
+  return pda;
+}
 
 export default async function handler(req, res) {
   try {
+    const authHeader = req.headers['authorization'];
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const raw = process.env.REBALANCE_PRIVATE_KEY || '';
     const PRIVATE_KEY = JSON.parse(raw.replace(/\s/g, ''));
     const rebalanceKeypair = Keypair.fromSecretKey(Uint8Array.from(PRIVATE_KEY));
@@ -23,7 +37,6 @@ export default async function handler(req, res) {
     const poolPubkey = new PublicKey(POOL_ADDRESS);
     const positionPubkey = new PublicKey(POSITION_ADDRESS);
 
-    // Pool und Position lesen
     const poolInfo = await connection.getAccountInfo(poolPubkey);
     const positionInfo = await connection.getAccountInfo(positionPubkey);
     const activeBin = poolInfo.data.readInt32LE(76);
@@ -35,34 +48,23 @@ export default async function handler(req, res) {
       return res.status(200).json({ status: "in_range", activeBin, message: "Kein Rebalance nötig" });
     }
 
-    // Pool Reserves lesen
+    // Reserves
     const reserveX = new PublicKey(poolInfo.data.slice(72, 104));
     const reserveY = new PublicKey(poolInfo.data.slice(104, 136));
-
-    // User Token Accounts
     const userTokenX = getAssociatedTokenAddressSync(SOL_MINT, OWNER);
     const userTokenY = getAssociatedTokenAddressSync(USDC_MINT, OWNER);
 
-    // Event Authority
     const [eventAuthority] = PublicKey.findProgramAddressSync(
       [Buffer.from("__event_authority")], DLMM_PROGRAM
     );
 
-    // Bin Arrays für Position
     const BIN_ARRAY_SIZE = 70;
     const lowerBinArrayIdx = Math.floor(lowerBinId / BIN_ARRAY_SIZE);
     const upperBinArrayIdx = Math.floor(upperBinId / BIN_ARRAY_SIZE);
+    const binArrayLower = getBinArrayPDA(poolPubkey, lowerBinArrayIdx);
+    const binArrayUpper = getBinArrayPDA(poolPubkey, upperBinArrayIdx);
 
-    const [binArrayLower] = PublicKey.findProgramAddressSync(
-      [Buffer.from("bin_array"), poolPubkey.toBuffer(), Buffer.from(new Int32Array([lowerBinArrayIdx]).buffer)],
-      DLMM_PROGRAM
-    );
-    const [binArrayUpper] = PublicKey.findProgramAddressSync(
-      [Buffer.from("bin_array"), poolPubkey.toBuffer(), Buffer.from(new Int32Array([upperBinArrayIdx]).buffer)],
-      DLMM_PROGRAM
-    );
-
-    // Remove Liquidity Instruction
+    // Step 1: Remove Liquidity
     const removeLiqIx = new TransactionInstruction({
       programId: DLMM_PROGRAM,
       keys: [
@@ -94,12 +96,16 @@ export default async function handler(req, res) {
     const sig = await connection.sendRawTransaction(tx.serialize());
     await connection.confirmTransaction(sig);
 
+    const newLower = activeBin - BIN_SPREAD;
+    const newUpper = activeBin + BIN_SPREAD;
+
     return res.status(200).json({
       status: "rebalanced",
       activeBin,
       oldRange: { lower: lowerBinId, upper: upperBinId },
-      newRange: { lower: activeBin - BIN_SPREAD, upper: activeBin + BIN_SPREAD },
+      newRange: { lower: newLower, upper: newUpper },
       removeSig: sig,
+      message: "Liquidität entfernt! Neue Position wird manuell geöffnet.",
     });
 
   } catch (err) {
