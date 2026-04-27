@@ -13,26 +13,23 @@ export default async function handler(req, res) {
     const RPC = process.env.VITE_RPC_URL;
     const connection = new Connection(RPC, "confirmed");
 
-    // Pool aktiven Bin lesen - alle möglichen Offsets testen
     const poolInfo = await connection.getAccountInfo(new PublicKey(POOL_ADDRESS));
     const positionInfo = await connection.getAccountInfo(new PublicKey(POSITION_ADDRESS));
 
-    // Pool: activeId bei verschiedenen Offsets
-    const poolOffsets = {};
-    for (let i = 60; i <= 90; i += 4) {
-      poolOffsets[i] = poolInfo.data.readInt32LE(i);
-    }
+    // Aktiver Bin bei Offset 76
+    const activeBin = poolInfo.data.readInt32LE(76);
 
-    // Position: lowerBinId bei verschiedenen Offsets  
-    const posOffsets = {};
-    for (let i = 72; i <= 108; i += 4) {
-      posOffsets[i] = positionInfo.data.readInt32LE(i);
-    }
+    // Position Range
+    const lowerBinId = positionInfo.data.readInt32LE(392);
+    const upperBinId = positionInfo.data.readInt32LE(396);
+
+    const inRange = activeBin >= lowerBinId && activeBin <= upperBinId;
 
     return res.status(200).json({
+      status: inRange ? "in_range" : "needs_rebalance",
+      activeBin,
+      position: { lower: lowerBinId, upper: upperBinId },
       rebalanceWallet: rebalanceKeypair.publicKey.toBase58(),
-      poolOffsets,
-      posOffsets,
     });
 
   } catch (err) {
