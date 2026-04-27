@@ -1,0 +1,51 @@
+import { Connection, PublicKey, Transaction, TransactionInstruction, SystemProgram } from "@solana/web3.js";
+
+const POOL_ADDRESS = "5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6";
+const POSITION_ADDRESS = "K5K1WgzUgtsW2DS29M6pDzGTjJcUP5tWxrQYc2r2QNi";
+const OWNER = "BFU5gQ5jYq534vSDKGnBSNffwtoTZFkeo68WJmviVVzj";
+const OPERATOR = "CEZLAd4XHjVNmJUfQujfVSd6g1NZX1QiuH6WCC7B4r61";
+const DLMM_PROGRAM = new PublicKey("LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo");
+
+export default async function handler(req, res) {
+  try {
+    const RPC = process.env.VITE_RPC_URL;
+    const connection = new Connection(RPC, "confirmed");
+
+    const ownerPubkey = new PublicKey(OWNER);
+    const operatorPubkey = new PublicKey(OPERATOR);
+    const positionPubkey = new PublicKey(POSITION_ADDRESS);
+
+    // updatePositionOperator instruction discriminator
+    const discriminator = Buffer.from([202, 185, 224, 11, 168, 176, 197, 18]);
+    
+    const data = Buffer.concat([
+      discriminator,
+      operatorPubkey.toBuffer()
+    ]);
+
+    const instruction = new TransactionInstruction({
+      programId: DLMM_PROGRAM,
+      keys: [
+        { pubkey: positionPubkey, isSigner: false, isWritable: true },
+        { pubkey: ownerPubkey, isSigner: true, isWritable: false },
+      ],
+      data,
+    });
+
+    const tx = new Transaction();
+    tx.add(instruction);
+    tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+    tx.feePayer = ownerPubkey;
+
+    const serialized = tx.serialize({ requireAllSignatures: false });
+    const base64 = Buffer.from(serialized).toString("base64");
+
+    return res.status(200).json({
+      transaction: base64,
+      message: "Einmalig in Phantom bestätigen um Operator zu setzen"
+    });
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
