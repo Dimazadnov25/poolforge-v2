@@ -6,32 +6,32 @@ const POOL_ADDRESS = "5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6";
 export default async function handler(req, res) {
   try {
     const raw = process.env.REBALANCE_PRIVATE_KEY || '';
-    const PRIVATE_KEY = JSON.parse(raw.replace(/\s/g, ''));
+    
+    if (!raw || raw.length < 10) {
+      return res.status(200).json({ error: "Key leer", length: raw.length });
+    }
+
+    const cleaned = raw.replace(/\s/g, '').replace(/\n/g, '').replace(/\r/g, '');
+    
+    let PRIVATE_KEY;
+    try {
+      PRIVATE_KEY = JSON.parse(cleaned);
+    } catch(e) {
+      return res.status(200).json({ 
+        error: "Parse failed", 
+        msg: e.message,
+        length: cleaned.length,
+        first20: cleaned.substring(0, 20),
+        last5: cleaned.substring(cleaned.length - 5)
+      });
+    }
+
     const rebalanceKeypair = Keypair.fromSecretKey(Uint8Array.from(PRIVATE_KEY));
-    const RPC = process.env.VITE_RPC_URL;
-    const connection = new Connection(RPC, "confirmed");
-
-    // Aktiven Bin on-chain lesen
-    const poolPubkey = new PublicKey(POOL_ADDRESS);
-    const accountInfo = await connection.getAccountInfo(poolPubkey);
-    if (!accountInfo) return res.status(404).json({ error: "Pool nicht gefunden" });
-    const activeBin = accountInfo.data.readInt32LE(70);
-
-    // Position über Meteora datapi lesen
-    const positionsResp = await fetch(
-      `https://dlmm.datapi.meteora.ag/wallet/${OWNER}/positions`
-    ).then(r => r.json());
-
-    const position = positionsResp?.data?.find(p => 
-      p.pool_address === POOL_ADDRESS || 
-      p.poolAddress === POOL_ADDRESS
-    );
-
+    
     return res.status(200).json({
-      activeBin,
-      position: position || null,
-      rawKeys: positionsResp ? Object.keys(positionsResp) : [],
+      status: "ok",
       rebalanceWallet: rebalanceKeypair.publicKey.toBase58(),
+      keyLength: PRIVATE_KEY.length
     });
 
   } catch (err) {
