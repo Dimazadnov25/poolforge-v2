@@ -14,6 +14,12 @@ export default async function handler(req, res) {
     const operatorPubkey = new PublicKey(OPERATOR);
     const positionPubkey = new PublicKey(POSITION_ADDRESS);
 
+    // Event authority PDA
+    const [eventAuthority] = PublicKey.findProgramAddressSync(
+      [Buffer.from("__event_authority")],
+      DLMM_PROGRAM
+    );
+
     const discriminator = Buffer.from([202, 184, 103, 143, 180, 191, 116, 217]);
     const data = Buffer.concat([discriminator, operatorPubkey.toBuffer()]);
 
@@ -22,6 +28,8 @@ export default async function handler(req, res) {
       keys: [
         { pubkey: positionPubkey, isSigner: false, isWritable: true },
         { pubkey: ownerPubkey, isSigner: true, isWritable: false },
+        { pubkey: eventAuthority, isSigner: false, isWritable: false },
+        { pubkey: DLMM_PROGRAM, isSigner: false, isWritable: false },
       ],
       data,
     });
