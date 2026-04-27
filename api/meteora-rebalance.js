@@ -17,11 +17,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "poolAddress fehlt" });
     }
 
-    const poolInfo = await fetch(
-      `https://dlmm-api.meteora.ag/pair/${poolAddress}`
-    ).then((r) => r.json());
+    // Aktiven Bin direkt on-chain lesen (kein externes API nötig)
+    const poolPubkey = new PublicKey(poolAddress);
+    const accountInfo = await connection.getAccountInfo(poolPubkey);
+    if (!accountInfo) {
+      return res.status(404).json({ error: "Pool nicht gefunden" });
+    }
 
-    const activeBin = poolInfo.active_bin_id;
+    // activeId ist bei Offset 70 gespeichert (4 bytes, little-endian int32)
+    const activeBin = accountInfo.data.readInt32LE(70);
     const newBinLower = activeBin - BIN_SPREAD;
     const newBinUpper = activeBin + BIN_SPREAD;
 
