@@ -1,6 +1,7 @@
 export default async function handler(req, res) {
   try {
-    const { default: DLMM } = await import("@meteora-ag/dlmm");
+    const dlmmModule = await import("@meteora-ag/dlmm");
+    const DLMM = dlmmModule.default || dlmmModule.DLMM || dlmmModule;
     const { Connection, PublicKey, Keypair } = await import("@solana/web3.js");
     const { default: BN } = await import("bn.js");
 
