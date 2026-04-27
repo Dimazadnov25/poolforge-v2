@@ -62,7 +62,7 @@ export default function PoolDashboard() {
       {pool.error && <div className="error-banner">{pool.error}</div>}
       {pool.txStatus && <div className={'tx-status tx-status--' + pool.txStatus}>{pool.txStatus}</div>}
 
-      {wallet.connected ? (
+      <MeteoraDashboard solPrice={pool.solPrice} />{wallet.connected ? (
         <div>
           {pool.positions.length > 0 && (
             <div className="positions-list" style={{marginBottom:'1rem'}}>
@@ -104,3 +104,4 @@ export default function PoolDashboard() {
     </div>
   )
 }
+
