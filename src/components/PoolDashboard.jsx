@@ -1,4 +1,4 @@
-ï»¿import { useWallet } from '@solana/wallet-adapter-react'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { useState, useCallback } from 'react'
 import { usePool } from '../hooks/usePool'
@@ -6,6 +6,7 @@ import PoolStats from './PoolStats'
 import PositionDetails from './PositionDetails'
 import OpenPositionForm from './OpenPositionForm'
 import StakeDashboard from './StakeDashboard'
+import MeteoraDashboard from './MeteoraDashboard'
 
 export default function PoolDashboard() {
   const wallet = useWallet()
@@ -52,8 +53,8 @@ export default function PoolDashboard() {
 
       {wallet.connected && (
         <div className="balances">
-          <span>SOL: <strong>{pool.solBalance != null ? pool.solBalance.toFixed(4) : 'â€”'}</strong></span>
-          <span>USDC: <strong>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : 'â€”'}</strong></span>
+          <span>SOL: <strong>{pool.solBalance != null ? pool.solBalance.toFixed(4) : '—'}</strong></span>
+          <span>USDC: <strong>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : '—'}</strong></span>
           
         </div>
       )}
@@ -84,6 +85,7 @@ export default function PoolDashboard() {
               ))}
             </div>
           )}
+          <MeteoraDashboard solPrice={pool.solPrice} />
           <StakeDashboard solPrice={pool.solPrice} solBalance={pool.solBalance} />
           
           <OpenPositionForm
