@@ -13,7 +13,9 @@ const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 const SOL_MINT_STR = "So11111111111111111111111111111111111111112";
 const USDC_MINT_STR = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const BIN_SPREAD = 4;
-const DISC_REMOVE = Buffer.from([213, 126, 47, 177, 34, 130, 243, 175]);
+
+// removeLiquidityByRange2(lowerBinId, upperBinId, bps)
+const DISC_REMOVE = Buffer.from([204, 2, 195, 145, 53, 145, 145, 205]);
 const DISC_INIT_ADD = Buffer.from([109, 230, 87, 162, 44, 49, 97, 75]);
 
 function getBinArrayPDA(poolPubkey, idx) {
@@ -27,6 +29,14 @@ function encodeBN(value, bytes=8) {
   const buf = Buffer.alloc(bytes);
   let v = BigInt(value);
   for(let i=0;i<bytes;i++) { buf[i]=Number(v&0xffn); v>>=8n; }
+  return buf;
+}
+
+function encodeRemoveParams(lowerBinId, upperBinId, bps) {
+  const buf = Buffer.alloc(10);
+  buf.writeInt32LE(lowerBinId, 0);
+  buf.writeInt32LE(upperBinId, 4);
+  buf.writeUInt16LE(bps, 8);
   return buf;
 }
 
@@ -58,7 +68,9 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
   const binArrayLower = getBinArrayPDA(poolPubkey, Math.floor(lowerBinId/BIN_ARRAY_SIZE));
   const binArrayUpper = getBinArrayPDA(poolPubkey, Math.floor(upperBinId/BIN_ARRAY_SIZE));
 
-  // Remove
+  // Remove with lowerBinId, upperBinId, bps=10000 (100%)
+  const removeData = Buffer.concat([DISC_REMOVE, encodeRemoveParams(lowerBinId, upperBinId, 10000)]);
+
   const removeTx = new Transaction();
   removeTx.add(new TransactionInstruction({
     programId: DLMM_PROGRAM,
@@ -79,7 +91,7 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
       {pubkey:eventAuthority,isSigner:false,isWritable:false},
       {pubkey:DLMM_PROGRAM,isSigner:false,isWritable:false},
     ],
-    data: DISC_REMOVE,
+    data: removeData,
   }));
   removeTx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
   removeTx.feePayer = rebalanceKeypair.publicKey;
@@ -87,7 +99,7 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
   const removeSig = await connection.sendRawTransaction(removeTx.serialize());
   await connection.confirmTransaction(removeSig);
 
-  // Swap
+  // Swap to 50/50
   await new Promise(r=>setTimeout(r,2000));
   const solBalance = await connection.getBalance(OWNER);
   const usdcAccount = await connection.getTokenAccountBalance(userTokenY);
@@ -157,7 +169,6 @@ export default async function handler(req, res) {
   try {
     const authHeader = req.headers['authorization'];
     if(authHeader !== `Bearer ${process.env.CRON_SECRET}`) return res.status(401).json({error:"Unauthorized"});
-
     const raw = process.env.REBALANCE_PRIVATE_KEY || '';
     const PRIVATE_KEY = JSON.parse(raw.replace(/\s/g,''));
     const rebalanceKeypair = Keypair.fromSecretKey(Uint8Array.from(PRIVATE_KEY));
@@ -166,19 +177,13 @@ export default async function handler(req, res) {
     const poolPubkey = new PublicKey(POOL_ADDRESS);
     const poolInfo = await connection.getAccountInfo(poolPubkey);
     const activeBin = poolInfo.data.readInt32LE(76);
-
     const results = [];
     for(const posAddr of POSITIONS) {
-      const positionPubkey = new PublicKey(posAddr);
-      const result = await rebalancePosition(connection, rebalanceKeypair, poolPubkey, positionPubkey, activeBin, poolInfo);
+      const result = await rebalancePosition(connection, rebalanceKeypair, poolPubkey, new PublicKey(posAddr), activeBin, poolInfo);
       results.push({ position: posAddr, ...result });
     }
-
     return res.status(200).json({ activeBin, results });
-
   } catch(err) {
     return res.status(500).json({ error: err.message });
   }
 }
-
-
