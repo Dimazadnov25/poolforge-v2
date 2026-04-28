@@ -13,7 +13,7 @@ const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 const SOL_MINT_STR = "So11111111111111111111111111111111111111112";
 const USDC_MINT_STR = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const BIN_SPREAD = 4;
-const DISC_REMOVE = Buffer.from([80, 85, 209, 72, 24, 206, 177, 108]);
+const DISC_REMOVE = Buffer.from([10, 51, 61, 35, 112, 105, 24, 85]);
 const DISC_INIT_ADD = Buffer.from([109, 230, 87, 162, 44, 49, 97, 75]);
 
 function getBinArrayPDA(poolPubkey, idx) {
@@ -180,3 +180,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
