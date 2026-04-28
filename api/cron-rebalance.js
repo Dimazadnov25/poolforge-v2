@@ -33,10 +33,11 @@ function encodeBN(value, bytes=8) {
 }
 
 function encodeRemoveParams(lowerBinId, upperBinId, bps) {
-  const buf = Buffer.alloc(10);
+  const buf = Buffer.alloc(14);
   buf.writeInt32LE(lowerBinId, 0);
   buf.writeInt32LE(upperBinId, 4);
   buf.writeUInt16LE(bps, 8);
+  buf.writeUInt32LE(0, 10); // empty slices vec
   return buf;
 }
 
@@ -187,3 +188,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
