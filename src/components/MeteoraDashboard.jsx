@@ -34,7 +34,7 @@ export default function MeteoraDashboard({ solPrice }) {
     setLoading(true)
     setMsg('Operator wird gesetzt...')
     try {
-      const r = await fetch(API + '/api/meteora-set-operator', { method: 'POST' })
+      const r = await fetch(API + '/api/meteora-set-operator2', { method: 'POST' })
       const { transaction } = await r.json()
       const tx = Transaction.from(Buffer.from(transaction, 'base64'))
       const signed = await wallet.signTransaction(tx)
@@ -81,3 +81,4 @@ export default function MeteoraDashboard({ solPrice }) {
     </div>
   )
 }
+
