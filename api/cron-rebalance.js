@@ -3,7 +3,7 @@ import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID } from "@solana/spl-tok
 
 const POOL_ADDRESS = "5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6";
 const POSITIONS = [
-  "K5K1WgzUgtsW2DS29M6pDzGTjJcUP5tWxrQYc2r2QNi",
+  
   "MkajHWsrmJrHpgxq6z64M26GDiGKazjSmpSaJnX5S1p"
 ];
 const OWNER = new PublicKey("BFU5gQ5jYq534vSDKGnBSNffwtoTZFkeo68WJmviVVzj");
@@ -188,4 +188,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
 
