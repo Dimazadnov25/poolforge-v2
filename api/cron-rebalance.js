@@ -68,7 +68,7 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
   const userTokenX = getAssociatedTokenAddressSync(SOL_MINT, OWNER);
   const userTokenY = getAssociatedTokenAddressSync(USDC_MINT, OWNER);
   const [eventAuthority] = PublicKey.findProgramAddressSync([Buffer.from("__event_authority")], DLMM_PROGRAM);
-  const bitmapExtension = getBitmapExtensionPDA(poolPubkey);
+  const bitmapExtension = DLMM_PROGRAM;
   const BIN_ARRAY_SIZE = 70;
   const binArrayLower = getBinArrayPDA(poolPubkey, Math.floor(lowerBinId/BIN_ARRAY_SIZE));
   const binArrayUpper = getBinArrayPDA(poolPubkey, Math.floor(upperBinId/BIN_ARRAY_SIZE));
@@ -191,3 +191,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
