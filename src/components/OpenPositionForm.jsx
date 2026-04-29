@@ -70,10 +70,9 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
     const sqrtP = Math.sqrt(p * 1e-3)
     const sqrtPl = Math.sqrt(pl * 1e-3)
     const sqrtPu = Math.sqrt(pu * 1e-3)
-    const liq = usdcAvailable * 1e6 / (sqrtP - sqrtPl)
-    const solNeeded = liq * (1 / sqrtP - 1 / sqrtPu) / 1e9
     const solAvail = Math.max(0, (pool?.solBalance || 0) - 0.01)
-    setSolAmount(Math.min(solNeeded, solAvail).toFixed(4))
+    const solFromUsdc = usdcAvailable / currentPrice
+    setSolAmount(Math.min(solFromUsdc, solAvail).toFixed(4))
   }
 
   const handleSubmit = (e) => {
@@ -162,3 +161,4 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
     </div>
   )
 }
+
