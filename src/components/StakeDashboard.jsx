@@ -95,9 +95,9 @@ export default function StakeDashboard({ solPrice, solBalance }) {
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>${jupsolValueUSD.toFixed(4)} USD</div>
         </div>
         <div style={{textAlign:'right'}}>
-          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>APY</div>
-          <div style={{color:'#06b6d4', fontWeight:'bold', fontSize:'1.5rem'}}>{JUPSOL_APY}%</div>
-          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>~${yearlyYield.toFixed(2)}/year</div>
+          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>SOL 24h</div>
+          <div style={{color: solPrice > 82 ? 'var(--green)' : '#f87171', fontWeight:'bold', fontSize:'1.5rem'}}>{solPrice ? (((solPrice - 82) / 82) * 100).toFixed(2) : '—'}%</div>
+          <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>${jupsolValueUSD.toFixed(2)} Wert</div>
         </div>
       </div>
       {jupsolPrice && (
