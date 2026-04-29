@@ -87,6 +87,8 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
       {pubkey:TOKEN_PROGRAM_ID,isSigner:false,isWritable:false},
       {pubkey:TOKEN_PROGRAM_ID,isSigner:false,isWritable:false},
       {pubkey:MEMO_PROGRAM,isSigner:false,isWritable:false},
+      {pubkey:binArrayLower,isSigner:false,isWritable:true},
+      {pubkey:binArrayUpper,isSigner:false,isWritable:true},
       {pubkey:EVENT_AUTHORITY,isSigner:false,isWritable:false},
       {pubkey:DLMM_PROGRAM,isSigner:false,isWritable:false},
     ],
@@ -184,3 +186,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
