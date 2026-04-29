@@ -111,9 +111,9 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
   const totalValue = solValueUsdc+usdcValue;
   const targetUsdc = totalValue/2;
   let swapSig = null;
-  if(usdcValue > targetUsdc*1.1) {
+  if(false && usdcValue > targetUsdc*1.1) {
     swapSig = await jupiterSwap(connection, rebalanceKeypair, USDC_MINT_STR, SOL_MINT_STR, Math.floor((usdcValue-targetUsdc)*1e6));
-  } else if(solValueUsdc > targetUsdc*1.1) {
+  } else if(false && solValueUsdc > targetUsdc*1.1) {
     swapSig = await jupiterSwap(connection, rebalanceKeypair, SOL_MINT_STR, USDC_MINT_STR, Math.floor((solValueUsdc-targetUsdc)/solPrice*1e9));
   }
 
@@ -189,6 +189,7 @@ export default async function handler(req, res) {
 
 
 // cache bust
+
 
 
 
