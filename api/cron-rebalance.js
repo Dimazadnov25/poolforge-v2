@@ -10,7 +10,11 @@ const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 const SOL_MINT_STR = "So11111111111111111111111111111111111111112";
 const USDC_MINT_STR = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const MEMO_PROGRAM = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
-const BIN_SPREAD = 4;
+const BITMAP_EXTENSION = new PublicKey("DArpuuqJxNLRGQ8xq5ebZbobyjxSWWsPq8MqSZ2fUZLE");
+const EVENT_AUTHORITY = new PublicKey("D1ZN9Wj1fRSUQfCjhvnu1hqDMT7hzjzBBpi12nVniYD6");
+const RESERVE_X = new PublicKey("EYj9xKw6ZszwpyNibHY7JD5o3QgTVrSdcBp1fMJhrR9o");
+const RESERVE_Y = new PublicKey("CoaxzEh8p5YyGLcj36Eo3cUThVJxeKCs7qvLAGDYwBcz");
+const BIN_SPREAD = 10;
 
 const DISC_REMOVE = Buffer.from([204, 2, 195, 145, 53, 145, 145, 205]);
 const DISC_INIT_ADD = Buffer.from([109, 230, 87, 162, 44, 49, 97, 75]);
@@ -58,11 +62,8 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
   const inRange = activeBin >= lowerBinId && activeBin <= upperBinId;
   if(inRange) return { status: "in_range", lower: lowerBinId, upper: upperBinId };
 
-  const reserveX = new PublicKey(poolInfo.data.slice(72, 104));
-  const reserveY = new PublicKey(poolInfo.data.slice(104, 136));
   const userTokenX = getAssociatedTokenAddressSync(SOL_MINT, OWNER);
   const userTokenY = getAssociatedTokenAddressSync(USDC_MINT, OWNER);
-  const [eventAuthority] = PublicKey.findProgramAddressSync([Buffer.from("__event_authority")], DLMM_PROGRAM);
   const BIN_ARRAY_SIZE = 70;
   const binArrayLower = getBinArrayPDA(poolPubkey, Math.floor(lowerBinId/BIN_ARRAY_SIZE));
   const binArrayUpper = getBinArrayPDA(poolPubkey, Math.floor(upperBinId/BIN_ARRAY_SIZE));
@@ -75,19 +76,18 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
     keys: [
       {pubkey:positionPubkey,isSigner:false,isWritable:true},
       {pubkey:poolPubkey,isSigner:false,isWritable:true},
-      {pubkey:binArrayLower,isSigner:false,isWritable:true},
-      {pubkey:binArrayUpper,isSigner:false,isWritable:true},
+      {pubkey:BITMAP_EXTENSION,isSigner:false,isWritable:true},
       {pubkey:userTokenX,isSigner:false,isWritable:true},
       {pubkey:userTokenY,isSigner:false,isWritable:true},
-      {pubkey:reserveX,isSigner:false,isWritable:true},
-      {pubkey:reserveY,isSigner:false,isWritable:true},
+      {pubkey:RESERVE_X,isSigner:false,isWritable:true},
+      {pubkey:RESERVE_Y,isSigner:false,isWritable:true},
       {pubkey:SOL_MINT,isSigner:false,isWritable:false},
       {pubkey:USDC_MINT,isSigner:false,isWritable:false},
+      {pubkey:rebalanceKeypair.publicKey,isSigner:true,isWritable:true},
       {pubkey:TOKEN_PROGRAM_ID,isSigner:false,isWritable:false},
       {pubkey:TOKEN_PROGRAM_ID,isSigner:false,isWritable:false},
       {pubkey:MEMO_PROGRAM,isSigner:false,isWritable:false},
-      {pubkey:rebalanceKeypair.publicKey,isSigner:true,isWritable:false},
-      {pubkey:eventAuthority,isSigner:false,isWritable:false},
+      {pubkey:EVENT_AUTHORITY,isSigner:false,isWritable:false},
       {pubkey:DLMM_PROGRAM,isSigner:false,isWritable:false},
     ],
     data: removeData,
@@ -140,15 +140,15 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
       {pubkey:newBinArrayLower,isSigner:false,isWritable:true},
       {pubkey:newBinArrayUpper,isSigner:false,isWritable:true},
       {pubkey:OWNER,isSigner:true,isWritable:true},
-      {pubkey:reserveX,isSigner:false,isWritable:true},
-      {pubkey:reserveY,isSigner:false,isWritable:true},
+      {pubkey:RESERVE_X,isSigner:false,isWritable:true},
+      {pubkey:RESERVE_Y,isSigner:false,isWritable:true},
       {pubkey:userTokenX,isSigner:false,isWritable:true},
       {pubkey:userTokenY,isSigner:false,isWritable:true},
       {pubkey:SOL_MINT,isSigner:false,isWritable:false},
       {pubkey:USDC_MINT,isSigner:false,isWritable:false},
       {pubkey:TOKEN_PROGRAM_ID,isSigner:false,isWritable:false},
       {pubkey:SystemProgram.programId,isSigner:false,isWritable:false},
-      {pubkey:eventAuthority,isSigner:false,isWritable:false},
+      {pubkey:EVENT_AUTHORITY,isSigner:false,isWritable:false},
       {pubkey:DLMM_PROGRAM,isSigner:false,isWritable:false},
     ],
     data: initAddData,
@@ -184,5 +184,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
-
-
