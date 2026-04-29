@@ -107,7 +107,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
       </div>
 
       <div style={{marginBottom:'0.5rem', color:'var(--muted)', fontSize:'0.75rem'}}>
-        Range: ${priceLower.toFixed(2)} — ${priceUpper.toFixed(2)}
+        Range: ${priceLower.toFixed(2)} ï¿½ ${priceUpper.toFixed(2)}
       </div>
 
       <div style={{marginBottom:'0.75rem'}}>
@@ -138,7 +138,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
           fontSize:'0.8rem',
           textAlign:'center'
         }}>
-          USDC benötigt: {usdc.toFixed(2)} — Verfügbar: {usdcAvail.toFixed(2)} {hasEnough ? '?' : '?'}
+          USDC benï¿½tigt: {usdc.toFixed(2)} ï¿½ Verfï¿½gbar: {usdcAvail.toFixed(2)} {hasEnough ? '?' : '?'}
         </div>
       )}
 
