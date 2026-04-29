@@ -1,5 +1,5 @@
 import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction, SystemProgram, VersionedTransaction } from "@solana/web3.js";
-import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
+import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 const POOL_ADDRESS = "5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6";
 const POSITIONS = ["MkajHWsrmJrHpgxq6z64M26GDiGKazjSmpSaJnX5S1p"];
@@ -19,11 +19,6 @@ function getBinArrayPDA(poolPubkey, idx) {
   const buf = Buffer.alloc(4);
   buf.writeInt32LE(idx);
   const [pda] = PublicKey.findProgramAddressSync([Buffer.from("bin_array"), poolPubkey.toBuffer(), buf], DLMM_PROGRAM);
-  return pda;
-}
-
-function getBitmapExtensionPDA(poolPubkey) {
-  const [pda] = PublicKey.findProgramAddressSync([Buffer.from("bitmap"), poolPubkey.toBuffer()], DLMM_PROGRAM);
   return pda;
 }
 
@@ -68,7 +63,6 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
   const userTokenX = getAssociatedTokenAddressSync(SOL_MINT, OWNER);
   const userTokenY = getAssociatedTokenAddressSync(USDC_MINT, OWNER);
   const [eventAuthority] = PublicKey.findProgramAddressSync([Buffer.from("__event_authority")], DLMM_PROGRAM);
-  const bitmapExtension = DLMM_PROGRAM;
   const BIN_ARRAY_SIZE = 70;
   const binArrayLower = getBinArrayPDA(poolPubkey, Math.floor(lowerBinId/BIN_ARRAY_SIZE));
   const binArrayUpper = getBinArrayPDA(poolPubkey, Math.floor(upperBinId/BIN_ARRAY_SIZE));
@@ -83,7 +77,6 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
       {pubkey:poolPubkey,isSigner:false,isWritable:true},
       {pubkey:binArrayLower,isSigner:false,isWritable:true},
       {pubkey:binArrayUpper,isSigner:false,isWritable:true},
-      {pubkey:bitmapExtension,isSigner:false,isWritable:false},
       {pubkey:userTokenX,isSigner:false,isWritable:true},
       {pubkey:userTokenY,isSigner:false,isWritable:true},
       {pubkey:reserveX,isSigner:false,isWritable:true},
@@ -191,4 +184,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
-
