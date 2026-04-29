@@ -85,8 +85,7 @@ export default function PoolDashboard() {
               ))}
             </div>
           )}
-          <MeteoraDashboard solPrice={pool.solPrice} />
-          <StakeDashboard solPrice={pool.solPrice} solBalance={pool.solBalance} />
+                    <StakeDashboard solPrice={pool.solPrice} solBalance={pool.solBalance} />
           
           <OpenPositionForm
             pool={pool}
@@ -104,5 +103,6 @@ export default function PoolDashboard() {
     </div>
   )
 }
+
 
 
