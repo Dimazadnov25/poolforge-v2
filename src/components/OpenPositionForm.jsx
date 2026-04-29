@@ -1,4 +1,4 @@
-Ôªøimport { useState } from 'react'
+import { useState } from 'react'
 import { useWallet, useConnection } from '@solana/wallet-adapter-react'
 
 export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
@@ -108,7 +108,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
       </div>
 
       <div style={{marginBottom:'0.5rem', color:'var(--muted)', fontSize:'0.75rem'}}>
-        Range: ${priceLower.toFixed(2)} ‚Äî ${priceUpper.toFixed(2)}
+        Range: ${priceLower.toFixed(2)} ó ${priceUpper.toFixed(2)}
       </div>
 
       <div style={{marginBottom:'0.75rem'}}>
@@ -139,10 +139,23 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
           fontSize:'0.8rem',
           textAlign:'center'
         }}>
-          USDC ben√∂tigt: {usdc.toFixed(2)} ‚Äî Verf√ºgbar: {usdcAvail.toFixed(2)} {hasEnough ? '‚úÖ' : '‚ùå'}
+          USDC benˆtigt: {usdc.toFixed(2)} ó Verf¸gbar: {usdcAvail.toFixed(2)} {hasEnough ? '?' : '?'}
         </div>
       )}
 
+
+      {usdc !== null && solAmount && !hasEnough && (
+        <div style={{marginBottom:'0.75rem'}}>
+          <div style={{color:'#f87171', fontSize:'0.8rem', marginBottom:'0.5rem'}}>
+            Fehlende USDC: {(usdc - usdcAvail).toFixed(2)}
+          </div>
+          <button type="button" className="btn btn-secondary"
+            onClick={() => doSwap('So11111111111111111111111111111111111111112','EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',((usdc - usdcAvail) / currentPrice * 1.02))}
+            disabled={swapping} style={{width:'100%', marginBottom:'0.5rem'}}>
+            {swapping ? 'Swapping...' : `Swap ${((usdc - usdcAvail) / currentPrice * 1.02).toFixed(4)} SOL -> ${(usdc - usdcAvail).toFixed(2)} USDC`}
+          </button>
+        </div>
+      )}
       <button type="button" className="btn btn-blue" onClick={handleSubmit} disabled={loading || !solAmount} style={{width:'100%'}}>
         {loading ? 'Opening...' : 'Open Position'}
       </button>
