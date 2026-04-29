@@ -20,8 +20,7 @@ const DISC_REMOVE = Buffer.from([204, 2, 195, 145, 53, 145, 145, 205]);
 const DISC_INIT_ADD = Buffer.from([109, 230, 87, 162, 44, 49, 97, 75]);
 
 function getBinArrayPDA(poolPubkey, idx) {
-  const buf = Buffer.alloc(4);
-  buf.writeInt32LE(idx);
+  const buf = Buffer.alloc(8); buf.writeBigInt64LE(BigInt(idx));
   const [pda] = PublicKey.findProgramAddressSync([Buffer.from("bin_array"), poolPubkey.toBuffer(), buf], DLMM_PROGRAM);
   return pda;
 }
@@ -190,5 +189,6 @@ export default async function handler(req, res) {
 
 
 // cache bust
+
 
 
