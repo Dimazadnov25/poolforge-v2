@@ -89,6 +89,8 @@ async function rebalancePosition(connection, rebalanceKeypair, poolPubkey, posit
       {pubkey:MEMO_PROGRAM,isSigner:false,isWritable:false},
       {pubkey:EVENT_AUTHORITY,isSigner:false,isWritable:false},
       {pubkey:DLMM_PROGRAM,isSigner:false,isWritable:false},
+      {pubkey:binArrayLower,isSigner:false,isWritable:true},
+      {pubkey:binArrayUpper,isSigner:false,isWritable:true},
     ],
     data: removeData,
   }));
@@ -188,4 +190,5 @@ export default async function handler(req, res) {
 
 
 // cache bust
+
 
