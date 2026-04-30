@@ -79,7 +79,23 @@ export default function StakeDashboard({ solPrice, solBalance }) {
   }
 
   const handleStake = () => doSwap('So11111111111111111111111111111111111111112', 'jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v')
-  const handleUnstake = () => doSwap('jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v', 'So11111111111111111111111111111111111111112')
+  const handleUnstake = async () => {
+    if (!solAmount || !wallet?.publicKey) return
+    try {
+      setLoading(true)
+      const amountLamports = Math.floor(parseFloat(solAmount) * 1e9)
+      const quoteResp = await fetch('https://ultra-api.jup.ag/order?inputMint=jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v&outputMint=So11111111111111111111111111111111111111112&amount='+amountLamports+'&taker='+wallet.publicKey.toBase58())
+      const quote = await quoteResp.json()
+      if(quote.error)throw new Error(quote.error)
+      const tx = (await import('@solana/web3.js')).VersionedTransaction.deserialize(Buffer.from(quote.transaction,'base64'))
+      const signed = await wallet.signTransaction(tx)
+      const sig = await connection.sendRawTransaction(signed.serialize())
+      const latest = await connection.getLatestBlockhash()
+      await connection.confirmTransaction({signature:sig,blockhash:latest.blockhash,lastValidBlockHeight:latest.lastValidBlockHeight},'confirmed')
+      setSolAmount('')
+    } catch(e){ alert('Fehler: '+e.message) }
+    finally{ setLoading(false) }
+  }
 
   const jupsolValueSOL = jupsolBalance && jupsolPrice ? jupsolBalance * jupsolPrice : 0
   const jupsolValueUSD = jupsolValueSOL && solPrice ? jupsolValueSOL * solPrice : 0
