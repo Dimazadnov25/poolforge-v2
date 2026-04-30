@@ -6,6 +6,7 @@ import PoolStats from './PoolStats'
 import PositionDetails from './PositionDetails'
 import OpenPositionForm from './OpenPositionForm'
 import StakeDashboard from './StakeDashboard'
+import LendDashboard from './LendDashboard'
 import MeteoraDashboard from './MeteoraDashboard'
 
 export default function PoolDashboard() {
@@ -53,8 +54,8 @@ export default function PoolDashboard() {
 
       {wallet.connected && (
         <div className="balances">
-          <span>SOL: <strong>{pool.solBalance != null ? pool.solBalance.toFixed(4) : '—'}</strong></span>
-          <span>USDC: <strong>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : '—'}</strong></span>
+          <span>SOL: <strong>{pool.solBalance != null ? pool.solBalance.toFixed(4) : 'ï¿½'}</strong></span>
+          <span>USDC: <strong>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : 'ï¿½'}</strong></span>
           
         </div>
       )}
