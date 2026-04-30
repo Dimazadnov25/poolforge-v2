@@ -14,7 +14,7 @@ export default function LendDashboard({usdcBalance=0}){
   const[mfAccount,setMfAccount]=useState(null)
 
   useEffect(()=>{fetchApy()},[])
-  useEffect(()=>{if(publicKey&&wallet?.adapter)initClient()},[publicKey,wallet])
+  useEffect(()=>{if(publicKey&&wallet?.adapter?.publicKey)initClient()},[publicKey,wallet?.adapter?.publicKey])
 
   async function fetchApy(){
     try{const r=await fetch('/api/marginfi-lend?action=apy');const d=await r.json();setApy(d.apy)}
@@ -22,15 +22,10 @@ export default function LendDashboard({usdcBalance=0}){
   }
 
   async function initClient(){
-    if(!wallet?.adapter||!publicKey)return
+    if(!wallet?.adapter||!publicKey||!wallet.adapter.publicKey)return
     try{
       const config=getConfig('production')
-      const walletAdapter={
-          publicKey,
-          signTransaction:wallet.adapter.signTransaction.bind(wallet.adapter),
-          signAllTransactions:wallet.adapter.signAllTransactions.bind(wallet.adapter),
-        }
-        const mfClient=await MarginfiClient.fetch(config,walletAdapter,connection)
+      const mfClient=await MarginfiClient.fetch(config,wallet.adapter,connection)
       setClient(mfClient)
       const accounts=await mfClient.getMarginfiAccountsForAuthority(publicKey)
       if(accounts?.length>0){
