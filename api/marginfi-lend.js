@@ -19,11 +19,18 @@ export default async function handler(req,res){
     }
     if(action==='balance'&&wallet){
       try{
-        const r=await fetch(JUP+'/earn/positions?wallet='+wallet,{headers:{accept:'application/json'}})
-        const d=await r.json()
-        const pos=(Array.isArray(d)?d:d.positions||[]).find(p=>p.assetAddress===USDC||p.asset?.address===USDC)
-        return res.status(200).json({balance:pos?parseFloat(pos.assets??pos.amount??0):0})
-      }catch{return res.status(200).json({balance:0})}
+        const{Connection,PublicKey}=await import('@solana/web3.js')
+        const conn=new Connection(process.env.VITE_RPC_URL||'https://api.mainnet-beta.solana.com','confirmed')
+        const JL_USDC=new PublicKey('9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D')
+        const TOKEN_PROG=new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
+        const ATA_PROG=new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJe1bE1')
+        const owner=new PublicKey(wallet)
+        const[ata]=PublicKey.findProgramAddressSync([owner.toBuffer(),TOKEN_PROG.toBuffer(),JL_USDC.toBuffer()],ATA_PROG)
+        try{
+          const bal=await conn.getTokenAccountBalance(ata)
+          return res.status(200).json({balance:parseFloat(bal.value.uiAmount||0)})
+        }catch{return res.status(200).json({balance:0})}
+      }catch(e){return res.status(200).json({balance:0,error:e.message})}
     }
   }
 
