@@ -35,7 +35,7 @@ export default function LendDashboard({usdcBalance=0}){
           if(bal){const{assets}=bal.computeQuantityUi(bank);setBalance(assets.toNumber())}
         }
       }
-    }catch(e){console.error('MarginFi init:',e.message)}
+    }catch(e){console.error('MarginFi init FULL:',e);setStatus('Init Fehler: '+e.message)}
   }
 
   async function doAction(action){
