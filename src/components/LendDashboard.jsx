@@ -2,9 +2,6 @@ import{useState,useEffect}from'react'
 import{useWallet,useConnection}from'@solana/wallet-adapter-react'
 import{Transaction,VersionedTransaction}from'@solana/web3.js'
 
-const USDC='EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-const API='https://lend-api.jup.ag'
-
 export default function LendDashboard({usdcBalance=0}){
   const{publicKey,sendTransaction}=useWallet()
   const{connection}=useConnection()
@@ -18,36 +15,24 @@ export default function LendDashboard({usdcBalance=0}){
   useEffect(()=>{if(publicKey)fetchBalance()},[publicKey?.toBase58()])
 
   async function fetchApy(){
-    try{
-      const r=await fetch(API+'/earn/tokens')
-      const d=await r.json()
-      const usdc=d.find(t=>t.mint===USDC||t.symbol==='USDC')
-      if(usdc)setApy(parseFloat(usdc.supplyApy??usdc.apy??usdc.depositApy)*100)
-    }catch(e){console.log('APY:',e.message)}
+    try{const r=await fetch('/api/marginfi-lend?action=apy');const d=await r.json();if(d.apy)setApy(parseFloat(d.apy))}catch{}
   }
-
   async function fetchBalance(){
     if(!publicKey)return
-    try{
-      const r=await fetch(API+'/earn/positions?wallet='+publicKey.toBase58())
-      const d=await r.json()
-      const pos=d.find?.(p=>p.mint===USDC)||(d.positions||[]).find(p=>p.mint===USDC)
-      setBalance(pos?parseFloat(pos.depositedAmount??pos.amount??0):0)
-    }catch{setBalance(0)}
+    try{const r=await fetch('/api/marginfi-lend?action=balance&wallet='+publicKey.toBase58());const d=await r.json();setBalance(d.balance||0)}catch{setBalance(0)}
   }
 
   async function doAction(action){
     if(!publicKey||!amount)return
     setLoading(true);setStatus('Wird vorbereitet...')
     try{
-      const endpoint=action==='deposit'?'/earn/deposit-instructions':'/earn/withdraw-instructions'
-      const r=await fetch(API+endpoint,{
+      const r=await fetch('/api/marginfi-lend',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({wallet:publicKey.toBase58(),mint:USDC,amount:Math.round(parseFloat(amount)*1e6)})
+        body:JSON.stringify({action,amount:parseFloat(amount),userPublicKey:publicKey.toBase58()})
       })
       const d=await r.json()
-      if(d.error)throw new Error(JSON.stringify(d.error))
+      if(d.error)throw new Error(d.error)
       const txData=d.transaction||d.tx
       if(!txData)throw new Error('Keine Transaktion erhalten')
       const buf=Buffer.from(txData,'base64')
