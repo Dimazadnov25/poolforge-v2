@@ -106,7 +106,13 @@ export default function StakeDashboard({ solPrice, solBalance }) {
         </div>
       )}
       <div style={{marginBottom:'1rem'}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.25rem'}}><div style={{color:'var(--muted)',fontSize:'0.75rem'}}>SOL Amount</div><button onClick={()=>setSolAmount(Math.max(0,(solBalance||0)-0.01).toFixed(4))} style={{padding:'0.2rem 0.4rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',cursor:'pointer',fontSize:'0.7rem'}}>MAX</button></div>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.25rem'}}>
+          <div style={{color:'var(--muted)',fontSize:'0.75rem'}}>SOL Amount</div>
+          <div style={{display:'flex',gap:'0.4rem'}}>
+            <button onClick={()=>setSolAmount(Math.max(0,(solBalance||0)-0.01).toFixed(4))} style={{padding:'0.2rem 0.4rem',borderRadius:'6px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',cursor:'pointer',fontSize:'0.7rem'}}>MAX SOL</button>
+            <button onClick={()=>setSolAmount(jupsolBalance>0?jupsolBalance.toFixed(6):'0')} disabled={!jupsolBalance} style={{padding:'0.2rem 0.4rem',borderRadius:'6px',border:'1px solid #f59e0b',background:'transparent',color:'#f59e0b',cursor:'pointer',fontSize:'0.7rem',opacity:jupsolBalance>0?1:0.5}}>MAX jupSOL</button>
+          </div>
+        </div>
         <input
           type="number"
           value={solAmount}

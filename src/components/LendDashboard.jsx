@@ -107,6 +107,10 @@ export default function LendDashboard({usdcBalance=0}){
           style={{padding:'0.6rem 0.9rem',borderRadius:'8px',border:'none',background:'#00c864',color:'#000',fontWeight:'bold',cursor:'pointer',fontSize:'0.8rem',opacity:!btnActive?0.5:1}}>
           Einzahlen
         </button>
+        <button onClick={()=>{setAmount(jlBalance.toFixed(6))}} disabled={!publicKey||jlBalance===0}
+          style={{padding:'0.6rem 0.5rem',borderRadius:'8px',border:'1px solid #f59e0b',background:'transparent',color:'#f59e0b',fontWeight:'bold',cursor:'pointer',fontSize:'0.75rem',whiteSpace:'nowrap',opacity:(!publicKey||jlBalance===0)?0.5:1}}>
+          MAX↑
+        </button>
         <button onClick={()=>doAction('withdraw')} disabled={!btnActive}
           style={{padding:'0.6rem 0.9rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',color:'var(--text)',fontWeight:'bold',cursor:'pointer',fontSize:'0.8rem',opacity:!btnActive?0.5:1}}>
           Abheben
