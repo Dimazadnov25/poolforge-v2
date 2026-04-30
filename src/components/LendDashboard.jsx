@@ -15,27 +15,38 @@ export default function LendDashboard({usdcBalance=0}){
   const[mfAccount,setMfAccount]=useState(null)
 
   useEffect(()=>{fetchApy()},[])
-  useEffect(()=>{if(anchorWallet&&publicKey)initClient()},[anchorWallet,publicKey])
+  useEffect(()=>{if(anchorWallet&&publicKey)initClient()},[anchorWallet?.publicKey?.toBase58()])
 
   async function fetchApy(){
-    try{const r=await fetch('/api/marginfi-lend?action=apy');const d=await r.json();if(d.apy)setApy(d.apy)}catch{}
+    try{const r=await fetch('/api/marginfi-lend?action=apy');const d=await r.json();if(d.apy)setApy(parseFloat(d.apy))}catch{}
   }
 
   async function initClient(){
     try{
       const config=getConfig('production')
-      const mfClient=await MarginfiClient.fetch(config,anchorWallet,connection)
+      const opts={commitment:'confirmed',skipPreflight:false}
+      const mfClient=await MarginfiClient.fetch(config,anchorWallet,connection,opts)
       setClient(mfClient)
+      const bank=mfClient.getBankByTokenSymbol('USDC')
+      if(!bank){console.warn('USDC bank not found');return}
       const accounts=await mfClient.getMarginfiAccountsForAuthority(publicKey)
       if(accounts?.length>0){
         setMfAccount(accounts[0])
-        const bank=mfClient.getBankByTokenSymbol('USDC')
-        if(bank){
-          const bal=accounts[0].activeBalances.find(b=>b.bankPk.equals(bank.address))
-          if(bal){const{assets}=bal.computeQuantityUi(bank);setBalance(assets.toNumber())}
+        const bal=accounts[0].activeBalances.find(b=>b.bankPk.equals(bank.address))
+        if(bal){
+          const{assets}=bal.computeQuantityUi(bank)
+          setBalance(assets.toNumber())
         }
       }
-    }catch(e){console.error('MarginFi init FULL:',e);setStatus('Init Fehler: '+e.message)}
+    }catch(e){
+      console.error('MarginFi init:',e)
+      // Retry mit anderem commitment
+      try{
+        const config=getConfig('production')
+        const mfClient=await MarginfiClient.fetch(config,anchorWallet,connection,{commitment:'finalized'})
+        setClient(mfClient)
+      }catch(e2){console.error('MarginFi retry failed:',e2.message)}
+    }
   }
 
   async function doAction(action){
@@ -52,10 +63,10 @@ export default function LendDashboard({usdcBalance=0}){
       }
       if(action==='deposit'){
         setStatus('Einzahlen...')
-        await acc.deposit(parseFloat(amount),bank)
+        await acc.deposit(parseFloat(amount),bank.address)
       }else{
         setStatus('Abheben...')
-        await acc.withdraw(parseFloat(amount),bank)
+        await acc.withdraw(parseFloat(amount),bank.address)
       }
       setStatus('Erfolg!')
       setAmount('')
@@ -113,6 +124,7 @@ export default function LendDashboard({usdcBalance=0}){
       </div>
       {status&&<div style={{fontSize:'0.78rem',marginTop:'0.25rem',color:status.startsWith('Fehler')?'#ff5555':'#00c864'}}>{status}</div>}
       {!publicKey&&<div style={{fontSize:'0.75rem',color:'var(--muted)',textAlign:'center',paddingTop:'0.25rem'}}>Wallet verbinden um zu lenden</div>}
+      {publicKey&&!client&&<div style={{fontSize:'0.72rem',color:'var(--muted)',textAlign:'center',paddingTop:'0.25rem'}}>MarginFi wird geladen...</div>}
     </div>
   )
 }
