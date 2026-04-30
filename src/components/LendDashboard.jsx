@@ -5,21 +5,32 @@ import{Transaction,VersionedTransaction}from'@solana/web3.js'
 export default function LendDashboard({usdcBalance=0}){
   const{publicKey,sendTransaction}=useWallet()
   const{connection}=useConnection()
-  const[apy,setApy]=useState(null)
-  const[balance,setBalance]=useState(0)
+  const[rate,setRate]=useState(1)
+  const[supplyRate,setSupplyRate]=useState(0)
+  const[jlBalance,setJlBalance]=useState(0)
   const[amount,setAmount]=useState('')
   const[loading,setLoading]=useState(false)
   const[status,setStatus]=useState('')
 
-  useEffect(()=>{fetchApy()},[])
+  useEffect(()=>{fetchRate()},[])
   useEffect(()=>{if(publicKey)fetchBalance()},[publicKey?.toBase58()])
 
-  async function fetchApy(){
-    try{const r=await fetch('/api/marginfi-lend?action=apy');const d=await r.json();if(d.apy)setApy(parseFloat(d.apy))}catch{}
+  async function fetchRate(){
+    try{
+      const r=await fetch('/api/marginfi-lend?action=apy')
+      const d=await r.json()
+      if(d.rate)setRate(d.rate)
+      if(d.supplyRate)setSupplyRate(d.supplyRate)
+    }catch{}
   }
+
   async function fetchBalance(){
     if(!publicKey)return
-    try{const r=await fetch('/api/marginfi-lend?action=balance&wallet='+publicKey.toBase58());const d=await r.json();setBalance(d.balance||0)}catch{setBalance(0)}
+    try{
+      const r=await fetch('/api/marginfi-lend?action=balance&wallet='+publicKey.toBase58())
+      const d=await r.json()
+      setJlBalance(d.balance||0)
+    }catch{setJlBalance(0)}
   }
 
   async function doAction(action){
@@ -42,12 +53,17 @@ export default function LendDashboard({usdcBalance=0}){
       await connection.confirmTransaction(sig,'confirmed')
       setStatus('Erfolg!')
       setAmount('')
-      setTimeout(()=>{fetchBalance();setStatus('')},3000)
+      setTimeout(()=>{fetchBalance();fetchRate();setStatus('')},3000)
     }catch(e){setStatus('Fehler: '+e.message)}
     setLoading(false)
   }
 
-  const yearly=apy&&balance>0?(balance*(apy/100)).toFixed(2):'0.00'
+  // jlUSDC * rate = aktueller USDC Wert
+  const currentValue=jlBalance*rate
+  // Zuwachs seit Launch in %
+  const growth=((rate-1)*100).toFixed(3)
+  // Jahresertrag
+  const yearly=(currentValue*(supplyRate/100)).toFixed(2)
   const btnActive=!loading&&!!publicKey&&!!amount
 
   return(
@@ -59,17 +75,19 @@ export default function LendDashboard({usdcBalance=0}){
           <span style={{fontSize:'0.7rem',color:'var(--muted)',background:'var(--surface)',padding:'0.1rem 0.4rem',borderRadius:'4px'}}>Jupiter</span>
         </div>
         <span style={{background:'rgba(0,200,100,0.15)',color:'#00c864',padding:'0.2rem 0.7rem',borderRadius:'20px',fontSize:'0.8rem',fontWeight:'bold'}}>
-          {apy!=null?apy.toFixed(2)+'% APY':'...'}
+          +{growth}% Zuwachs
         </span>
       </div>
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem',marginBottom:'1rem'}}>
         <div style={{background:'var(--surface)',borderRadius:'8px',padding:'0.75rem',textAlign:'center'}}>
           <div style={{color:'var(--muted)',fontSize:'0.72rem',marginBottom:'0.3rem'}}>Eingezahlt</div>
-          <div style={{fontWeight:'bold',fontSize:'1.05rem'}}>{balance.toFixed(2)} USDC</div>
+          <div style={{fontWeight:'bold',fontSize:'1.05rem'}}>{currentValue.toFixed(4)} USDC</div>
+          <div style={{color:'var(--muted)',fontSize:'0.68rem'}}>{jlBalance.toFixed(4)} jlUSDC</div>
         </div>
         <div style={{background:'var(--surface)',borderRadius:'8px',padding:'0.75rem',textAlign:'center'}}>
           <div style={{color:'var(--muted)',fontSize:'0.72rem',marginBottom:'0.3rem'}}>Jahresertrag</div>
           <div style={{fontWeight:'bold',fontSize:'1.05rem',color:'#00c864'}}>+{yearly} USDC</div>
+          <div style={{color:'var(--muted)',fontSize:'0.68rem'}}>{supplyRate.toFixed(2)}% p.a.</div>
         </div>
       </div>
       {publicKey&&usdcBalance>0&&(

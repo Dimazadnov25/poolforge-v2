@@ -9,13 +9,14 @@ export default async function handler(req,res){
       try{
         const r=await fetch(JUP+'/earn/tokens',{headers:{accept:'application/json'}})
         const d=await r.json()
-        const usdc=d.find(t=>t.assetAddress===USDC||t.symbol?.includes('USDC'))
+        const usdc=d.find(t=>t.assetAddress===USDC)
         if(usdc){
-          const apy=(parseFloat(usdc.supplyRate??usdc.totalRate??0)*100)
-          return res.status(200).json({apy})
+          const rate=parseFloat(usdc.convertToAssets||1000000)/1000000
+          const supplyRate=parseFloat(usdc.supplyRate||0)/10000
+          return res.status(200).json({rate,supplyRate})
         }
       }catch(e){console.error(e.message)}
-      return res.status(200).json({apy:7.2})
+      return res.status(200).json({rate:1,supplyRate:3.16})
     }
     if(action==='balance'&&wallet){
       try{
