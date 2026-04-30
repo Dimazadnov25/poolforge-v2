@@ -11,18 +11,17 @@ function getATA(owner){
   return a
 }
 
-export default function LendDashboard(){
+export default function LendDashboard({usdcBalance=0}){
   const{publicKey,sendTransaction}=useWallet()
   const{connection}=useConnection()
   const[apy,setApy]=useState(null)
   const[balance,setBalance]=useState(0)
-  const[walletUsdc,setWalletUsdc]=useState(0)
-  const[amount,setAmount]=useState('')
+    const[amount,setAmount]=useState('')
   const[loading,setLoading]=useState(false)
   const[status,setStatus]=useState('')
 
   useEffect(()=>{fetchApy()},[])
-  useEffect(()=>{if(publicKey){fetchBalance();fetchWalletUsdc()}},[publicKey])
+  useEffect(()=>{if(publicKey){fetchBalance()}},[publicKey])
 
   async function fetchApy(){
     try{const r=await fetch('/api/marginfi-lend?action=apy');const d=await r.json();setApy(d.apy)}
@@ -33,14 +32,7 @@ export default function LendDashboard(){
     try{const r=await fetch('/api/marginfi-lend?action=balance&wallet='+publicKey.toBase58());const d=await r.json();setBalance(d.balance||0)}
     catch{}
   }
-  async function fetchWalletUsdc(){
-    if(!publicKey)return
-    try{
-      const ata=getATA(publicKey)
-      const info=await connection.getTokenAccountBalance(ata)
-      setWalletUsdc(info.value.uiAmount||0)
-    }catch{setWalletUsdc(0)}
-  }
+  
   async function doAction(action){
     if(!publicKey||!amount)return
     setLoading(true);setStatus('Transaktion wird vorbereitet...')
@@ -84,9 +76,9 @@ export default function LendDashboard(){
         </div>
       </div>
 
-      {publicKey&&walletUsdc>0&&(
+      {publicKey&&usdcBalance>0&&(
         <div style={{fontSize:'0.75rem',color:'var(--muted)',marginBottom:'0.4rem'}}>
-          Wallet: <span style={{color:'var(--text)',fontWeight:'bold'}}>{walletUsdc.toFixed(2)} USDC</span>
+          Wallet: <span style={{color:'var(--text)',fontWeight:'bold'}}>{usdcBalance.toFixed(2)} USDC</span>
         </div>
       )}
 
@@ -101,8 +93,8 @@ export default function LendDashboard(){
             style={{flex:1,padding:'0.6rem 3.5rem 0.6rem 0.75rem',borderRadius:'8px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',fontSize:'0.875rem',outline:'none',width:'100%'}}
           />
           <button
-            onClick={()=>setAmount(walletUsdc.toFixed(6))}
-            disabled={!publicKey||walletUsdc===0}
+            onClick={()=>setAmount(usdcBalance.toFixed(6))}
+            disabled={!publicKey||usdcBalance===0}
             style={{position:'absolute',right:'6px',top:'50%',transform:'translateY(-50%)',padding:'0.15rem 0.4rem',borderRadius:'4px',border:'1px solid #00c864',background:'transparent',color:'#00c864',fontWeight:'bold',cursor:'pointer',fontSize:'0.7rem'}}
           >MAX</button>
         </div>

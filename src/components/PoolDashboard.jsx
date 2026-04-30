@@ -87,7 +87,7 @@ export default function PoolDashboard() {
             </div>
           )}
                     <StakeDashboard solPrice={pool.solPrice} solBalance={pool.solBalance} />
-          <LendDashboard />
+          <LendDashboard usdcBalance={pool.usdcBalance} />
           
           <OpenPositionForm
             pool={pool}
