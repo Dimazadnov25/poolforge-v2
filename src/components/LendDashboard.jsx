@@ -2,10 +2,13 @@ import{useState,useEffect}from'react'
 import{useWallet,useConnection}from'@solana/wallet-adapter-react'
 import{Transaction,VersionedTransaction}from'@solana/web3.js'
 
+const USDC='EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+const API='https://lend-api.jup.ag'
+
 export default function LendDashboard({usdcBalance=0}){
   const{publicKey,sendTransaction}=useWallet()
   const{connection}=useConnection()
-  const[apy,setApy]=useState(7.2)
+  const[apy,setApy]=useState(null)
   const[balance,setBalance]=useState(0)
   const[amount,setAmount]=useState('')
   const[loading,setLoading]=useState(false)
@@ -15,27 +18,43 @@ export default function LendDashboard({usdcBalance=0}){
   useEffect(()=>{if(publicKey)fetchBalance()},[publicKey?.toBase58()])
 
   async function fetchApy(){
-    try{const r=await fetch('/api/marginfi-lend?action=apy');const d=await r.json();if(d.apy)setApy(parseFloat(d.apy))}catch{}
+    try{
+      const r=await fetch(API+'/earn/tokens')
+      const d=await r.json()
+      const usdc=d.find(t=>t.mint===USDC||t.symbol==='USDC')
+      if(usdc)setApy(parseFloat(usdc.supplyApy??usdc.apy??usdc.depositApy)*100)
+    }catch(e){console.log('APY:',e.message)}
   }
+
   async function fetchBalance(){
     if(!publicKey)return
-    try{const r=await fetch('/api/marginfi-lend?action=balance&wallet='+publicKey.toBase58());const d=await r.json();setBalance(d.balance||0)}catch{setBalance(0)}
+    try{
+      const r=await fetch(API+'/earn/positions?wallet='+publicKey.toBase58())
+      const d=await r.json()
+      const pos=d.find?.(p=>p.mint===USDC)||(d.positions||[]).find(p=>p.mint===USDC)
+      setBalance(pos?parseFloat(pos.depositedAmount??pos.amount??0):0)
+    }catch{setBalance(0)}
   }
 
   async function doAction(action){
     if(!publicKey||!amount)return
     setLoading(true);setStatus('Wird vorbereitet...')
     try{
-      const r=await fetch('/api/marginfi-lend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,amount:parseFloat(amount),userPublicKey:publicKey.toBase58()})})
+      const endpoint=action==='deposit'?'/earn/deposit-instructions':'/earn/withdraw-instructions'
+      const r=await fetch(API+endpoint,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({wallet:publicKey.toBase58(),mint:USDC,amount:Math.round(parseFloat(amount)*1e6)})
+      })
       const d=await r.json()
-      if(d.error)throw new Error(d.error)
-      for(const txData of d.transactions||[]){
-        const buf=Buffer.from(txData,'base64')
-        let tx
-        try{tx=VersionedTransaction.deserialize(buf)}catch{tx=Transaction.from(buf)}
-        const sig=await sendTransaction(tx,connection)
-        await connection.confirmTransaction(sig,'confirmed')
-      }
+      if(d.error)throw new Error(JSON.stringify(d.error))
+      const txData=d.transaction||d.tx
+      if(!txData)throw new Error('Keine Transaktion erhalten')
+      const buf=Buffer.from(txData,'base64')
+      let tx
+      try{tx=VersionedTransaction.deserialize(buf)}catch{tx=Transaction.from(buf)}
+      const sig=await sendTransaction(tx,connection)
+      await connection.confirmTransaction(sig,'confirmed')
       setStatus('Erfolg!')
       setAmount('')
       setTimeout(()=>{fetchBalance();setStatus('')},3000)
@@ -43,7 +62,7 @@ export default function LendDashboard({usdcBalance=0}){
     setLoading(false)
   }
 
-  const yearly=balance>0?(balance*(apy/100)).toFixed(2):'0.00'
+  const yearly=apy&&balance>0?(balance*(apy/100)).toFixed(2):'0.00'
   const btnActive=!loading&&!!publicKey&&!!amount
 
   return(
@@ -52,10 +71,10 @@ export default function LendDashboard({usdcBalance=0}){
         <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
           <span style={{fontSize:'1.1rem'}}>💵</span>
           <h3 style={{margin:0,fontSize:'0.95rem',fontWeight:'bold'}}>USDC Lend</h3>
-          <span style={{fontSize:'0.7rem',color:'var(--muted)',background:'var(--surface)',padding:'0.1rem 0.4rem',borderRadius:'4px'}}>Kamino</span>
+          <span style={{fontSize:'0.7rem',color:'var(--muted)',background:'var(--surface)',padding:'0.1rem 0.4rem',borderRadius:'4px'}}>Jupiter</span>
         </div>
         <span style={{background:'rgba(0,200,100,0.15)',color:'#00c864',padding:'0.2rem 0.7rem',borderRadius:'20px',fontSize:'0.8rem',fontWeight:'bold'}}>
-          {apy.toFixed(2)}% APY
+          {apy!=null?apy.toFixed(2)+'% APY':'...'}
         </span>
       </div>
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem',marginBottom:'1rem'}}>
