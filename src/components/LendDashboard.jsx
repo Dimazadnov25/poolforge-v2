@@ -25,7 +25,12 @@ export default function LendDashboard({usdcBalance=0}){
     if(!wallet?.adapter||!publicKey)return
     try{
       const config=getConfig('production')
-      const mfClient=await MarginfiClient.fetch(config,wallet.adapter,connection)
+      const walletAdapter={
+          publicKey,
+          signTransaction:wallet.adapter.signTransaction.bind(wallet.adapter),
+          signAllTransactions:wallet.adapter.signAllTransactions.bind(wallet.adapter),
+        }
+        const mfClient=await MarginfiClient.fetch(config,walletAdapter,connection)
       setClient(mfClient)
       const accounts=await mfClient.getMarginfiAccountsForAuthority(publicKey)
       if(accounts?.length>0){
