@@ -81,8 +81,8 @@ export default function LendDashboard({usdcBalance=0}){
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem',marginBottom:'1rem'}}>
         <div style={{background:'var(--surface)',borderRadius:'8px',padding:'0.75rem',textAlign:'center'}}>
           <div style={{color:'var(--muted)',fontSize:'0.72rem',marginBottom:'0.3rem'}}>Eingezahlt</div>
-          <div style={{fontWeight:'bold',fontSize:'1.05rem'}}>{currentValue.toFixed(4)} USDC</div>
-          <div style={{color:'var(--muted)',fontSize:'0.68rem'}}>{jlBalance.toFixed(4)} jlUSDC</div>
+          <div style={{fontWeight:'bold',fontSize:'1.05rem'}}>{currentValue.toFixed(6)} USDC</div>
+          <div style={{color:'var(--muted)',fontSize:'0.68rem'}}>{jlBalance.toFixed(6)} jlUSDC</div>
         </div>
         <div style={{background:'var(--surface)',borderRadius:'8px',padding:'0.75rem',textAlign:'center'}}>
           <div style={{color:'var(--muted)',fontSize:'0.72rem',marginBottom:'0.3rem'}}>Jahresertrag</div>
