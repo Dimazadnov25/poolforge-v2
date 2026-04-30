@@ -21,15 +21,13 @@ export default async function handler(req,res){
       try{
         const{Connection,PublicKey}=await import('@solana/web3.js')
         const conn=new Connection(process.env.VITE_RPC_URL||'https://api.mainnet-beta.solana.com','confirmed')
-        const JL_USDC=new PublicKey('9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D')
+        const JL_USDC='9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D'
         const TOKEN_PROG=new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
-        const ATA_PROG=new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJe1bE1')
         const owner=new PublicKey(wallet)
-        const[ata]=PublicKey.findProgramAddressSync([owner.toBuffer(),TOKEN_PROG.toBuffer(),JL_USDC.toBuffer()],ATA_PROG)
-        try{
-          const bal=await conn.getTokenAccountBalance(ata)
-          return res.status(200).json({balance:parseFloat(bal.value.uiAmount||0)})
-        }catch{return res.status(200).json({balance:0})}
+        const accs=await conn.getParsedTokenAccountsByOwner(owner,{programId:TOKEN_PROG})
+        const jlAcc=accs.value.find(a=>a.account.data.parsed.info.mint===JL_USDC)
+        const balance=jlAcc?parseFloat(jlAcc.account.data.parsed.info.tokenAmount.uiAmount||0):0
+        return res.status(200).json({balance})
       }catch(e){return res.status(200).json({balance:0,error:e.message})}
     }
   }
