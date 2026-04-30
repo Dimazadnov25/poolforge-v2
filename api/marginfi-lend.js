@@ -34,7 +34,7 @@ export default async function handler(req,res){
       const r=await fetch(JUP+endpoint,{
         method:'POST',
         headers:{'Content-Type':'application/json',accept:'application/json'},
-        body:JSON.stringify({wallet:userPublicKey,asset:USDC,amount:Math.round(parseFloat(amount)*1e6)})
+        body:JSON.stringify({signer:userPublicKey,asset:USDC,amount:String(Math.round(parseFloat(amount)*1e6))})
       })
       const d=await r.json()
       if(!r.ok)return res.status(400).json({error:JSON.stringify(d)})
