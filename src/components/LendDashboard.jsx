@@ -1,11 +1,10 @@
 import{useState,useEffect}from'react'
-import{useWallet,useConnection,useAnchorWallet}from'@solana/wallet-adapter-react'
-import{KaminoMarket,KaminoAction,VanillaObligation,PROGRAM_ID}from'@kamino-finance/klend-sdk'
-import{PublicKey}from'@solana/web3.js'
-import BN from'bn.js'
+import{useWallet,useConnection}from'@solana/wallet-adapter-react'
+import{Transaction,VersionedTransaction}from'@solana/web3.js'
 
-const MARKET_ADDRESS='7u3HeHxYDLhnCoErrtycNokbQYbWGzLs6JSDqGAv5PfF'
+const MARKET='7u3HeHxYDLhnCoErrtycNokbQYbWGzLs6JSDqGAv5PfF'
 const USDC_MINT='EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+const API='https://api.kamino.finance'
 
 export default function LendDashboard({usdcBalance=0}){
   const{publicKey,sendTransaction}=useWallet()
@@ -15,51 +14,52 @@ export default function LendDashboard({usdcBalance=0}){
   const[amount,setAmount]=useState('')
   const[loading,setLoading]=useState(false)
   const[status,setStatus]=useState('')
-  const[market,setMarket]=useState(null)
 
-  useEffect(()=>{initMarket()},[])
-  useEffect(()=>{if(market&&publicKey)fetchBalance()},[market,publicKey?.toBase58()])
+  useEffect(()=>{fetchApy()},[])
+  useEffect(()=>{if(publicKey)fetchBalance()},[publicKey?.toBase58()])
 
-  async function initMarket(){
+  async function fetchApy(){
     try{
-      const m=await KaminoMarket.load(connection,new PublicKey(MARKET_ADDRESS),400)
-      setMarket(m)
-      const reserve=m.getReserveByMint(new PublicKey(USDC_MINT))
-      if(reserve){
-        const rate=reserve.calculateSupplyAPR()
-        setApy(rate*100)
-      }
-    }catch(e){console.error('Kamino init:',e.message)}
+      const r=await fetch(API+'/markets/'+MARKET+'/reserves')
+      const d=await r.json()
+      const usdc=d.find(x=>x.liquidityToken?.mint===USDC_MINT||x.mint===USDC_MINT)
+      if(usdc){const a=usdc.supplyInterestAPY??usdc.supplyAPY??usdc.apy;if(a)setApy(parseFloat(a)*100)}
+    }catch(e){console.log('APY fetch:',e.message)}
   }
 
   async function fetchBalance(){
-    if(!publicKey||!market)return
+    if(!publicKey)return
     try{
-      const obligation=await market.getObligationByWallet(publicKey,new VanillaObligation(PROGRAM_ID))
-      if(!obligation){setBalance(0);return}
-      const deposit=obligation.deposits.find(d=>d.mintAddress.toBase58()===USDC_MINT)
-      if(deposit)setBalance(deposit.amount.toNumber()/1e6)
-      else setBalance(0)
+      const r=await fetch(API+'/users/'+publicKey.toBase58()+'/obligations?market='+MARKET)
+      const d=await r.json()
+      const dep=d?.deposits?.find(x=>x.mint===USDC_MINT||x.symbol==='USDC')
+      setBalance(dep?parseFloat(dep.amount||dep.depositedAmount||0):0)
     }catch{setBalance(0)}
   }
 
   async function doAction(action){
-    if(!publicKey||!amount||!market)return
+    if(!publicKey||!amount)return
     setLoading(true);setStatus('Wird vorbereitet...')
     try{
-      const reserve=market.getReserveByMint(new PublicKey(USDC_MINT))
-      if(!reserve)throw new Error('USDC Reserve nicht gefunden')
-      const amountBN=new BN(Math.round(parseFloat(amount)*1e6))
-      let kaminoAction
-      if(action==='deposit'){
-        setStatus('Einzahlen...')
-        kaminoAction=await KaminoAction.buildDepositTxns(market,amountBN,new PublicKey(USDC_MINT),publicKey,new VanillaObligation(PROGRAM_ID))
-      }else{
-        setStatus('Abheben...')
-        kaminoAction=await KaminoAction.buildWithdrawTxns(market,amountBN,new PublicKey(USDC_MINT),publicKey,new VanillaObligation(PROGRAM_ID))
-      }
-      const txs=[...kaminoAction.setupIxsToSign,...kaminoAction.lendingIxsToSign,...kaminoAction.cleanupIxsToSign]
-      for(const tx of txs){
+      const endpoint=action==='deposit'?'deposit':'withdraw'
+      const r=await fetch(API+'/markets/'+MARKET+'/'+endpoint,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          wallet:publicKey.toBase58(),
+          mint:USDC_MINT,
+          amount:parseFloat(amount),
+          slippage:0.01
+        })
+      })
+      const d=await r.json()
+      if(d.error)throw new Error(d.error)
+      const txs=d.transactions||d.txs||[d.transaction||d.tx]
+      for(const txData of txs.filter(Boolean)){
+        const buf=Buffer.from(txData,'base64')
+        let tx
+        try{tx=VersionedTransaction.deserialize(buf)}
+        catch{tx=Transaction.from(buf)}
         const sig=await sendTransaction(tx,connection)
         await connection.confirmTransaction(sig,'confirmed')
       }
@@ -71,7 +71,7 @@ export default function LendDashboard({usdcBalance=0}){
   }
 
   const yearly=balance>0?(balance*(apy/100)).toFixed(2):'0.00'
-  const btnActive=!loading&&!!publicKey&&!!amount&&!!market
+  const btnActive=!loading&&!!publicKey&&!!amount
 
   return(
     <div style={{background:'var(--card)',borderRadius:'12px',padding:'1.25rem',marginBottom:'1rem'}}>
@@ -119,7 +119,6 @@ export default function LendDashboard({usdcBalance=0}){
       </div>
       {status&&<div style={{fontSize:'0.78rem',marginTop:'0.25rem',color:status.startsWith('Fehler')?'#ff5555':'#00c864'}}>{status}</div>}
       {!publicKey&&<div style={{fontSize:'0.75rem',color:'var(--muted)',textAlign:'center',paddingTop:'0.25rem'}}>Wallet verbinden um zu lenden</div>}
-      {publicKey&&!market&&<div style={{fontSize:'0.72rem',color:'var(--muted)',textAlign:'center',paddingTop:'0.25rem'}}>Kamino wird geladen...</div>}
     </div>
   )
 }
