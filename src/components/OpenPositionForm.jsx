@@ -155,6 +155,17 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
           </button>
         </div>
       )}
+
+      {usdc !== null && solAmount && hasEnough && usdcAvail > usdc * 1.05 && (
+        <div style={{marginBottom:'0.75rem'}}>
+          <div style={{color:'#f59e0b',fontSize:'0.8rem',marginBottom:'0.5rem'}}>Ueberschuss USDC: {(usdcAvail-usdc).toFixed(2)} — in SOL tauschen?</div>
+          <button type="button" className="btn btn-secondary"
+            onClick={()=>doSwap('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v','So11111111111111111111111111111111111111112',(usdcAvail-usdc)*0.98)}
+            disabled={swapping} style={{width:'100%',marginBottom:'0.5rem',borderColor:'#f59e0b',color:'#f59e0b'}}>
+            {swapping?'Swapping...':'Swap '+(usdcAvail-usdc).toFixed(2)+' USDC -> '+((usdcAvail-usdc)/currentPrice).toFixed(4)+' SOL'}
+          </button>
+        </div>
+      )}
       <button type="button" className="btn btn-blue" onClick={handleSubmit} disabled={loading || !solAmount} style={{width:'100%'}}>
         {loading ? 'Opening...' : 'Open Position'}
       </button>
