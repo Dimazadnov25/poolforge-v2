@@ -71,6 +71,7 @@ export default function StakeDashboard({ solPrice, solBalance }) {
       const latest = await connection.getLatestBlockhash()
       await connection.confirmTransaction({ signature: sig, blockhash: latest.blockhash, lastValidBlockHeight: latest.lastValidBlockHeight }, 'confirmed')
       setSolAmount('')
+      setTimeout(()=>window.location.reload(),2000)
     } catch (e) {
       alert('Fehler: ' + e.message)
     } finally {

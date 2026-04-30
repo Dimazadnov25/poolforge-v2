@@ -27,6 +27,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
       const latest = await connection.getLatestBlockhash()
       await connection.confirmTransaction({ signature: sig, blockhash: latest.blockhash, lastValidBlockHeight: latest.lastValidBlockHeight }, 'confirmed')
       if (pool?.refreshBalances) await pool.refreshBalances()
+      else setTimeout(()=>window.location.reload(),2000)
     } catch (e) {
       alert('Swap Fehler: ' + e.message)
     } finally {
