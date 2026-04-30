@@ -124,7 +124,7 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
         </button>
       </div>
 
-      <div style={{display:'flex', flexDirection:'column', gap:'0.5rem'}}>
+      <div style={{display:'flex', flexWrap:'wrap', gap:'0.5rem'}}>
         <button type="button" className="btn btn-green" onClick={() => onCollect && onCollect(position.mint)}>Collect Fees</button>
         <button type="button" className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.03)}>Rebalance 3%</button>
         <button type="button" className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.02)}>Rebalance 2%</button>
