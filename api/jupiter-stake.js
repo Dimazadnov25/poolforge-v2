@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const swapResp = await fetch('https://public.jupiterapi.com/swap', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quoteResponse: quote, userPublicKey, wrapAndUnwrapSol: true })
+      body: JSON.stringify({ wrapAndUnwrapSol: true, quoteResponse: quote, userPublicKey, wrapAndUnwrapSol: true })
     })
     const swapData = await swapResp.json()
     if (!swapData.swapTransaction) return res.status(400).json({ error: 'No tx', data: swapData })
