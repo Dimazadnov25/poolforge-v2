@@ -38,7 +38,20 @@ export default async function handler(req,res){
       })
       const d=await r.json()
       if(!r.ok)return res.status(400).json({error:JSON.stringify(d)})
-      return res.status(200).json(d)
+      // Build transaction from instructions
+      const{Connection,PublicKey,Transaction,TransactionInstruction}=await import('@solana/web3.js')
+      const conn=new Connection(process.env.VITE_RPC_URL||'https://api.mainnet-beta.solana.com','confirmed')
+      const{blockhash}=await conn.getLatestBlockhash()
+      const tx=new Transaction({recentBlockhash:blockhash,feePayer:new PublicKey(userPublicKey)})
+      for(const ix of d.instructions||[]){
+        tx.add(new TransactionInstruction({
+          programId:new PublicKey(ix.programId),
+          keys:ix.accounts.map(a=>({pubkey:new PublicKey(a.pubkey),isSigner:a.isSigner,isWritable:a.isWritable})),
+          data:ix.data?Buffer.from(ix.data,'base64'):Buffer.alloc(0)
+        }))
+      }
+      const serialized=tx.serialize({requireAllSignatures:false,verifySignatures:false}).toString('base64')
+      return res.status(200).json({transaction:serialized})
     }catch(e){return res.status(500).json({error:e.message})}
   }
   res.status(405).end()
