@@ -2,10 +2,6 @@ import{useState,useEffect}from'react'
 import{useWallet,useConnection}from'@solana/wallet-adapter-react'
 import{Transaction,VersionedTransaction}from'@solana/web3.js'
 
-const MARKET='7u3HeHxYDLhnCoErrtycNokbQYbWGzLs6JSDqGAv5PfF'
-const USDC_MINT='EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-const API='https://api.kamino.finance'
-
 export default function LendDashboard({usdcBalance=0}){
   const{publicKey,sendTransaction}=useWallet()
   const{connection}=useConnection()
@@ -19,47 +15,24 @@ export default function LendDashboard({usdcBalance=0}){
   useEffect(()=>{if(publicKey)fetchBalance()},[publicKey?.toBase58()])
 
   async function fetchApy(){
-    try{
-      const r=await fetch(API+'/markets/'+MARKET+'/reserves')
-      const d=await r.json()
-      const usdc=d.find(x=>x.liquidityToken?.mint===USDC_MINT||x.mint===USDC_MINT)
-      if(usdc){const a=usdc.supplyInterestAPY??usdc.supplyAPY??usdc.apy;if(a)setApy(parseFloat(a)*100)}
-    }catch(e){console.log('APY fetch:',e.message)}
+    try{const r=await fetch('/api/marginfi-lend?action=apy');const d=await r.json();if(d.apy)setApy(parseFloat(d.apy))}catch{}
   }
-
   async function fetchBalance(){
     if(!publicKey)return
-    try{
-      const r=await fetch(API+'/users/'+publicKey.toBase58()+'/obligations?market='+MARKET)
-      const d=await r.json()
-      const dep=d?.deposits?.find(x=>x.mint===USDC_MINT||x.symbol==='USDC')
-      setBalance(dep?parseFloat(dep.amount||dep.depositedAmount||0):0)
-    }catch{setBalance(0)}
+    try{const r=await fetch('/api/marginfi-lend?action=balance&wallet='+publicKey.toBase58());const d=await r.json();setBalance(d.balance||0)}catch{setBalance(0)}
   }
 
   async function doAction(action){
     if(!publicKey||!amount)return
     setLoading(true);setStatus('Wird vorbereitet...')
     try{
-      const endpoint=action==='deposit'?'deposit':'withdraw'
-      const r=await fetch(API+'/markets/'+MARKET+'/'+endpoint,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          wallet:publicKey.toBase58(),
-          mint:USDC_MINT,
-          amount:parseFloat(amount),
-          slippage:0.01
-        })
-      })
+      const r=await fetch('/api/marginfi-lend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,amount:parseFloat(amount),userPublicKey:publicKey.toBase58()})})
       const d=await r.json()
       if(d.error)throw new Error(d.error)
-      const txs=d.transactions||d.txs||[d.transaction||d.tx]
-      for(const txData of txs.filter(Boolean)){
+      for(const txData of d.transactions||[]){
         const buf=Buffer.from(txData,'base64')
         let tx
-        try{tx=VersionedTransaction.deserialize(buf)}
-        catch{tx=Transaction.from(buf)}
+        try{tx=VersionedTransaction.deserialize(buf)}catch{tx=Transaction.from(buf)}
         const sig=await sendTransaction(tx,connection)
         await connection.confirmTransaction(sig,'confirmed')
       }
