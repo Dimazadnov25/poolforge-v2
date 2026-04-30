@@ -1,51 +1,66 @@
 import{useState,useEffect}from'react'
 import{useWallet,useConnection}from'@solana/wallet-adapter-react'
-import{Transaction,PublicKey}from'@solana/web3.js'
-
-const USDC_MINT=new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
-const ATA_PROG=new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJe1bE1')
-const TOKEN_PROG=new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
-
-function getATA(owner){
-  const[a]=PublicKey.findProgramAddressSync([owner.toBuffer(),TOKEN_PROG.toBuffer(),USDC_MINT.toBuffer()],ATA_PROG)
-  return a
-}
+import{MarginfiClient,getConfig}from'@mrgnlabs/marginfi-client-v2'
 
 export default function LendDashboard({usdcBalance=0}){
-  const{publicKey,sendTransaction}=useWallet()
+  const{publicKey,sendTransaction,wallet}=useWallet()
   const{connection}=useConnection()
   const[apy,setApy]=useState(null)
   const[balance,setBalance]=useState(0)
-    const[amount,setAmount]=useState('')
+  const[amount,setAmount]=useState('')
   const[loading,setLoading]=useState(false)
   const[status,setStatus]=useState('')
+  const[client,setClient]=useState(null)
+  const[mfAccount,setMfAccount]=useState(null)
 
   useEffect(()=>{fetchApy()},[])
-  useEffect(()=>{if(publicKey){fetchBalance()}},[publicKey])
+  useEffect(()=>{if(publicKey&&wallet?.adapter)initClient()},[publicKey,wallet])
 
   async function fetchApy(){
     try{const r=await fetch('/api/marginfi-lend?action=apy');const d=await r.json();setApy(d.apy)}
     catch{setApy(7.5)}
   }
-  async function fetchBalance(){
-    if(!publicKey)return
-    try{const r=await fetch('/api/marginfi-lend?action=balance&wallet='+publicKey.toBase58());const d=await r.json();setBalance(d.balance||0)}
-    catch{}
+
+  async function initClient(){
+    if(!wallet?.adapter||!publicKey)return
+    try{
+      const config=getConfig('production')
+      const mfClient=await MarginfiClient.fetch(config,wallet.adapter,connection)
+      setClient(mfClient)
+      const accounts=await mfClient.getMarginfiAccountsForAuthority(publicKey)
+      if(accounts?.length>0){
+        setMfAccount(accounts[0])
+        const bank=mfClient.getBankByTokenSymbol('USDC')
+        if(bank){
+          const bal=accounts[0].activeBalances.find(b=>b.bankPk.equals(bank.address))
+          if(bal){const{assets}=bal.computeQuantityUi(bank);setBalance(assets.toNumber())}
+        }
+      }
+    }catch(e){console.error('MarginFi init:',e.message)}
   }
-  
+
   async function doAction(action){
-    if(!publicKey||!amount)return
+    if(!publicKey||!amount||!client)return
     setLoading(true);setStatus('Transaktion wird vorbereitet...')
     try{
-      const r=await fetch('/api/marginfi-lend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,amount:parseFloat(amount),userPublicKey:publicKey.toBase58()})})
-      const d=await r.json()
-      if(d.error)throw new Error(d.error)
-      const tx=Transaction.from(Buffer.from(d.transaction,'base64'))
-      const sig=await sendTransaction(tx,connection)
-      await connection.confirmTransaction(sig,'confirmed')
-      setStatus('Erfolg! '+sig.slice(0,8)+'...')
+      const bank=client.getBankByTokenSymbol('USDC')
+      if(!bank)throw new Error('USDC Bank nicht gefunden')
+      let acc=mfAccount
+      if(!acc){
+        setStatus('Erstelle MarginFi Account...')
+        acc=await client.createMarginfiAccount()
+        setMfAccount(acc)
+      }
+      if(action==='deposit'){
+        setStatus('Einzahlen...')
+        await acc.deposit(parseFloat(amount),bank)
+      }else{
+        setStatus('Abheben...')
+        await acc.withdraw(parseFloat(amount),bank)
+      }
+      setStatus('Erfolg!')
       setAmount('')
-      setTimeout(()=>{fetchBalance();fetchWalletUsdc();setStatus('')},3000)
+      setTimeout(()=>{initClient();setStatus('')},3000)
     }catch(e){setStatus('Fehler: '+e.message)}
     setLoading(false)
   }
@@ -84,26 +99,21 @@ export default function LendDashboard({usdcBalance=0}){
 
       <div style={{display:'flex',gap:'0.5rem',marginBottom:'0.5rem'}}>
         <div style={{flex:1,position:'relative',display:'flex'}}>
-          <input
-            type="number"
-            value={amount}
-            onChange={e=>setAmount(e.target.value)}
-            placeholder="USDC Betrag"
-            disabled={loading||!publicKey}
+          <input type="number" value={amount} onChange={e=>setAmount(e.target.value)}
+            placeholder="USDC Betrag" disabled={loading||!publicKey}
             style={{flex:1,padding:'0.6rem 3.5rem 0.6rem 0.75rem',borderRadius:'8px',border:'1px solid var(--border)',background:'var(--surface)',color:'var(--text)',fontSize:'0.875rem',outline:'none',width:'100%'}}
           />
-          <button
-            onClick={()=>setAmount(usdcBalance.toFixed(6))}
-            disabled={!publicKey||usdcBalance===0}
-            style={{position:'absolute',right:'6px',top:'50%',transform:'translateY(-50%)',padding:'0.15rem 0.4rem',borderRadius:'4px',border:'1px solid #00c864',background:'transparent',color:'#00c864',fontWeight:'bold',cursor:'pointer',fontSize:'0.7rem'}}
-          >MAX</button>
+          <button onClick={()=>setAmount(usdcBalance.toFixed(6))} disabled={!publicKey||usdcBalance===0}
+            style={{position:'absolute',right:'6px',top:'50%',transform:'translateY(-50%)',padding:'0.15rem 0.4rem',borderRadius:'4px',border:'1px solid #00c864',background:'transparent',color:'#00c864',fontWeight:'bold',cursor:'pointer',fontSize:'0.7rem'}}>
+            MAX
+          </button>
         </div>
-        <button onClick={()=>doAction('deposit')} disabled={loading||!publicKey||!amount}
-          style={{padding:'0.6rem 0.9rem',borderRadius:'8px',border:'none',background:'#00c864',color:'#000',fontWeight:'bold',cursor:'pointer',fontSize:'0.8rem',opacity:(loading||!publicKey||!amount)?0.5:1}}>
+        <button onClick={()=>doAction('deposit')} disabled={loading||!publicKey||!amount||!client}
+          style={{padding:'0.6rem 0.9rem',borderRadius:'8px',border:'none',background:'#00c864',color:'#000',fontWeight:'bold',cursor:'pointer',fontSize:'0.8rem',opacity:(loading||!publicKey||!amount||!client)?0.5:1}}>
           Einzahlen
         </button>
-        <button onClick={()=>doAction('withdraw')} disabled={loading||!publicKey||!amount}
-          style={{padding:'0.6rem 0.9rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',color:'var(--text)',fontWeight:'bold',cursor:'pointer',fontSize:'0.8rem',opacity:(loading||!publicKey||!amount)?0.5:1}}>
+        <button onClick={()=>doAction('withdraw')} disabled={loading||!publicKey||!amount||!client}
+          style={{padding:'0.6rem 0.9rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',color:'var(--text)',fontWeight:'bold',cursor:'pointer',fontSize:'0.8rem',opacity:(loading||!publicKey||!amount||!client)?0.5:1}}>
           Abheben
         </button>
       </div>
