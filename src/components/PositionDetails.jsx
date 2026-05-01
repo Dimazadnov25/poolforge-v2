@@ -89,9 +89,7 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
           <div style={{textAlign:'center',marginTop:'0.25rem'}}><span style={{fontWeight:'bold',fontSize:'1.4rem',color:rangeColor,textShadow:rangeGlow}}>{rangePct.toFixed(1)}%</span></div>
           <div style={{color:'var(--muted)', fontSize:'0.7rem', textAlign:'center'}}>{details.solAmount.toFixed(4)} SOL + {details.usdcAmount.toFixed(2)} USDC</div>
         </div>
-        <div style={{background:'var(--surface)', borderRadius:'8px', padding:'0.5rem'}
-          <div style={{color:'var(--muted)', fontSize:'0.7rem'}}>{feeA.toFixed(6)} SOL + {feeB.toFixed(4)} USDC</div>
-        </div>
+        <div style={{background:'var(--surface)', borderRadius:'8px', padding:'0.5rem'}}></div>
       </div>
 
       <div style={{marginBottom:'0.5rem'}}>
