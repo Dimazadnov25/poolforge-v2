@@ -24,6 +24,10 @@ export default function MeteoraDashboard({solPrice}){
       const binsToLower=activeBin-lowerBin
       const binsToUpper=upperBin-activeBin
       const pct=totalBins>0?(binsToLower/totalBins*100):50
+      const binToPrice=bin=>Math.pow(1.0001,bin)*Math.pow(10,9-6)
+      const priceActive=binToPrice(activeBin)
+      const priceLower=binToPrice(lowerBin)
+      const priceUpper=binToPrice(upperBin)
       // Wert: USDC aus Bins summieren
       let totalUsdc=0
       for(let i=0;i<totalBins;i++){
@@ -34,7 +38,7 @@ export default function MeteoraDashboard({solPrice}){
       // Gesamtwert: USDC + SOL Anteil (ca 50/50 bei Spot)
       const solRatio=binsToLower/totalBins
       const totalUsd=totalUsdc/(1-solRatio*0.5)
-      setData({activeBin,lowerBin,upperBin,inRange,binsToLower,binsToUpper,totalBins,pct,totalUsdc,totalUsd})
+      setData({activeBin,lowerBin,upperBin,inRange,binsToLower,binsToUpper,totalBins,pct,totalUsdc,totalUsd,priceActive,priceLower,priceUpper})
     }catch(e){console.error("Meteora:",e.message)}
   }
 
