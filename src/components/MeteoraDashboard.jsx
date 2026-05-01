@@ -22,17 +22,8 @@ export default function MeteoraDashboard({solPrice}){
       const inRange=activeBin>=lowerBin&&activeBin<=upperBin
       const totalBins=upperBin-lowerBin
       const binsToLower=activeBin-lowerBin
-      const binsToUpper=upperBin-activeBin
       const pct=totalBins>0?(binsToLower/totalBins*100):50
-      let totalUsdc=0
-      for(let i=0;i<totalBins;i++){
-        const off=200+i*16
-        if(off+16>pos.data.length)break
-        totalUsdc+=Number(pos.data.readBigUInt64LE(off+8))/1e6
-      }
-      const solRatio=binsToLower/totalBins
-      const totalUsd=totalUsdc/(1-solRatio*0.5)
-      setData({inRange,binsToLower,binsToUpper,totalBins,pct,totalUsd})
+      setData({inRange,pct})
     }catch(e){console.error("Meteora:",e.message)}
   }
 
@@ -64,15 +55,9 @@ export default function MeteoraDashboard({solPrice}){
         </div>
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.5rem",marginBottom:"0.75rem"}}>
-        <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.6rem",textAlign:"center"}}>
-          <div style={{color:"var(--muted)",fontSize:"0.68rem",marginBottom:"0.2rem"}}>Position</div>
-          <div style={{fontWeight:"bold",fontSize:"1.8rem",color,textShadow:glow,textAlign:"center"}}>{data.pct.toFixed(1)}%</div>
-        </div>
-        <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.6rem",textAlign:"center"}}>
-          <div style={{color:"var(--muted)",fontSize:"0.68rem",marginBottom:"0.2rem"}}>Wert</div>
-          <div style={{fontWeight:"bold",fontSize:"0.9rem",color:"#00c864"}}>${data.totalUsd.toFixed(2)}</div>
-        </div>
+      <div style={{textAlign:"center",marginBottom:"0.75rem"}}>
+        <div style={{color:"var(--muted)",fontSize:"0.68rem",marginBottom:"0.2rem"}}>Position</div>
+        <div style={{fontWeight:"bold",fontSize:"1.8rem",color,textShadow:glow}}>{data.pct.toFixed(1)}%</div>
       </div>
 
       <a href={METEORA_URL} target="_blank" rel="noopener noreferrer"
