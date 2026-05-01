@@ -1,6 +1,6 @@
 import{useState,useEffect}from"react"
 import{useConnection}from"@solana/wallet-adapter-react"
-import{Connection,PublicKey}from"@solana/web3.js"
+import{PublicKey}from"@solana/web3.js"
 
 const POOL=new PublicKey("5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6")
 const POS=new PublicKey("2pLfC12zAeZD1CCE7q4ksxwj84h4kuZP2W5dM1u8Cgtt")
@@ -22,18 +22,17 @@ export default function MeteoraDashboard({solPrice}){
       const totalBins=upperBin-lowerBin
       const binsToLower=activeBin-lowerBin
       const binsToUpper=upperBin-activeBin
-      setData({activeBin,lowerBin,upperBin,inRange,binsToLower,binsToUpper,totalBins})
+      const pct=totalBins>0?(binsToLower/totalBins*100):50
+      setData({activeBin,lowerBin,upperBin,inRange,binsToLower,binsToUpper,totalBins,pct})
     }catch(e){console.error("Meteora:",e.message)}
   }
 
-  if(!data)return(
-    <div style={{background:"var(--card)",borderRadius:"12px",padding:"1.25rem",marginBottom:"1rem",color:"var(--muted)",fontSize:"0.85rem"}}>
-      🌊 Meteora wird geladen...
-    </div>
-  )
+  if(!data)return<div style={{background:"var(--card)",borderRadius:"12px",padding:"1.25rem",marginBottom:"1rem",color:"var(--muted)",fontSize:"0.85rem"}}>🌊 Meteora wird geladen...</div>
 
   const pctLower=(data.binsToLower/data.totalBins*100).toFixed(1)
   const pctUpper=(data.binsToUpper/data.totalBins*100).toFixed(1)
+  const dangerLower=data.binsToLower<8
+  const dangerUpper=data.binsToUpper<8
 
   return(
     <div style={{background:"var(--card)",borderRadius:"12px",padding:"1.25rem",marginBottom:"1rem"}}>
@@ -47,22 +46,43 @@ export default function MeteoraDashboard({solPrice}){
           {data.inRange?"✅ In Range":"🚨 Out of Range"}
         </span>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.75rem",marginBottom:"0.75rem"}}>
-        <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.75rem",textAlign:"center"}}>
-          <div style={{color:"var(--muted)",fontSize:"0.7rem",marginBottom:"0.25rem"}}>Active Bin</div>
-          <div style={{fontWeight:"bold",fontSize:"1rem"}}>{data.activeBin}</div>
+
+      {/* Visuelle Range Bar */}
+      <div style={{marginBottom:"1rem"}}>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.72rem",color:"var(--muted)",marginBottom:"0.3rem"}}>
+          <span style={{color:dangerLower?"#ef4444":"var(--muted)"}}>Min {data.lowerBin}</span>
+          <span style={{color:"#00d4ff",fontWeight:"bold"}}>● {data.activeBin}</span>
+          <span style={{color:dangerUpper?"#ef4444":"var(--muted)"}}>Max {data.upperBin}</span>
         </div>
-        <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.75rem",textAlign:"center"}}>
-          <div style={{color:"var(--muted)",fontSize:"0.7rem",marginBottom:"0.25rem"}}>Bis Untergrenze</div>
-          <div style={{fontWeight:"bold",fontSize:"1rem",color:data.binsToLower<5?"#ef4444":"var(--text)"}}>{data.binsToLower} Bins ({pctLower}%)</div>
+        <div style={{position:"relative",height:"12px",borderRadius:"6px",background:"var(--surface)",overflow:"hidden"}}>
+          {/* Range füllung */}
+          <div style={{position:"absolute",left:0,top:0,width:"100%",height:"100%",background:"linear-gradient(90deg,rgba(0,200,100,0.15),rgba(0,200,100,0.3),rgba(0,200,100,0.15))",borderRadius:"6px"}}/>
+          {/* Active Bin Marker */}
+          <div style={{position:"absolute",top:"50%",left:data.pct+"%",transform:"translate(-50%,-50%)",width:"10px",height:"10px",borderRadius:"50%",background:"#00d4ff",boxShadow:"0 0 8px #00d4ff",zIndex:2}}/>
+          {/* Danger zones */}
+          {dangerLower&&<div style={{position:"absolute",left:0,top:0,width:"12%",height:"100%",background:"rgba(239,68,68,0.3)",borderRadius:"6px 0 0 6px"}}/>}
+          {dangerUpper&&<div style={{position:"absolute",right:0,top:0,width:"12%",height:"100%",background:"rgba(239,68,68,0.3)",borderRadius:"0 6px 6px 0"}}/>}
         </div>
-        <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.75rem",textAlign:"center"}}>
-          <div style={{color:"var(--muted)",fontSize:"0.7rem",marginBottom:"0.25rem"}}>Bis Obergrenze</div>
-          <div style={{fontWeight:"bold",fontSize:"1rem",color:data.binsToUpper<5?"#ef4444":"var(--text)"}}>{data.binsToUpper} Bins ({pctUpper}%)</div>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.7rem",marginTop:"0.3rem"}}>
+          <span style={{color:dangerLower?"#ef4444":"var(--muted)"}}>⬅ {data.binsToLower} Bins ({pctLower}%)</span>
+          <span style={{color:dangerUpper?"#ef4444":"var(--muted)"}}>{ data.binsToUpper} Bins ({pctUpper}%) ➡</span>
         </div>
       </div>
-      <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.5rem 0.75rem",fontSize:"0.75rem",color:"var(--muted)",textAlign:"center"}}>
-        Range: <span style={{color:"var(--text)",fontWeight:"bold"}}>{data.lowerBin}</span> → <span style={{color:"var(--text)",fontWeight:"bold"}}>{data.upperBin}</span> ({data.totalBins} Bins)
+
+      {/* Stats */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem"}}>
+        <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.6rem",textAlign:"center"}}>
+          <div style={{color:"var(--muted)",fontSize:"0.68rem",marginBottom:"0.2rem"}}>Active Bin</div>
+          <div style={{fontWeight:"bold",fontSize:"0.9rem"}}>{data.activeBin}</div>
+        </div>
+        <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.6rem",textAlign:"center"}}>
+          <div style={{color:"var(--muted)",fontSize:"0.68rem",marginBottom:"0.2rem"}}>Total Bins</div>
+          <div style={{fontWeight:"bold",fontSize:"0.9rem"}}>{data.totalBins}</div>
+        </div>
+        <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.6rem",textAlign:"center"}}>
+          <div style={{color:"var(--muted)",fontSize:"0.68rem",marginBottom:"0.2rem"}}>Position</div>
+          <div style={{fontWeight:"bold",fontSize:"0.9rem"}}>{data.pct.toFixed(1)}%</div>
+        </div>
       </div>
     </div>
   )
