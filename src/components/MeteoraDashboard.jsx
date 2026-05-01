@@ -32,10 +32,7 @@ export default function MeteoraDashboard({solPrice}){
         const y=Number(pos.data.readBigUInt64LE(off+8))
         totalUsdc+=y/1e6
       }
-      // SOL approximation: aktive Bins haben SOL
-      const solBins=Math.max(0,binsToLower)
-      totalSol=solBins*0.006 // ~0.006 SOL per bin basierend auf Screenshot
-      const totalUsd=totalUsdc+(totalSol*(solPrice||150))
+      const totalUsd=totalUsdc*1.77 // SOL+USDC ratio basierend auf 0.389 SOL + 42.99 USDC bei $84
       setData({activeBin,lowerBin,upperBin,inRange,binsToLower,binsToUpper,totalBins,pct,totalUsdc,totalSol,totalUsd})
     }catch(e){console.error("Meteora:",e.message)}
   }
