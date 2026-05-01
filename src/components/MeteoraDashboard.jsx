@@ -2,9 +2,9 @@ import{useState,useEffect}from"react"
 import{useConnection}from"@solana/wallet-adapter-react"
 import{PublicKey}from"@solana/web3.js"
 
-const POOL=new PublicKey("5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6")
-const POS=new PublicKey("2pLfC12zAeZD1CCE7q4ksxwj84h4kuZP2W5dM1u8Cgtt")
-const METEORA_URL="https://app.meteora.ag/dlmm/5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6"
+const POOL=new PublicKey("HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR")
+const POS=new PublicKey("GyBaG3ockgdVqkyz4A3BEk4qyS961Ph4R2NB7ScfzoVJ")
+const METEORA_URL="https://app.meteora.ag/dlmm/HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR"
 
 export default function MeteoraDashboard({solPrice}){
   const{connection}=useConnection()
