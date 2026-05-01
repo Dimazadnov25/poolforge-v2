@@ -50,6 +50,12 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
   if (!details) return <div className="card" style={{marginTop:'0.5rem'}}>Loading...</div>
 
   const inRange = poolState?.currentPrice >= details.priceLower && poolState?.currentPrice <= details.priceUpper
+  const totalRange = (details.priceUpper||0) - (details.priceLower||0)
+  const distFromLower = (poolState?.currentPrice||0) - (details.priceLower||0)
+  const rangePct = totalRange>0 ? Math.min(100,Math.max(0,(distFromLower/totalRange)*100)) : 50
+  const nearEdge = rangePct<10||rangePct>90
+  const rangeColor = nearEdge?"#ef4444":"#00c864"
+  const rangeGlow = nearEdge?"0 0 15px #ef4444":"0 0 15px #00c864"
   const feeA = parseFloat(details.feeOwedA || 0) / 1e9
   const feeB = parseFloat(details.feeOwedB || 0) / 1e6
   const feeUSD = feeA * (poolState?.currentPrice || 0) + feeB
