@@ -96,3 +96,4 @@ export default function MeteoraDashboard({solPrice}){
     </div>
   )
 }
+
