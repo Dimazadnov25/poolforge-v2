@@ -85,6 +85,8 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
         <div style={{background:'var(--surface)', borderRadius:'8px', padding:'0.5rem'}}>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>Value</div>
           <div style={{color:'#00d4ff', fontWeight:'bold', fontSize:'3rem', textShadow:'0 0 20px #00d4ff, 0 0 40px #00d4ff'}}>${posValue.toFixed(2)}</div>
+          <div style={{marginTop:'0.5rem',position:'relative',height:'10px',borderRadius:'6px',background:'var(--surface)',overflow:'hidden'}}><div style={{position:'absolute',left:0,top:0,width:'100%',height:'100%',background:'linear-gradient(90deg,rgba(0,200,100,0.15),rgba(0,200,100,0.3),rgba(0,200,100,0.15))'}}></div><div style={{position:'absolute',top:'50%',left:rangePct+'%',transform:'translate(-50%,-50%)',width:'10px',height:'10px',borderRadius:'50%',background:'#00d4ff',boxShadow:'0 0 8px #00d4ff',zIndex:2}}></div></div>
+          <div style={{textAlign:'center',marginTop:'0.25rem'}}><span style={{fontWeight:'bold',fontSize:'1.4rem',color:rangeColor,textShadow:rangeGlow}}>{rangePct.toFixed(1)}%</span></div>
           <div style={{color:'var(--muted)', fontSize:'0.7rem'}}>{details.solAmount.toFixed(4)} SOL + {details.usdcAmount.toFixed(2)} USDC</div>
         </div>
         <div style={{background:'var(--surface)', borderRadius:'8px', padding:'0.5rem'}}>
