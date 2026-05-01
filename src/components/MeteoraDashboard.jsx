@@ -86,6 +86,10 @@ export default function MeteoraDashboard({solPrice}){
           <span style={{fontWeight:"bold",color:"#00c864",fontSize:"1rem"}}>${data.totalUsd.toFixed(2)}</span>
         </div>
       )}
+      <a href="https://app.meteora.ag/dlmm/5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6" target="_blank" rel="noopener noreferrer"
+        style={{display:"block",textAlign:"center",padding:"0.6rem",borderRadius:"8px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"0.85rem",textDecoration:"none",marginBottom:"0.75rem",border:"1px solid rgba(0,200,100,0.3)"}}>
+        🔄 Rebalancen auf Meteora ↗
+      </a>
       {/* Stats */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem"}}>
         <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.6rem",textAlign:"center"}}>
