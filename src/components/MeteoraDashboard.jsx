@@ -81,7 +81,7 @@ export default function MeteoraDashboard({solPrice}){
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.5rem",marginBottom:"0.75rem"}}>
         <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.6rem",textAlign:"center"}}>
           <div style={{color:"var(--muted)",fontSize:"0.68rem",marginBottom:"0.2rem"}}>Position</div>
-          <div style={{fontWeight:"bold",fontSize:"0.9rem"}}>{data.pct.toFixed(1)}%</div>
+          <div style={{fontWeight:"bold",fontSize:"1.8rem",color:"#fbbf24",textShadow:"0 0 15px #fbbf24"}}>{data.pct.toFixed(1)}%</div>
         </div>
         <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.6rem",textAlign:"center"}}>
           <div style={{color:"var(--muted)",fontSize:"0.68rem",marginBottom:"0.2rem"}}>Wert</div>
