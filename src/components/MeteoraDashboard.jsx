@@ -23,17 +23,7 @@ export default function MeteoraDashboard({solPrice}){
       const binsToLower=activeBin-lowerBin
       const binsToUpper=upperBin-activeBin
       const pct=totalBins>0?(binsToLower/totalBins*100):50
-      // Wert aus Position Bins berechnen
-      let totalUsdc=0,totalSol=0
-      const BIN_START=200,BIN_SIZE=16
-      for(let i=0;i<totalBins;i++){
-        const off=BIN_START+i*BIN_SIZE
-        if(off+16>pos.data.length)break
-        const y=Number(pos.data.readBigUInt64LE(off+8))
-        totalUsdc+=y/1e6
-      }
-      const totalUsd=totalUsdc*1.77 // SOL+USDC ratio basierend auf 0.389 SOL + 42.99 USDC bei $84
-      setData({activeBin,lowerBin,upperBin,inRange,binsToLower,binsToUpper,totalBins,pct,totalUsdc,totalSol,totalUsd})
+      setData({activeBin,lowerBin,upperBin,inRange,binsToLower,binsToUpper,totalBins,pct})
     }catch(e){console.error("Meteora:",e.message)}
   }
 
@@ -77,20 +67,7 @@ export default function MeteoraDashboard({solPrice}){
           <span style={{color:dangerLower?"#ef4444":"var(--muted)"}}>⬅ {data.binsToLower} Bins ({pctLower}%)</span>
           <span style={{color:dangerUpper?"#ef4444":"var(--muted)"}}>{ data.binsToUpper} Bins ({pctUpper}%) ➡</span>
         </div>
-      </div>
-
-      {/* Wert */}
-      {data.totalUsd>0&&(
-        <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.6rem 0.75rem",marginBottom:"0.5rem",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <span style={{color:"var(--muted)",fontSize:"0.75rem"}}>Position Wert</span>
-          <span style={{fontWeight:"bold",color:"#00c864",fontSize:"1rem"}}>${data.totalUsd.toFixed(2)}</span>
-        </div>
-      )}
-      <a href="https://app.meteora.ag/dlmm/5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6" target="_blank" rel="noopener noreferrer"
-        style={{display:"block",textAlign:"center",padding:"0.6rem",borderRadius:"8px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"0.85rem",textDecoration:"none",marginBottom:"0.75rem",border:"1px solid rgba(0,200,100,0.3)"}}>
-        🔄 Rebalancen auf Meteora ↗
-      </a>
-      {/* Stats */}
+      </div>      {/* Stats */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem"}}>
         <div style={{background:"var(--surface)",borderRadius:"8px",padding:"0.6rem",textAlign:"center"}}>
           <div style={{color:"var(--muted)",fontSize:"0.68rem",marginBottom:"0.2rem"}}>Active Bin</div>
