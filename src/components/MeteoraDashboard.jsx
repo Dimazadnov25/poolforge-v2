@@ -2,52 +2,54 @@ import{useState,useEffect}from"react"
 import{useConnection,useWallet}from"@solana/wallet-adapter-react"
 import{PublicKey}from"@solana/web3.js"
 
-const DLMM_PROG="LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
-const TOKEN_PROG="TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+const DLMM_PROG=new PublicKey("LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo")
+const TOKEN_PROG=new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
 
 export default function MeteoraDashboard(){
   const{connection}=useConnection()
   const{publicKey}=useWallet()
   const[positions,setPositions]=useState([])
+  const[loading,setLoading]=useState(false)
 
   useEffect(()=>{
-    if(publicKey)fetchPositions()
+    if(publicKey){fetchPositions()}
     const t=setInterval(()=>{if(publicKey)fetchPositions()},30000)
     return()=>clearInterval(t)
-  },[publicKey])
+  },[publicKey?.toBase58()])
 
   async function fetchPositions(){
+    setLoading(true)
     try{
-      // Alle NFTs (amount=1) im Wallet finden
-      const accs=await connection.getParsedTokenAccountsByOwner(publicKey,{programId:new PublicKey(TOKEN_PROG)})
-      const nfts=accs.value.filter(a=>a.account.data.parsed.info.tokenAmount.amount==="1")
+      // Alle Program Accounts die dem Wallet gehören und DLMM Program als Owner haben
+      const accs=await connection.getProgramAccounts(DLMM_PROG,{
+        filters:[{memcmp:{offset:40,bytes:publicKey.toBase58()}}]
+      })
       const result=[]
-      for(const nft of nfts){
-        const mint=nft.account.data.parsed.info.mint
-        // Position PDA berechnen
-        const[pda]=PublicKey.findProgramAddressSync([Buffer.from("position"),new PublicKey(mint).toBuffer()],new PublicKey(DLMM_PROG))
-        const posInfo=await connection.getAccountInfo(pda)
-        if(!posInfo||posInfo.owner.toBase58()!==DLMM_PROG)continue
-        const d=posInfo.data
+      for(const acc of accs){
+        const d=acc.account.data
         if(d.length<8120)continue
-        // lbPair aus Position lesen (offset 8)
         const lbPair=new PublicKey(d.slice(8,40))
         const poolInfo=await connection.getAccountInfo(lbPair)
         if(!poolInfo)continue
         const activeBin=poolInfo.data.readInt32LE(48)
         const lowerBin=d.readInt32LE(7912)
         const upperBin=d.readInt32LE(7916)
+        if(lowerBin===0&&upperBin===0)continue
         const inRange=activeBin>=lowerBin&&activeBin<=upperBin
         const totalBins=upperBin-lowerBin
         const binsToLower=activeBin-lowerBin
         const pct=totalBins>0?(binsToLower/totalBins*100):50
-        result.push({lbPair:lbPair.toBase58(),inRange,pct,binsToLower,binsToUpper:upperBin-activeBin,totalBins})
+        result.push({lbPair:lbPair.toBase58(),inRange,pct,totalBins})
       }
       setPositions(result)
     }catch(e){console.error("Meteora:",e.message)}
+    setLoading(false)
   }
 
   if(!publicKey)return null
+  if(loading&&!positions.length)return(
+    <div style={{background:"var(--card)",borderRadius:"12px",padding:"1.25rem",marginBottom:"1rem",color:"var(--muted)",fontSize:"0.85rem"}}>🌊 Meteora wird geladen...</div>
+  )
   if(!positions.length)return null
 
   return(
