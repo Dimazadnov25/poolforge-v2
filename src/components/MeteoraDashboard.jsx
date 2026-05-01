@@ -1,84 +1,64 @@
-import { useState, useEffect } from 'react'
-import { useWallet, useConnection } from '@solana/wallet-adapter-react'
-import { Transaction } from '@solana/web3.js'
+import{useState,useEffect}from'react'
+import{useWallet}from'@solana/wallet-adapter-react'
 
-const API = 'https://poolforge-v2.vercel.app'
+const METEORA_API='https://dlmm-api.meteora.ag'
+const WALLET='BFU5gQ5jYq534vSDKGnBSNffwtoTZFkeo68WJmviVVzj'
 
-export default function MeteoraDashboard({ solPrice }) {
-  const { connection } = useConnection()
-  const wallet = useWallet()
-  const [status, setStatus] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [msg, setMsg] = useState('')
+export default function MeteoraDashboard({solPrice}){
+  const[positions,setPositions]=useState([])
+  const[loading,setLoading]=useState(true)
 
-  useEffect(() => {
-    fetchStatus()
-    const interval = setInterval(fetchStatus, 60000)
-    return () => clearInterval(interval)
-  }, [])
+  useEffect(()=>{fetchPositions();const t=setInterval(fetchPositions,60000);return()=>clearInterval(t)},[])
 
-  async function fetchStatus() {
-    try {
-      const r = await fetch(API + '/api/meteora-rebalance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-      })
-      const data = await r.json()
-      setStatus(data)
-    } catch(e) {}
-  }
-
-  async function setOperator() {
-    if (!wallet.connected) return
-    setLoading(true)
-    setMsg('Operator wird gesetzt...')
-    try {
-      const r = await fetch(API + '/api/meteora-set-operator2', { method: 'POST' })
-      const { transaction } = await r.json()
-      const tx = Transaction.from(Buffer.from(transaction, 'base64'))
-      const signed = await wallet.signTransaction(tx)
-      const sig = await connection.sendRawTransaction(signed.serialize())
-      await connection.confirmTransaction(sig)
-      setMsg('? Operator gesetzt! Auto-Rebalance aktiv!')
-    } catch(e) {
-      setMsg('? Fehler: ' + e.message)
-    }
+  async function fetchPositions(){
+    try{
+      const r=await fetch(METEORA_API+'/position/'+WALLET)
+      const d=await r.json()
+      setPositions(Array.isArray(d)?d:[])
+    }catch(e){console.error('Meteora:',e.message)}
     setLoading(false)
   }
 
-  return (
-    <div style={{background:'var(--surface)',borderRadius:'12px',padding:'1.5rem',marginBottom:'1rem'}}>
-      <h3 style={{margin:'0 0 1rem',color:'var(--text)'}}>?? Meteora DLMM Position</h3>
-      {status && (
-        <div>
-          <div style={{display:'flex',gap:'1rem',marginBottom:'1rem',flexWrap:'wrap'}}>
-            <div style={{background: status.status==='in_range'?'#1a3a1a':'#3a1a1a',padding:'0.75rem 1rem',borderRadius:'8px',flex:1}}>
-              <div style={{fontSize:'0.75rem',color:'#888',marginBottom:'4px'}}>Status</div>
-              <div style={{color:status.status==='in_range'?'#4ade80':'#f87171',fontWeight:'bold'}}>
-                {status.status==='in_range'?'? In Range':'?? Out of Range'}
+  if(loading)return <div style={{background:'var(--card)',borderRadius:'12px',padding:'1.25rem',marginBottom:'1rem',color:'var(--muted)',fontSize:'0.85rem'}}>🌊 Meteora wird geladen...</div>
+  if(!positions.length)return null
+
+  return(
+    <div style={{background:'var(--card)',borderRadius:'12px',padding:'1.25rem',marginBottom:'1rem'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'1rem'}}>
+        <span style={{fontSize:'1.1rem'}}>🌊</span>
+        <h3 style={{margin:0,fontSize:'0.95rem',fontWeight:'bold'}}>Meteora DLMM</h3>
+      </div>
+      {positions.map((pos,i)=>{
+        const activeBin=pos.activeBinId??pos.currentBinId??0
+        const minBin=pos.lowerBinId??pos.minBinId??0
+        const maxBin=pos.upperBinId??pos.maxBinId??0
+        const inRange=activeBin>=minBin&&activeBin<=maxBin
+        const totalUsd=(parseFloat(pos.totalXAmount||0)/1e9)*(solPrice||0)+(parseFloat(pos.totalYAmount||0)/1e6)
+        return(
+          <div key={i} style={{background:'var(--surface)',borderRadius:'8px',padding:'0.75rem',marginBottom:'0.5rem'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.5rem'}}>
+              <span style={{fontSize:'0.75rem',color:'var(--muted)'}}>{(pos.address||pos.pubkey||'').slice(0,8)}...</span>
+              <span style={{padding:'0.15rem 0.5rem',borderRadius:'20px',fontSize:'0.75rem',fontWeight:'bold',background:inRange?'rgba(0,200,100,0.15)':'rgba(239,68,68,0.15)',color:inRange?'#00c864':'#ef4444'}}>
+                {inRange?'✅ In Range':'🚨 Out of Range'}
+              </span>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0.5rem',fontSize:'0.8rem'}}>
+              <div style={{textAlign:'center'}}>
+                <div style={{color:'var(--muted)',fontSize:'0.7rem'}}>Active Bin</div>
+                <div style={{fontWeight:'bold'}}>{activeBin}</div>
+              </div>
+              <div style={{textAlign:'center'}}>
+                <div style={{color:'var(--muted)',fontSize:'0.7rem'}}>Range</div>
+                <div style={{fontWeight:'bold'}}>{minBin} → {maxBin}</div>
+              </div>
+              <div style={{textAlign:'center'}}>
+                <div style={{color:'var(--muted)',fontSize:'0.7rem'}}>Wert</div>
+                <div style={{fontWeight:'bold',color:'#00c864'}}>${totalUsd.toFixed(2)}</div>
               </div>
             </div>
-            <div style={{background:'#111',padding:'0.75rem 1rem',borderRadius:'8px',flex:1}}>
-              <div style={{fontSize:'0.75rem',color:'#888',marginBottom:'4px'}}>Active Bin</div>
-              <div style={{color:'#fff',fontWeight:'bold'}}>{status.activeBin}</div>
-            </div>
-            <div style={{background:'#111',padding:'0.75rem 1rem',borderRadius:'8px',flex:2}}>
-              <div style={{fontSize:'0.75rem',color:'#888',marginBottom:'4px'}}>Range</div>
-              <div style={{color:'#fff',fontWeight:'bold'}}>{status.position?.lower} ? {status.position?.upper}</div>
-            </div>
           </div>
-        </div>
-      )}
-      <button
-        onClick={setOperator}
-        disabled={loading||!wallet.connected}
-        style={{background:'linear-gradient(135deg,#9945FF,#14F195)',border:'none',borderRadius:'8px',padding:'0.75rem 1.5rem',color:'#fff',fontWeight:'bold',cursor:'pointer',width:'100%',opacity:!wallet.connected?0.5:1}}
-      >
-        {loading?'Wird ausgef�hrt...':'? Auto-Rebalance aktivieren (einmalig)'}
-      </button>
-      {msg&&<p style={{color:'#888',marginTop:'0.5rem',fontSize:'0.85rem'}}>{msg}</p>}
+        )
+      })}
     </div>
   )
 }
-
