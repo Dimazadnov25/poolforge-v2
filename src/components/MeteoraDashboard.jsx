@@ -4,16 +4,15 @@ import{PublicKey}from"@solana/web3.js"
 
 const DLMM_PROG=new PublicKey("LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo")
 const TOKEN_PROG=new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
-const METEORA_BASE="https://app.meteora.ag/dlmm/"
+const METEORA_URL="https://app.meteora.ag/dlmm/HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR"
 
 export default function MeteoraDashboard(){
   const{connection}=useConnection()
   const{publicKey}=useWallet()
   const[positions,setPositions]=useState([])
-  const[loading,setLoading]=useState(false)
 
   useEffect(()=>{
-    if(publicKey){fetchPositions()}
+    if(publicKey)fetchPositions()
     const t=setInterval(()=>{if(publicKey)fetchPositions()},5000)
     return()=>clearInterval(t)
   },[publicKey?.toBase58()])
@@ -44,24 +43,24 @@ export default function MeteoraDashboard(){
     }catch(e){console.error("Meteora:",e.message)}
   }
 
+  const PositionBtn=({url})=>(
+    <div style={{textAlign:"center",marginTop:"0.75rem"}}>
+      <a href={url} target="_blank" rel="noopener noreferrer"
+        style={{display:"inline-block",padding:"0.8rem 2.5rem",borderRadius:"10px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"1.4rem",textDecoration:"none",border:"2px solid #00c864",textShadow:"0 0 10px #00c864",boxShadow:"0 0 15px rgba(0,200,100,0.3)"}}>
+        Position
+      </a>
+    </div>
+  )
+
   if(!publicKey)return null
-  if(!positions.length&&!loading)return(
+
+  if(!positions.length)return(
     <div style={{background:"var(--card)",borderRadius:"12px",padding:"1.25rem",marginBottom:"1rem"}}>
       <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"1rem"}}>
         <span style={{fontSize:"1.1rem"}}>🌊</span>
         <h3 style={{margin:0,fontSize:"0.95rem",fontWeight:"bold"}}>Meteora DLMM</h3>
       </div>
-      <div style={{textAlign:"center",marginBottom:"0.75rem"}}>
-        <div style={{color:"var(--muted)",fontSize:"0.72rem",marginBottom:"0.5rem"}}>Neue Position öffnen</div>
-        <div style={{display:"flex",gap:"0.5rem",justifyContent:"center",flexWrap:"wrap"}}>
-          {[{bins:4,url:"https://app.meteora.ag/dlmm/5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6"},{bins:10,url:"https://app.meteora.ag/dlmm/BGm1tav58oGcsQJehL9WXBFXF7D27vZsKefj4xJKD5Y"},{bins:20,url:"https://app.meteora.ag/dlmm/BVRbyLjjfSBcoyiYFuxbgKYnWuiFaF9CSXEa5vdSZ9Hh"}].map(({bins,url})=>(
-            <a key={bins} href={url} target="_blank" rel="noopener noreferrer"
-              style={{padding:"0.3rem 0.8rem",borderRadius:"8px",background:"var(--surface)",color:"#00c864",fontSize:"0.82rem",fontWeight:"bold",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
-              �{bins} Bin
-            </a>
-          ))}
-        </div>
-      </div>
+      <PositionBtn url={METEORA_URL}/>
     </div>
   )
 
@@ -71,7 +70,7 @@ export default function MeteoraDashboard(){
         const nearEdge=pos.pct<10||pos.pct>90
         const color=nearEdge?"#ef4444":"#00c864"
         const glow=nearEdge?"0 0 15px #ef4444":"0 0 15px #00c864"
-        const url=METEORA_BASE+pos.lbPair
+        const url="https://app.meteora.ag/dlmm/"+pos.lbPair
         return(
           <div key={i} style={{background:"var(--card)",borderRadius:"12px",padding:"1.25rem",marginBottom:"1rem"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem"}}>
@@ -100,13 +99,10 @@ export default function MeteoraDashboard(){
               style={{display:"block",textAlign:"center",padding:"0.6rem",borderRadius:"8px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"0.85rem",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)",marginBottom:"0.75rem"}}>
               📊 Position auf Meteora öffnen ↗
             </a>
-            <div style={{textAlign:"center",marginTop:"0.75rem"}}>
-              <a href="https://app.meteora.ag/dlmm/HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR" target="_blank" rel="noopener noreferrer"
-                style={{display:"inline-block",padding:"0.8rem 2.5rem",borderRadius:"10px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"1.4rem",textDecoration:"none",border:"2px solid #00c864",textShadow:"0 0 10px #00c864",boxShadow:"0 0 15px rgba(0,200,100,0.3)"}}>
-                Position
-              </a>
-            </div>
+            <PositionBtn url={METEORA_URL}/>
+          </div>
+        )
+      })}
+    </div>
   )
 }
-
-
