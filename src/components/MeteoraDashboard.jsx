@@ -96,7 +96,7 @@ export default function MeteoraDashboard(){
               <div style={{fontWeight:"bold",fontSize:"1.8rem",color,textShadow:glow}}>{pos.pct.toFixed(1)}%</div>
             </div>
             <a href={url} target="_blank" rel="noopener noreferrer"
-              style={{display:"block",textAlign:"center",padding:"0.6rem",borderRadius:"8px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"0.85rem",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)",marginBottom:"0.75rem"}}>
+              style={{display:"inline-block",padding:"0.8rem 2.5rem",borderRadius:"10px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"1.4rem",textDecoration:"none",border:"2px solid #00c864",textShadow:"0 0 10px #00c864",boxShadow:"0 0 15px rgba(0,200,100,0.3)",marginBottom:"0.75rem"}}>
               📊 Position auf Meteora öffnen ↗
             </a>
             <PositionBtn url={METEORA_URL}/>
@@ -106,3 +106,4 @@ export default function MeteoraDashboard(){
     </div>
   )
 }
+
