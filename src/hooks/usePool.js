@@ -52,7 +52,7 @@ export function usePool() {
       } catch (e) {}
     }
     fetchPool()
-    const interval = setInterval(fetchPool, 10000)
+    const interval = setInterval(fetchPool, 1000)
     return () => clearInterval(interval)
   }, [connection])
 
