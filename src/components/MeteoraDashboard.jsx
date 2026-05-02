@@ -54,7 +54,7 @@ export default function MeteoraDashboard(){
       <div style={{textAlign:"center",marginBottom:"0.75rem"}}>
         <div style={{color:"var(--muted)",fontSize:"0.72rem",marginBottom:"0.5rem"}}>Neue Position Ã¶ffnen</div>
         <div style={{display:"flex",gap:"0.5rem",justifyContent:"center",flexWrap:"wrap"}}>
-          {[1,4,10,20].map(bins=>(
+          {[4,10,20].map(bins=>(
             <a key={bins} href={METEORA_BASE+"HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR"} target="_blank" rel="noopener noreferrer"
               style={{padding:"0.3rem 0.8rem",borderRadius:"8px",background:"var(--surface)",color:"#00c864",fontSize:"0.82rem",fontWeight:"bold",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
               ±{bins} Bin
@@ -103,7 +103,7 @@ export default function MeteoraDashboard(){
             <div style={{textAlign:"center"}}>
               <div style={{color:"var(--muted)",fontSize:"0.72rem",marginBottom:"0.5rem"}}>Neue Position Ã¶ffnen</div>
               <div style={{display:"flex",gap:"0.5rem",justifyContent:"center",flexWrap:"wrap"}}>
-                {[1,4,10,20].map(bins=>(
+                {[4,10,20].map(bins=>(
                   <a key={bins} href={url} target="_blank" rel="noopener noreferrer"
                     style={{padding:"0.3rem 0.8rem",borderRadius:"8px",background:"var(--surface)",color:"#00c864",fontSize:"0.82rem",fontWeight:"bold",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
                     ±{bins} Bin
@@ -117,3 +117,4 @@ export default function MeteoraDashboard(){
     </div>
   )
 }
+
