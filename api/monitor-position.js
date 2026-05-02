@@ -26,9 +26,9 @@ export default async function handler(req,res){
     const inRange=activeBin>=lowerBin&&activeBin<=upperBin
     if(!inRange){
       await sendAlert("OUT OF RANGE!","Sofort rebalancen! https://poolforge-v2.vercel.app","urgent")
-    }else if(pct<10){
+    }else if(pct<20){
       await sendAlert("AKTUELL "+pct.toFixed(1)+"%","Nahe unterem Rand! https://poolforge-v2.vercel.app","high")
-    }else if(pct>90){
+    }else if(pct>80){
       await sendAlert("AKTUELL "+pct.toFixed(1)+"%","Nahe oberem Rand! https://poolforge-v2.vercel.app","high")
     }
     res.status(200).json({ok:true,pct:pct.toFixed(1),inRange,activeBin,lowerBin,upperBin})
@@ -36,4 +36,5 @@ export default async function handler(req,res){
     res.status(500).json({error:e.message})
   }
 }
+
 
