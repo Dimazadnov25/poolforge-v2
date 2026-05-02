@@ -5,10 +5,10 @@ const WALLET=new PublicKey("BFU5gQ5jYq534vSDKGnBSNffwtoTZFkeo68WJmviVVzj")
 const NTFY_CHANNEL="poolforge-dzad"
 const RPC=process.env.VITE_RPC_URL||"https://api.mainnet-beta.solana.com"
 
-async function sendAlert(msg){
+async function sendAlert(title,msg,priority="urgent"){
   await fetch("https://ntfy.sh/"+NTFY_CHANNEL,{
     method:"POST",
-    headers:{"Title":"PoolForge Alert 🚨","Priority":"urgent","Tags":"warning"},
+    headers:{"Title":title,"Priority":priority,"Tags":"warning"},
     body:msg
   })
 }
@@ -35,11 +35,11 @@ export default async function handler(req,res){
       const inRange=activeBin>=lowerBin&&activeBin<=upperBin
 
       if(!inRange){
-        await sendAlert("🚨 OUT OF RANGE! Position sofort rebalancen!\nhttps://poolforge-v2.vercel.app")
+        await sendAlert("🚨 PoolForge OUT OF RANGE","Sofort rebalancen!\nhttps://poolforge-v2.vercel.app","urgent")
       }else if(pct<10){
-        await sendAlert("⚠️ Position nahe unterem Rand! "+pct.toFixed(1)+"% verbleibend\nhttps://poolforge-v2.vercel.app")
+        await sendAlert("⚠️ AKTUELL "+pct.toFixed(1)+"%","Position nahe unterem Rand!\nhttps://poolforge-v2.vercel.app","high")
       }else if(pct>90){
-        await sendAlert("⚠️ Position nahe oberem Rand! "+(100-pct).toFixed(1)+"% verbleibend\nhttps://poolforge-v2.vercel.app")
+        await sendAlert("⚠️ AKTUELL "+pct.toFixed(1)+"%","Position nahe oberem Rand!\nhttps://poolforge-v2.vercel.app","high")
       }
     }
     res.status(200).json({ok:true})
