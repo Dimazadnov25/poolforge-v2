@@ -4,6 +4,7 @@ import{PublicKey}from"@solana/web3.js"
 
 const DLMM_PROG=new PublicKey("LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo")
 const TOKEN_PROG=new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+const METEORA_BASE="https://app.meteora.ag/dlmm/"
 
 export default function MeteoraDashboard(){
   const{connection}=useConnection()
@@ -13,14 +14,12 @@ export default function MeteoraDashboard(){
 
   useEffect(()=>{
     if(publicKey){fetchPositions()}
-    const t=setInterval(()=>{if(publicKey)fetchPositions()},30000)
+    const t=setInterval(()=>{if(publicKey)fetchPositions()},5000)
     return()=>clearInterval(t)
   },[publicKey?.toBase58()])
 
   async function fetchPositions(){
-    setLoading(true)
     try{
-      // Alle Program Accounts die dem Wallet gehören und DLMM Program als Owner haben
       const accs=await connection.getProgramAccounts(DLMM_PROG,{
         filters:[{memcmp:{offset:40,bytes:publicKey.toBase58()}}]
       })
@@ -43,14 +42,28 @@ export default function MeteoraDashboard(){
       }
       setPositions(result)
     }catch(e){console.error("Meteora:",e.message)}
-    setLoading(false)
   }
 
   if(!publicKey)return null
-  if(loading&&!positions.length)return(
-    <div style={{background:"var(--card)",borderRadius:"12px",padding:"1.25rem",marginBottom:"1rem",color:"var(--muted)",fontSize:"0.85rem"}}>🌊 Meteora wird geladen...</div>
+  if(!positions.length&&!loading)return(
+    <div style={{background:"var(--card)",borderRadius:"12px",padding:"1.25rem",marginBottom:"1rem"}}>
+      <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"1rem"}}>
+        <span style={{fontSize:"1.1rem"}}>🌊</span>
+        <h3 style={{margin:0,fontSize:"0.95rem",fontWeight:"bold"}}>Meteora DLMM</h3>
+      </div>
+      <div style={{textAlign:"center",marginBottom:"0.75rem"}}>
+        <div style={{color:"var(--muted)",fontSize:"0.72rem",marginBottom:"0.5rem"}}>Neue Position öffnen</div>
+        <div style={{display:"flex",gap:"0.5rem",justifyContent:"center",flexWrap:"wrap"}}>
+          {[1,4,10,20].map(bins=>(
+            <a key={bins} href={METEORA_BASE+"HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR"} target="_blank" rel="noopener noreferrer"
+              style={{padding:"0.3rem 0.8rem",borderRadius:"8px",background:"var(--surface)",color:"#00c864",fontSize:"0.82rem",fontWeight:"bold",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
+              {bins} Bin
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
   )
-  if(!positions.length)return null
 
   return(
     <div>
@@ -58,7 +71,7 @@ export default function MeteoraDashboard(){
         const nearEdge=pos.pct<10||pos.pct>90
         const color=nearEdge?"#ef4444":"#00c864"
         const glow=nearEdge?"0 0 15px #ef4444":"0 0 15px #00c864"
-        const url="https://app.meteora.ag/dlmm/"+pos.lbPair
+        const url=METEORA_BASE+pos.lbPair
         return(
           <div key={i} style={{background:"var(--card)",borderRadius:"12px",padding:"1.25rem",marginBottom:"1rem"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem"}}>
@@ -84,9 +97,20 @@ export default function MeteoraDashboard(){
               <div style={{fontWeight:"bold",fontSize:"1.8rem",color,textShadow:glow}}>{pos.pct.toFixed(1)}%</div>
             </div>
             <a href={url} target="_blank" rel="noopener noreferrer"
-              style={{display:"block",textAlign:"center",padding:"0.6rem",borderRadius:"8px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"0.85rem",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
+              style={{display:"block",textAlign:"center",padding:"0.6rem",borderRadius:"8px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"0.85rem",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)",marginBottom:"0.75rem"}}>
               📊 Position auf Meteora öffnen ↗
             </a>
+            <div style={{textAlign:"center"}}>
+              <div style={{color:"var(--muted)",fontSize:"0.72rem",marginBottom:"0.5rem"}}>Neue Position öffnen</div>
+              <div style={{display:"flex",gap:"0.5rem",justifyContent:"center",flexWrap:"wrap"}}>
+                {[1,4,10,20].map(bins=>(
+                  <a key={bins} href={url} target="_blank" rel="noopener noreferrer"
+                    style={{padding:"0.3rem 0.8rem",borderRadius:"8px",background:"var(--surface)",color:"#00c864",fontSize:"0.82rem",fontWeight:"bold",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
+                    {bins} Bin
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         )
       })}
