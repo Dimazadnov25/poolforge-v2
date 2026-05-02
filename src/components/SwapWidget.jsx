@@ -5,7 +5,6 @@ import{VersionedTransaction}from"@solana/web3.js"
 const TOKENS=[
   {symbol:"SOL",mint:"So11111111111111111111111111111111111111112",decimals:9},
   {symbol:"USDC",mint:"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",decimals:6},
-  {symbol:"jupSOL",mint:"jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v",decimals:9},
 ]
 
 export default function SwapWidget({solBalance,usdcBalance}){
