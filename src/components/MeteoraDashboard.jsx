@@ -3,8 +3,11 @@ import{useConnection,useWallet}from"@solana/wallet-adapter-react"
 import{PublicKey}from"@solana/web3.js"
 
 const DLMM_PROG=new PublicKey("LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo")
-const TOKEN_PROG=new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
 const METEORA_URL="https://app.meteora.ag/dlmm/HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR"
+
+const BtnStyle={display:"inline-block",padding:"0.8rem 2.5rem",borderRadius:"10px",fontWeight:"bold",fontSize:"1.4rem",textDecoration:"none",marginBottom:"0.5rem"}
+const GreenBtn={...BtnStyle,background:"rgba(0,200,100,0.15)",color:"#00c864",border:"2px solid #00c864",textShadow:"0 0 10px #00c864",boxShadow:"0 0 15px rgba(0,200,100,0.3)"}
+const BlueBtn={...BtnStyle,background:"rgba(0,212,255,0.15)",color:"#00d4ff",border:"2px solid #00d4ff",textShadow:"0 0 10px #00d4ff",boxShadow:"0 0 15px rgba(0,212,255,0.3)"}
 
 export default function MeteoraDashboard(){
   const{connection}=useConnection()
@@ -19,7 +22,7 @@ export default function MeteoraDashboard(){
 
   async function fetchPositions(){
     try{
-      const accs=await connection.getProgramAccounts(DLMM_PROG,{
+      const accs=await connection.getProgramAccounts(new PublicKey("LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"),{
         filters:[{memcmp:{offset:40,bytes:publicKey.toBase58()}}]
       })
       const result=[]
@@ -43,15 +46,6 @@ export default function MeteoraDashboard(){
     }catch(e){console.error("Meteora:",e.message)}
   }
 
-  const PositionBtn=({url})=>(
-    <div style={{textAlign:"center",marginTop:"0.75rem"}}>
-      <a href={url} target="_blank" rel="noopener noreferrer"
-        style={{display:"inline-block",padding:"0.8rem 2.5rem",borderRadius:"10px",background:"rgba(0,200,100,0.15)",color:"#00d4ff",fontWeight:"bold",fontSize:"1.4rem",textDecoration:"none",border:"2px solid #00d4ff",textShadow:"0 0 10px #00d4ff",boxShadow:"0 0 15px rgba(0,212,255,0.3)"}}>
-        Position
-      </a>
-    </div>
-  )
-
   if(!publicKey)return null
 
   if(!positions.length)return(
@@ -60,7 +54,9 @@ export default function MeteoraDashboard(){
         <span style={{fontSize:"1.1rem"}}>🌊</span>
         <h3 style={{margin:0,fontSize:"0.95rem",fontWeight:"bold"}}>Meteora DLMM</h3>
       </div>
-      <PositionBtn url={METEORA_URL}/>
+      <div style={{textAlign:"center"}}>
+        <a href={METEORA_URL} target="_blank" rel="noopener noreferrer" style={BlueBtn}>POSITION</a>
+      </div>
     </div>
   )
 
@@ -91,18 +87,17 @@ export default function MeteoraDashboard(){
                 {pos.pct>90&&<div style={{position:"absolute",right:0,top:0,width:"12%",height:"100%",background:"rgba(239,68,68,0.3)",borderRadius:"0 6px 6px 0"}}/>}
               </div>
             </div>
-            <div style={{textAlign:"center",marginBottom:"0.75rem"}}>
+            <div style={{textAlign:"center",marginBottom:"1rem"}}>
               <div style={{color:"var(--muted)",fontSize:"0.68rem",marginBottom:"0.2rem"}}>Position</div>
               <div style={{fontWeight:"bold",fontSize:"1.8rem",color,textShadow:glow}}>{pos.pct.toFixed(1)}%</div>
             </div>
-            <a href={url} target="_blank" rel="noopener noreferrer"
-              style={{display:"inline-block",padding:"0.8rem 2.5rem",borderRadius:"10px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"1.4rem",textDecoration:"none",border:"2px solid #00c864",textShadow:"0 0 10px #00c864",boxShadow:"0 0 15px rgba(0,200,100,0.3)",marginBottom:"0.75rem"}}>AKTUELL</a>
-            <PositionBtn url={METEORA_URL}/>
+            <div style={{textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",gap:"0.5rem"}}>
+              <a href={url} target="_blank" rel="noopener noreferrer" style={GreenBtn}>AKTUELL</a>
+              <a href={METEORA_URL} target="_blank" rel="noopener noreferrer" style={BlueBtn}>POSITION</a>
+            </div>
           </div>
         )
       })}
     </div>
   )
 }
-
-
