@@ -1,6 +1,6 @@
 import{Connection,PublicKey}from"@solana/web3.js"
 
-const POS=new PublicKey("Gs39HvfzRqu7aRMQ1iQyR3M6sVpNgDrqe7jjx5qK6gHE")
+const POS=new PublicKey("F2nV1SQMmApbkXEJi2mzzuxgkAVFq6XuHb1pZF1Ugw4x")
 const NTFY="poolforge-dzad"
 const RPC="https://mainnet.helius-rpc.com/?api-key=7802f08f-81ab-48e9-a7e7-edccb2357cf2"
 
