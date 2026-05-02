@@ -54,10 +54,10 @@ export default function MeteoraDashboard(){
       <div style={{textAlign:"center",marginBottom:"0.75rem"}}>
         <div style={{color:"var(--muted)",fontSize:"0.72rem",marginBottom:"0.5rem"}}>Neue Position Ã¶ffnen</div>
         <div style={{display:"flex",gap:"0.5rem",justifyContent:"center",flexWrap:"wrap"}}>
-          {[4,10,20].map(bins=>(
+          {[{bins:4,url:"https://app.meteora.ag/dlmm/5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6"},{bins:10,url:"https://app.meteora.ag/dlmm/BGm1tav58oGcsQJehL9WXBFXF7D27vZsKefj4xJKD5Y"},{bins:20,url:"https://app.meteora.ag/dlmm/BVRbyLjjfSBcoyiYFuxbgKYnWuiFaF9CSXEa5vdSZ9Hh"}].map(({bins,url})=>(
             <a key={bins} href={METEORA_BASE+"HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR"} target="_blank" rel="noopener noreferrer"
               style={{padding:"0.3rem 0.8rem",borderRadius:"8px",background:"var(--surface)",color:"#00c864",fontSize:"0.82rem",fontWeight:"bold",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
-              ±{bins} Bin
+              ï¿½{bins} Bin
             </a>
           ))}
         </div>
@@ -106,7 +106,7 @@ export default function MeteoraDashboard(){
                 {[4,10,20].map(bins=>(
                   <a key={bins} href={url} target="_blank" rel="noopener noreferrer"
                     style={{padding:"0.3rem 0.8rem",borderRadius:"8px",background:"var(--surface)",color:"#00c864",fontSize:"0.82rem",fontWeight:"bold",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
-                    ±{bins} Bin
+                    ï¿½{bins} Bin
                   </a>
                 ))}
               </div>
