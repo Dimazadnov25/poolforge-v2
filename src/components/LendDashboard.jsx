@@ -16,32 +16,17 @@ export default function LendDashboard({usdcBalance=0}){
   useEffect(()=>{if(publicKey)fetchBalance();const t=setInterval(()=>{if(publicKey)fetchBalance()},5000);return()=>clearInterval(t)},[publicKey?.toBase58()])
 
   async function fetchRate(){
-    try{
-      const r=await fetch('/api/marginfi-lend?action=apy')
-      const d=await r.json()
-      if(d.rate)setRate(d.rate)
-      if(d.supplyRate)setSupplyRate(d.supplyRate)
-    }catch{}
+    try{const r=await fetch('/api/marginfi-lend?action=apy');const d=await r.json();if(d.rate)setRate(d.rate);if(d.supplyRate)setSupplyRate(d.supplyRate)}catch{}
   }
-
   async function fetchBalance(){
     if(!publicKey)return
-    try{
-      const r=await fetch('/api/marginfi-lend?action=balance&wallet='+publicKey.toBase58())
-      const d=await r.json()
-      setJlBalance(d.balance||0)
-    }catch{setJlBalance(0)}
+    try{const r=await fetch('/api/marginfi-lend?action=balance&wallet='+publicKey.toBase58());const d=await r.json();setJlBalance(d.balance||0)}catch{setJlBalance(0)}
   }
-
   async function doAction(action){
     if(!publicKey||!amount)return
     setLoading(true);setStatus('Wird vorbereitet...')
     try{
-      const r=await fetch('/api/marginfi-lend',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({action,amount:parseFloat(amount),userPublicKey:publicKey.toBase58()})
-      })
+      const r=await fetch('/api/marginfi-lend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,amount:parseFloat(amount),userPublicKey:publicKey.toBase58()})})
       const d=await r.json()
       if(d.error)throw new Error(d.error)
       const txData=d.transaction||d.tx
@@ -58,25 +43,16 @@ export default function LendDashboard({usdcBalance=0}){
     setLoading(false)
   }
 
-  // jlUSDC * rate = aktueller USDC Wert
   const currentValue=jlBalance*rate
-  // Zuwachs seit Launch in %
-  const growth=((rate-1)*100).toFixed(3)
-  // Jahresertrag
   const yearly=(currentValue*(supplyRate/100)).toFixed(2)
   const btnActive=!loading&&!!publicKey&&!!amount
 
   return(
     <div style={{background:'var(--card)',borderRadius:'12px',padding:'1.25rem',marginBottom:'1rem'}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
-        <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
-          <span style={{fontSize:'1.1rem'}}>💵</span>
-          <h3 style={{margin:0,fontSize:'0.95rem',fontWeight:'bold'}}>USDC Lend</h3>
-          <span style={{fontSize:'0.7rem',color:'var(--muted)',background:'var(--surface)',padding:'0.1rem 0.4rem',borderRadius:'4px'}}>Jupiter</span>
-        </div>
-        <span style={{background:'rgba(0,200,100,0.15)',color:'#00c864',padding:'0.2rem 0.7rem',borderRadius:'20px',fontSize:'0.8rem',fontWeight:'bold'}}>
-          +{growth}% Zuwachs
-        </span>
+      <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'1rem'}}>
+        <span style={{fontSize:'1.1rem'}}>💵</span>
+        <h3 style={{margin:0,fontSize:'0.95rem',fontWeight:'bold'}}>USDC Lend</h3>
+        <span style={{fontSize:'0.7rem',color:'var(--muted)',background:'var(--surface)',padding:'0.1rem 0.4rem',borderRadius:'4px'}}>Jupiter</span>
       </div>
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem',marginBottom:'1rem'}}>
         <div style={{background:'var(--surface)',borderRadius:'8px',padding:'0.75rem',textAlign:'center'}}>
@@ -121,4 +97,3 @@ export default function LendDashboard({usdcBalance=0}){
     </div>
   )
 }
-
