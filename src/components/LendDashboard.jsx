@@ -13,7 +13,7 @@ export default function LendDashboard({usdcBalance=0}){
   const[status,setStatus]=useState('')
 
   useEffect(()=>{fetchRate()},[])
-  useEffect(()=>{if(publicKey)fetchBalance()},[publicKey?.toBase58()])
+  useEffect(()=>{if(publicKey)fetchBalance();const t=setInterval(()=>{if(publicKey)fetchBalance()},5000);return()=>clearInterval(t)},[publicKey?.toBase58()])
 
   async function fetchRate(){
     try{
@@ -121,3 +121,4 @@ export default function LendDashboard({usdcBalance=0}){
     </div>
   )
 }
+
