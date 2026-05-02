@@ -57,7 +57,7 @@ export default function MeteoraDashboard(){
           {[1,4,10,20].map(bins=>(
             <a key={bins} href={METEORA_BASE+"HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR"} target="_blank" rel="noopener noreferrer"
               style={{padding:"0.3rem 0.8rem",borderRadius:"8px",background:"var(--surface)",color:"#00c864",fontSize:"0.82rem",fontWeight:"bold",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
-              {bins} Bin
+              ±{bins} Bin
             </a>
           ))}
         </div>
@@ -106,7 +106,7 @@ export default function MeteoraDashboard(){
                 {[1,4,10,20].map(bins=>(
                   <a key={bins} href={url} target="_blank" rel="noopener noreferrer"
                     style={{padding:"0.3rem 0.8rem",borderRadius:"8px",background:"var(--surface)",color:"#00c864",fontSize:"0.82rem",fontWeight:"bold",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
-                    {bins} Bin
+                    ±{bins} Bin
                   </a>
                 ))}
               </div>
