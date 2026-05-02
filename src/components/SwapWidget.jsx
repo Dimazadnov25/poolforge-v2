@@ -20,6 +20,12 @@ export default function SwapWidget({solBalance,usdcBalance}){
   const fromToken=TOKENS[from]
   const toToken=TOKENS[to]
 
+  function getBalance(){
+    if(fromToken.symbol==="SOL")return Math.max(0,(solBalance||0)-0.01)
+    if(fromToken.symbol==="USDC")return usdcBalance||0
+    return 0
+  }
+
   async function doSwap(){
     if(!publicKey||!amount)return
     setLoading(true);setStatus("Wird vorbereitet...")
@@ -37,10 +43,12 @@ export default function SwapWidget({solBalance,usdcBalance}){
       await connection.confirmTransaction(sig,"confirmed")
       setStatus("Erfolg! ✅")
       setAmount("")
-      setTimeout(()=>setStatus(""),3000)
+      setTimeout(()=>{setStatus("");window.location.reload()},2000)
     }catch(e){setStatus("Fehler: "+e.message)}
     setLoading(false)
   }
+
+  const bal=getBalance()
 
   return(
     <div className="card" style={{marginTop:"1rem"}}>
@@ -48,6 +56,11 @@ export default function SwapWidget({solBalance,usdcBalance}){
         <span style={{fontSize:"1.1rem"}}>⚡</span>
         <h3 style={{margin:0}}>Swap</h3>
         <span style={{fontSize:"0.7rem",color:"var(--muted)",background:"var(--surface)",padding:"0.1rem 0.4rem",borderRadius:"4px"}}>Jupiter</span>
+      </div>
+
+      <div style={{display:"flex",gap:"1rem",marginBottom:"0.75rem",padding:"0.5rem",borderRadius:"8px",background:"var(--surface)",fontSize:"0.8rem"}}>
+        <span style={{color:"var(--muted)"}}>SOL: <strong style={{color:"var(--text)"}}>{(solBalance||0).toFixed(4)}</strong></span>
+        <span style={{color:"var(--muted)"}}>USDC: <strong style={{color:"var(--text)"}}>{(usdcBalance||0).toFixed(2)}</strong></span>
       </div>
 
       <div style={{display:"flex",gap:"0.5rem",marginBottom:"0.75rem"}}>
@@ -63,15 +76,17 @@ export default function SwapWidget({solBalance,usdcBalance}){
         </select>
       </div>
 
-      <div style={{position:"relative",marginBottom:"0.75rem"}}>
+      <div style={{position:"relative",marginBottom:"0.5rem"}}>
         <input type="number" value={amount} onChange={e=>setAmount(e.target.value)}
           placeholder={"Betrag "+fromToken.symbol} disabled={loading||!publicKey}
-          style={{width:"100%",padding:"0.6rem 3.5rem 0.6rem 0.75rem",borderRadius:"8px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",fontSize:"0.9rem",boxSizing:"border-box"}}/>
-        <button onClick={()=>{
-          if(fromToken.symbol==="SOL")setAmount(Math.max(0,(solBalance||0)-0.01).toFixed(4))
-          else if(fromToken.symbol==="USDC")setAmount((usdcBalance||0).toFixed(2))
-        }} disabled={!publicKey}
-          style={{position:"absolute",right:"8px",top:"50%",transform:"translateY(-50%)",padding:"0.15rem 0.4rem",borderRadius:"4px",border:"1px solid #00c864",background:"transparent",color:"#00c864",fontWeight:"bold",cursor:"pointer",fontSize:"0.7rem"}}>MAX</button>
+          style={{width:"100%",padding:"0.6rem 0.75rem",borderRadius:"8px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",fontSize:"0.9rem",boxSizing:"border-box"}}/>
+      </div>
+
+      <div style={{display:"flex",gap:"0.5rem",marginBottom:"0.75rem"}}>
+        <button onClick={()=>setAmount((bal*0.5).toFixed(6))} disabled={!publicKey||bal===0}
+          style={{flex:1,padding:"0.4rem",borderRadius:"8px",border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text)",cursor:"pointer",fontSize:"0.8rem",fontWeight:"bold"}}>50%</button>
+        <button onClick={()=>setAmount(bal.toFixed(6))} disabled={!publicKey||bal===0}
+          style={{flex:1,padding:"0.4rem",borderRadius:"8px",border:"1px solid #00c864",background:"transparent",color:"#00c864",cursor:"pointer",fontSize:"0.8rem",fontWeight:"bold"}}>MAX</button>
       </div>
 
       <button onClick={doSwap} disabled={loading||!publicKey||!amount}
