@@ -1,6 +1,6 @@
 import{Connection,PublicKey}from"@solana/web3.js"
 
-const POS=new PublicKey("F2nV1SQMmApbkXEJi2mzzuxgkAVFq6XuHb1pZF1Ugw4x")
+const POS=new PublicKey("2evg5qKSALH5AHCksNrtAyrSPQAMs4p8SMpKEw6NcLu9")
 const NTFY="poolforge-dzad"
 const RPC="https://mainnet.helius-rpc.com/?api-key=7802f08f-81ab-48e9-a7e7-edccb2357cf2"
 
@@ -36,3 +36,4 @@ export default async function handler(req,res){
     res.status(500).json({error:e.message})
   }
 }
+
