@@ -5,7 +5,6 @@ import { usePool } from '../hooks/usePool'
 import PoolStats from './PoolStats'
 import PositionDetails from './PositionDetails'
 import OpenPositionForm from './OpenPositionForm'
-import StakeDashboard from './StakeDashboard'
 import LendDashboard from './LendDashboard'
 import MeteoraDashboard from './MeteoraDashboard'
 
@@ -88,7 +87,6 @@ export default function PoolDashboard() {
           )}
                     <MeteoraDashboard solPrice={pool.solPrice} />
           <LendDashboard usdcBalance={pool.usdcBalance} />
-          <StakeDashboard solPrice={pool.solPrice} solBalance={pool.solBalance} />
           
           <OpenPositionForm
             pool={pool}
