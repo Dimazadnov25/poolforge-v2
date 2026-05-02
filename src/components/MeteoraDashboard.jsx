@@ -100,21 +100,12 @@ export default function MeteoraDashboard(){
               style={{display:"block",textAlign:"center",padding:"0.6rem",borderRadius:"8px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"0.85rem",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)",marginBottom:"0.75rem"}}>
               📊 Position auf Meteora öffnen ↗
             </a>
-            <div style={{textAlign:"center"}}>
-              <div style={{color:"var(--muted)",fontSize:"0.72rem",marginBottom:"0.5rem"}}>Neue Position öffnen</div>
-              <div style={{display:"flex",gap:"0.5rem",justifyContent:"center",flexWrap:"wrap"}}>
-                {[4,10,20].map(bins=>(
-                  <a key={bins} href={url} target="_blank" rel="noopener noreferrer"
-                    style={{padding:"0.3rem 0.8rem",borderRadius:"8px",background:"var(--surface)",color:"#00c864",fontSize:"0.82rem",fontWeight:"bold",textDecoration:"none",border:"1px solid rgba(0,200,100,0.3)"}}>
-                    �{bins} Bin
-                  </a>
-                ))}
-              </div>
+            <div style={{textAlign:"center",marginTop:"0.75rem"}}>
+              <a href="https://app.meteora.ag/dlmm/HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR" target="_blank" rel="noopener noreferrer"
+                style={{display:"inline-block",padding:"0.8rem 2.5rem",borderRadius:"10px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"1.4rem",textDecoration:"none",border:"2px solid #00c864",textShadow:"0 0 10px #00c864",boxShadow:"0 0 15px rgba(0,200,100,0.3)"}}>
+                Position
+              </a>
             </div>
-          </div>
-        )
-      })}
-    </div>
   )
 }
 
