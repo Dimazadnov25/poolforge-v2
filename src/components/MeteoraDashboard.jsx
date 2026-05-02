@@ -46,7 +46,7 @@ export default function MeteoraDashboard(){
   const PositionBtn=({url})=>(
     <div style={{textAlign:"center",marginTop:"0.75rem"}}>
       <a href={url} target="_blank" rel="noopener noreferrer"
-        style={{display:"inline-block",padding:"0.8rem 2.5rem",borderRadius:"10px",background:"rgba(0,200,100,0.15)",color:"#00c864",fontWeight:"bold",fontSize:"1.4rem",textDecoration:"none",border:"2px solid #00c864",textShadow:"0 0 10px #00c864",boxShadow:"0 0 15px rgba(0,200,100,0.3)"}}>
+        style={{display:"inline-block",padding:"0.8rem 2.5rem",borderRadius:"10px",background:"rgba(0,200,100,0.15)",color:"#00d4ff",fontWeight:"bold",fontSize:"1.4rem",textDecoration:"none",border:"2px solid #00d4ff",textShadow:"0 0 10px #00d4ff",boxShadow:"0 0 15px rgba(0,212,255,0.3)"}}>
         Position
       </a>
     </div>
