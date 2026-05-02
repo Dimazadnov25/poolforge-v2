@@ -2,7 +2,7 @@ import{Connection,PublicKey}from"@solana/web3.js"
 
 const DLMM_PROG=new PublicKey("LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo")
 const WALLET=new PublicKey("ESLvaL9rNoDFYoWwRGqpLZmLk9KgR9r5S3L5EvauHyAy")
-const POS=new PublicKey("4bFqcr6euauPqdwo67yNWh14E8baDFAc985ZD4KddJvw")
+const POS=new PublicKey("Gs39HvfzRqu7aRMQ1iQyR3M6sVpNgDrqe7jjx5qK6gHE")
 const NTFY_CHANNEL="poolforge-dzad"
 const RPC="https://mainnet.helius-rpc.com/?api-key=7802f08f-81ab-48e9-a7e7-edccb2357cf2"
 
