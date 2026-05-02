@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react'
 import { usePool } from '../hooks/usePool'
 import PoolStats from './PoolStats'
 import PositionDetails from './PositionDetails'
-import OpenPositionForm from './OpenPositionForm'
+import SwapWidget from './SwapWidget'
 import LendDashboard from './LendDashboard'
 import MeteoraDashboard from './MeteoraDashboard'
 
@@ -88,12 +88,7 @@ export default function PoolDashboard() {
                     <MeteoraDashboard solPrice={pool.solPrice} />
           <LendDashboard usdcBalance={pool.usdcBalance} />
           
-          <OpenPositionForm
-            pool={pool}
-            solPrice={pool.solPrice}
-            onOpen={pool.openPosition}
-            loading={pool.loading}
-          />
+          <SwapWidget solPrice={pool.solPrice} solBalance={pool.solBalance} usdcBalance={pool.usdcBalance} />
         </div>
       ) : (
         <div className="connect-cta">
