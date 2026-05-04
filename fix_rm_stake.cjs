@@ -1,0 +1,6 @@
+const fs=require("fs")
+let f=fs.readFileSync("C:/Users/dzadn/poolforge-v2/src/components/PoolDashboard.jsx","utf8")
+f=f.replace("import StakeDashboard from './StakeDashboard'\n","")
+f=f.replace("\n          <StakeDashboard solPrice={pool.solPrice} solBalance={pool.solBalance} />","")
+fs.writeFileSync("C:/Users/dzadn/poolforge-v2/src/components/PoolDashboard.jsx",f)
+console.log("done")
