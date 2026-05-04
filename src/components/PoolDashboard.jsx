@@ -1,6 +1,6 @@
 import { useWallet } from '@solana/wallet-adapter-react'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { usePool } from '../hooks/usePool'
 import PoolStats from './PoolStats'
 import PositionDetails from './PositionDetails'
@@ -9,8 +9,8 @@ import LendDashboard from './LendDashboard'
 import MeteoraDashboard from './MeteoraDashboard'
 
 export default function PoolDashboard() {
-  const [solVolume, setSolVolume] = React.useState(null)
-  React.useEffect(() => {
+  const [solVolume, setSolVolume] = useState(null)
+  useEffect(() => {
     const fetchVolume = async () => {
       try {
         const r = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=SOLUSDT')
