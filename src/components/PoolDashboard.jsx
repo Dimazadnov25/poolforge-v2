@@ -9,6 +9,20 @@ import LendDashboard from './LendDashboard'
 import MeteoraDashboard from './MeteoraDashboard'
 
 export default function PoolDashboard() {
+  const [solVolume, setSolVolume] = React.useState(null)
+  React.useEffect(() => {
+    const fetchVolume = async () => {
+      try {
+        const r = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=SOLUSDT')
+        const d = await r.json()
+        if (d.quoteVolume) setSolVolume(parseFloat(d.quoteVolume))
+      } catch(e) {}
+    }
+    fetchVolume()
+    const iv = setInterval(fetchVolume, 60000)
+    return () => clearInterval(iv)
+  }, [])
+
   const wallet = useWallet()
   const pool = usePool()
   const [positionData, setPositionData] = useState({})
@@ -42,12 +56,21 @@ export default function PoolDashboard() {
         <WalletMultiButton />
       </header>
 
-      {pool.solPrice && (
-        <div className="price-ticker">
-          SOL <strong style={{color:'#06b6d4', fontSize:'2rem'}}>${pool.solPrice.toFixed(2)}</strong>
-          
-        </div>
-      )}
+      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',flexWrap:'wrap'}}>
+              {pool.solPrice && (
+                <div className="price-ticker">
+                  SOL <strong style={{color:'#06b6d4',fontSize:'2rem'}}>${pool.solPrice.toFixed(2)}</strong>
+                </div>
+              )}
+              {solVolume != null && (
+                <div className="price-ticker" style={{fontSize:'0.85rem',padding:'0.35rem 0.75rem',display:'flex',flexDirection:'column',alignItems:'center',gap:'0.1rem'}}>
+                  <span style={{color:'#94a3b8',fontSize:'0.7rem',letterSpacing:'0.05em',textTransform:'uppercase'}}>Vol 24h</span>
+                  <strong style={{color:'#10b981'}}>
+                    ${solVolume>=1e9?(solVolume/1e9).toFixed(2)+'B':solVolume>=1e6?(solVolume/1e6).toFixed(1)+'M':solVolume.toFixed(0)}
+                  </strong>
+                </div>
+              )}
+            </div>
 
       
 
