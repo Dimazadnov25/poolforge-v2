@@ -63,9 +63,9 @@ export default function PoolDashboard() {
                 </div>
               )}
               {solVolume != null && (
-                <div className="price-ticker" style={{fontSize:'0.85rem',padding:'0.35rem 0.75rem',display:'flex',flexDirection:'column',alignItems:'center',gap:'0.1rem'}}>
-                  <span style={{color:'#94a3b8',fontSize:'0.7rem',letterSpacing:'0.05em',textTransform:'uppercase'}}>Vol 24h</span>
-                  <strong style={{color:'#10b981'}}>
+                <div className="price-ticker" style={{fontSize:'1rem',padding:'0.5rem 1.2rem',display:'flex',flexDirection:'column',alignItems:'center',gap:'0.2rem'}}>
+                  <span style={{color:'#94a3b8',fontSize:'0.75rem',letterSpacing:'0.05em',textTransform:'uppercase'}}>Vol 24h</span>
+                  <strong style={{color:'#10b981',fontSize:'1.6rem'}}>
                     ${solVolume>=1e9?(solVolume/1e9).toFixed(2)+'B':solVolume>=1e6?(solVolume/1e6).toFixed(1)+'M':solVolume.toFixed(0)}
                   </strong>
                 </div>
