@@ -71,10 +71,9 @@ export default function PoolDashboard() {
                 </div>
               )}
             </div>
+            <PriceAlert solPrice={pool.solPrice} />
 
-      
-
-      {wallet.connected && (
+            {wallet.connected && (
         <div className="balances">
           <span>SOL: <strong>{pool.solBalance != null ? pool.solBalance.toFixed(4) : '�'}</strong></span>
           <span>USDC: <strong>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : '�'}</strong></span>
