@@ -42,7 +42,7 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
         if (onUpdate) onUpdate(position.mint, d)
       })
       load()
-      const interval = setInterval(load, 60000)
+      const interval = setInterval(load, 10000)
       return () => clearInterval(interval)
     }
   }, [position?.mint])
