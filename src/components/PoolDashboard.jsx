@@ -11,7 +11,6 @@ export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
   const [swapSuggest, setSwapSuggest] = useState(null)
   const [positionData, setPositionData] = useState({})
-
   const wallet = useWallet()
   const pool = usePool()
 
@@ -39,30 +38,11 @@ export default function PoolDashboard() {
     setPositionData(prev => ({ ...prev, [mint]: details }))
   }, [])
 
-  return () => clearInterval(iv)
-  }, [])
-
-  // Balance alle 3 Sekunden aktualisieren
-  useEffect(() => {
-    const iv = setInterval(() => {
-      if (pool.refreshBalances) pool.refreshBalances()
-    }, 3000)
-    return () => clearInterval(iv)
-  }, [pool.refreshBalances])
-
-  const wallet = useWallet()
-  const pool = usePool()
-
-  const handlePositionUpdate = useCallback((mint, details) => {
-    setPositionData(prev => ({ ...prev, [mint]: details }))
-  }, [])
-
   return (
-    <div style={{maxWidth:'430px', margin:'0 auto', padding:'0.6rem 0.75rem', background:'#080808', minHeight:'100dvh', display:'flex', flexDirection:'column', gap:'0.5rem'}}>
+    <div style={{maxWidth:'430px',margin:'0 auto',padding:'0.6rem 0.75rem',background:'#080808',minHeight:'100dvh',display:'flex',flexDirection:'column',gap:'0.5rem'}}>
 
-      {/* HEADER */}
-      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-        <div style={{display:'flex', alignItems:'center', gap:'0.4rem'}}>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div style={{display:'flex',alignItems:'center',gap:'0.4rem'}}>
           <svg width="18" height="18" viewBox="0 0 397 311" xmlns="http://www.w3.org/2000/svg">
             <path d="M64.6 237.9a9 9 0 016.3-2.6h314.4c4 0 6 4.8 3.2 7.6l-62.4 62.4a9 9 0 01-6.3 2.6H5.4c-4 0-6-4.8-3.2-7.6l62.4-62.4z" fill="url(#a)"/>
             <path d="M64.6 2.6A9.1 9.1 0 0170.9 0h314.4c4 0 6 4.8 3.2 7.6L326.1 70a9 9 0 01-6.3 2.6H5.4C1.4 72.6-.6 67.8 2.2 65L64.6 2.6z" fill="url(#b)"/>
@@ -73,47 +53,45 @@ export default function PoolDashboard() {
               <linearGradient id="c" x1="-7" y1="155" x2="381" y2="155" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#9945FF"/><stop offset="1" stopColor="#14F195"/></linearGradient>
             </defs>
           </svg>
-          <span style={{fontWeight:700, fontSize:'0.95rem', color:'#e2e8f0'}}>PoolForge</span>
-          <span style={{fontSize:'0.65rem', background:'rgba(99,102,241,0.2)', color:'#818cf8', padding:'0.1rem 0.35rem', borderRadius:'4px'}}>SOL/USDC</span>
+          <span style={{fontWeight:700,fontSize:'0.95rem',color:'#e2e8f0',fontFamily:'Orbitron,monospace'}}>PoolForge</span>
+          <span style={{fontSize:'0.65rem',background:'rgba(0,255,255,0.1)',color:'#00ffff',padding:'0.1rem 0.35rem',borderRadius:'4px',fontFamily:'Share Tech Mono,monospace'}}>SOL/USDC</span>
         </div>
         <WalletMultiButton />
       </div>
 
-      {/* PREIS + VOL + BALANCES - eine Zeile */}
-      <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'0.4rem'}}>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0.4rem'}}>
         {pool.solPrice && (
-          <div style={{background:'#111111', borderRadius:'0.6rem', padding:'0.5rem 0.6rem', border:'1px solid rgba(255,255,255,0.07)'}}>
-            <div style={{fontSize:'0.6rem', color:'#64748b', textTransform:'uppercase'}}>SOL</div>
-            <div style={{fontSize:'1.5rem', fontWeight:700, color:'#06b6d4', fontFamily:'Orbitron, monospace'}}>${pool.solPrice.toFixed(2)}</div>
+          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
+            <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
+            <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Orbitron,monospace'}}>${pool.solPrice.toFixed(2)}</div>
           </div>
         )}
         {solVolume != null && (
-          <div style={{background:'#1e293b', borderRadius:'0.6rem', padding:'0.5rem 0.6rem', border:'1px solid rgba(255,255,255,0.07)'}}>
-            <div style={{fontSize:'0.6rem', color:'#64748b', textTransform:'uppercase'}}>Vol 24h</div>
-            <div style={{fontSize:'1.5rem', fontWeight:700, color:'#10b981', fontFamily:'Orbitron, monospace'}}>
+          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
+            <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Vol 24h</div>
+            <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ff88',fontFamily:'Orbitron,monospace'}}>
               ${solVolume>=1e9?(solVolume/1e9).toFixed(1)+'B':solVolume>=1e6?(solVolume/1e6).toFixed(0)+'M':solVolume.toFixed(0)}
             </div>
           </div>
         )}
         {wallet.connected && (
-          <div style={{background:'#1e293b', borderRadius:'0.6rem', padding:'0.5rem 0.6rem', border:'1px solid rgba(255,255,255,0.07)'}}>
-            <div style={{fontSize:'0.6rem', color:'#64748b'}}>SOL / USDC</div>
-            <div style={{fontSize:'1rem', fontWeight:600, color:'#e2e8f0', lineHeight:1.4, fontFamily:'Orbitron, monospace'}}>
+          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
+            <div style={{fontSize:'0.6rem',color:'#444',fontFamily:'Share Tech Mono,monospace'}}>SOL/USDC</div>
+            <div style={{fontSize:'1rem',fontWeight:600,color:'#e0e0e0',lineHeight:1.4,fontFamily:'Orbitron,monospace'}}>
               {pool.solBalance != null ? pool.solBalance.toFixed(3) : '—'}<br/>
-              <span style={{color:'#94a3b8'}}>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : '—'}</span>
+              <span style={{color:'#888',fontSize:'0.85rem'}}>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : '—'}</span>
             </div>
           </div>
         )}
       </div>
 
-      {/* ALERT BUTTONS */}
       <PriceAlert solPrice={pool.solPrice} />
 
-      {/* ERRORS */}
-      {pool.error && <div style={{background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'0.5rem', padding:'0.4rem 0.6rem', color:'#f87171', fontSize:'0.78rem'}}>{pool.error}</div>}
-      {pool.txStatus && <div style={{background:'rgba(99,102,241,0.1)', borderRadius:'0.5rem', padding:'0.4rem 0.6rem', color:'#818cf8', fontSize:'0.78rem'}}>{pool.txStatus}</div>}
+      {pool.error && <div style={{background:'rgba(255,34,68,0.1)',border:'1px solid rgba(255,34,68,0.3)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#ff2244',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.error}</div>}
+      {pool.txStatus && <div style={{background:'rgba(0,255,255,0.1)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#00ffff',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.txStatus}</div>}
 
-      {/* POSITION */}
+      <SwapWidget solPrice={pool.solPrice} solBalance={pool.solBalance} usdcBalance={pool.usdcBalance} />
+
       {wallet.connected && pool.positions.length > 0 && pool.positions.map(p => (
         <PositionDetails
           key={p.mint}
@@ -139,35 +117,30 @@ export default function PoolDashboard() {
       ))}
 
       {wallet.connected && pool.positions.length === 0 && (
-        <div style={{color:'#64748b', fontSize:'0.82rem', textAlign:'center', padding:'0.75rem'}}>Keine offenen Positionen</div>
+        <div style={{color:'#444',fontSize:'0.82rem',textAlign:'center',padding:'0.75rem',fontFamily:'Share Tech Mono,monospace'}}>// KEINE POSITIONEN</div>
       )}
 
       {!wallet.connected && (
-        <div style={{textAlign:'center', padding:'1.5rem 1rem'}}>
-          <p style={{color:'#64748b', marginBottom:'1rem', fontSize:'0.9rem'}}>Wallet verbinden um loszulegen</p>
+        <div style={{textAlign:'center',padding:'1.5rem 1rem'}}>
+          <p style={{color:'#444',marginBottom:'1rem',fontSize:'0.85rem',fontFamily:'Share Tech Mono,monospace'}}>// WALLET VERBINDEN</p>
           <WalletMultiButton />
         </div>
       )}
 
-      {/* SWAP */}
-      <SwapWidget solPrice={pool.solPrice} solBalance={pool.solBalance} usdcBalance={pool.usdcBalance} />
-
-      {/* BYREAL */}
       <ByrealDashboard />
 
-      {/* SWAP SUGGEST MODAL */}
       {swapSuggest && (
-        <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.75)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000}}
+        <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.85)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000}}
           onClick={() => setSwapSuggest(null)}>
-          <div style={{background:'#1e293b',borderRadius:'1rem',padding:'1.5rem',maxWidth:'340px',width:'90%',border:'1px solid rgba(99,102,241,0.4)'}}
+          <div style={{background:'#111',borderRadius:'0.75rem',padding:'1.5rem',maxWidth:'340px',width:'90%',border:'1px solid rgba(0,255,255,0.3)',boxShadow:'0 0 40px rgba(0,255,255,0.15)'}}
             onClick={e => e.stopPropagation()}>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#e2e8f0',marginBottom:'0.75rem'}}>💱 SOL → USDC</div>
-            <div style={{color:'#94a3b8',fontSize:'0.9rem',marginBottom:'1.25rem'}}>
-              Du hast <strong style={{color:'#06b6d4'}}>{swapSuggest} SOL</strong> über Minimum.<br/>Jetzt zu USDC tauschen?
+            <div style={{fontSize:'1rem',fontWeight:700,color:'#00ffff',marginBottom:'0.75rem',fontFamily:'Orbitron,monospace'}}>SOL → USDC</div>
+            <div style={{color:'#888',fontSize:'0.85rem',marginBottom:'1.25rem',fontFamily:'Share Tech Mono,monospace'}}>
+              Überschuss: <strong style={{color:'#00ffff'}}>{swapSuggest} SOL</strong><br/>Jetzt tauschen?
             </div>
             <div style={{display:'flex',gap:'0.75rem'}}>
-              <button onClick={() => setSwapSuggest(null)} style={{flex:1,padding:'0.6rem',borderRadius:'0.5rem',border:'1px solid rgba(255,255,255,0.1)',background:'transparent',color:'#64748b',cursor:'pointer'}}>Nein</button>
-              <button onClick={async () => { setSwapSuggest(null); await pool.swapSolToUsdc(swapSuggest) }} style={{flex:1,padding:'0.6rem',borderRadius:'0.5rem',border:'none',background:'linear-gradient(135deg,#6366f1,#06b6d4)',color:'#fff',cursor:'pointer',fontWeight:600}}>Ja, swap!</button>
+              <button onClick={() => setSwapSuggest(null)} style={{flex:1,padding:'0.6rem',borderRadius:'4px',border:'1px solid #333',background:'transparent',color:'#444',cursor:'pointer',fontFamily:'Share Tech Mono,monospace'}}>NEIN</button>
+              <button onClick={async () => { setSwapSuggest(null); await pool.swapSolToUsdc(swapSuggest) }} style={{flex:1,padding:'0.6rem',borderRadius:'4px',border:'1px solid #00ffff',background:'rgba(0,255,255,0.1)',color:'#00ffff',cursor:'pointer',fontFamily:'Orbitron,monospace',fontWeight:700}}>JA</button>
             </div>
           </div>
         </div>
