@@ -87,6 +87,8 @@ export default function PoolDashboard() {
 
       <PriceAlert solPrice={pool.solPrice} />
 
+      <ByrealDashboard />
+
       {pool.error && <div style={{background:'rgba(255,34,68,0.1)',border:'1px solid rgba(255,34,68,0.3)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#ff2244',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.error}</div>}
       {pool.txStatus && <div style={{background:'rgba(0,255,255,0.1)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#00ffff',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.txStatus}</div>}
 
@@ -127,7 +129,6 @@ export default function PoolDashboard() {
         </div>
       )}
 
-      <ByrealDashboard />
 
       {swapSuggest && (
         <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.85)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000}}
