@@ -27,7 +27,6 @@ export default function PoolDashboard() {
   const pool = usePool()
   const [positionData, setPositionData] = useState({})
   const [swapSuggest, setSwapSuggest] = useState(null)
-  const [swapSuggest, setSwapSuggest] = useState(null)
 
   const handlePositionUpdate = useCallback((mint, details) => {
     setPositionData(prev => ({ ...prev, [mint]: details }))
