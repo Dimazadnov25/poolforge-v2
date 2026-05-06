@@ -1,4 +1,6 @@
-export default function ByrealDashboard() {
+const fs = require('fs')
+
+const byreal = `export default function ByrealDashboard() {
   return (
     <div style={{textAlign:'center', margin:'1.5rem 0'}}>
       <a href="https://www.byreal.io/en/portfolio" target="_blank" rel="noreferrer" style={{
@@ -18,3 +20,6 @@ export default function ByrealDashboard() {
     </div>
   )
 }
+`
+fs.writeFileSync('src/components/ByrealDashboard.jsx', byreal)
+console.log('✅ Byreal Button neon + zentriert + groß')
