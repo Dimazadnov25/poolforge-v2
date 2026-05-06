@@ -34,6 +34,11 @@ export default function PoolDashboard() {
     return () => clearInterval(iv)
   }, [pool.refreshBalances])
 
+  const totalClaim = Object.values(positionData).reduce((acc, d) => {
+    if (!d) return acc
+    return acc + (parseFloat(d.feeOwedA || 0) / 1e9) * (pool.solPrice || 0) + parseFloat(d.feeOwedB || 0) / 1e6
+  }, 0)
+
   const handlePositionUpdate = useCallback((mint, details) => {
     setPositionData(prev => ({ ...prev, [mint]: details }))
   }, [])
@@ -64,6 +69,12 @@ export default function PoolDashboard() {
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
             <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
             <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Orbitron,monospace'}}>${pool.solPrice.toFixed(2)}</div>
+          </div>
+        )}
+        {totalClaim > 0 && (
+          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(255,34,68,0.3)'}}>
+            <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Claim</div>
+            <div style={{fontSize:'1.4rem',fontWeight:700,color:'#ff2244',fontFamily:'Orbitron,monospace'}}>${totalClaim.toFixed(2)}</div>
           </div>
         )}
         {solVolume != null && (
