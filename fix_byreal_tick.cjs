@@ -1,0 +1,5 @@
+const fs = require('fs')
+let c = fs.readFileSync('api/byreal-positions.js', 'utf8')
+c = c.replace('poolInfo.data.readInt32LE(912)', 'poolInfo.data.readInt32LE(269)')
+fs.writeFileSync('api/byreal-positions.js', c)
+console.log('✅ Tick offset 912 → 269')

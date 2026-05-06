@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       let currentTick = null
       let inRange = null
       if (poolInfo) {
-        currentTick = poolInfo.data.readInt32LE(912)
+        currentTick = poolInfo.data.readInt32LE(269)
         inRange = currentTick >= tickLower && currentTick <= tickUpper
       }
 
