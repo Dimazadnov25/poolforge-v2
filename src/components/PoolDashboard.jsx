@@ -33,7 +33,7 @@ export default function PoolDashboard() {
   }, [])
 
   return (
-    <div style={{maxWidth:'430px', margin:'0 auto', padding:'0.6rem 0.75rem', background:'#0f172a', minHeight:'100dvh', display:'flex', flexDirection:'column', gap:'0.5rem'}}>
+    <div style={{maxWidth:'430px', margin:'0 auto', padding:'0.6rem 0.75rem', background:'#080808', minHeight:'100dvh', display:'flex', flexDirection:'column', gap:'0.5rem'}}>
 
       {/* HEADER */}
       <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
@@ -57,7 +57,7 @@ export default function PoolDashboard() {
       {/* PREIS + VOL + BALANCES - eine Zeile */}
       <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'0.4rem'}}>
         {pool.solPrice && (
-          <div style={{background:'#1e293b', borderRadius:'0.6rem', padding:'0.5rem 0.6rem', border:'1px solid rgba(255,255,255,0.07)'}}>
+          <div style={{background:'#111111', borderRadius:'0.6rem', padding:'0.5rem 0.6rem', border:'1px solid rgba(255,255,255,0.07)'}}>
             <div style={{fontSize:'0.6rem', color:'#64748b', textTransform:'uppercase'}}>SOL</div>
             <div style={{fontSize:'1.2rem', fontWeight:700, color:'#06b6d4'}}>${pool.solPrice.toFixed(2)}</div>
           </div>
@@ -124,11 +124,11 @@ export default function PoolDashboard() {
         </div>
       )}
 
-      {/* BYREAL */}
-      <ByrealDashboard />
-
       {/* SWAP */}
       <SwapWidget solPrice={pool.solPrice} solBalance={pool.solBalance} usdcBalance={pool.usdcBalance} />
+
+      {/* BYREAL */}
+      <ByrealDashboard />
 
       {/* SWAP SUGGEST MODAL */}
       {swapSuggest && (

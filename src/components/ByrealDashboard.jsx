@@ -1,20 +1,12 @@
 export default function ByrealDashboard() {
   return (
-    <div style={{textAlign:'center', margin:'1.5rem 0'}}>
-      <a href="https://www.byreal.io/en/portfolio" target="_blank" rel="noreferrer" style={{
-        display:'inline-block',
-        padding:'1rem 2.5rem',
-        borderRadius:'999px',
-        fontWeight:700,
-        fontSize:'1.4rem',
-        textDecoration:'none',
-        color:'#fff',
-        background:'linear-gradient(135deg, #a855f7, #06b6d4)',
-        boxShadow:'0 0 24px rgba(168,85,247,0.6), 0 0 48px rgba(6,182,212,0.4)',
-        border:'2px solid rgba(255,255,255,0.2)',
-        letterSpacing:'0.05em',
-        transition:'all 0.3s'
-      }}>↗ Byreal Portfolio</a>
-    </div>
+    <a href="https://www.byreal.io/en/portfolio" target="_blank" rel="noreferrer" style={{
+      display:'inline-flex', alignItems:'center', gap:'0.4rem',
+      padding:'0.3rem 0.8rem', borderRadius:'4px', textDecoration:'none',
+      border:'1px solid rgba(0,255,255,0.3)', color:'rgba(0,255,255,0.7)',
+      fontSize:'0.7rem', fontFamily:'Share Tech Mono, monospace',
+      textTransform:'uppercase', letterSpacing:'0.08em',
+      background:'rgba(0,255,255,0.05)'
+    }}>↗ BYREAL PORTFOLIO</a>
   )
 }
