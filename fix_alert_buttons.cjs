@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+const fs = require('fs')
+
+const comp = `import { useState, useEffect, useRef } from 'react'
 
 export default function PriceAlert({ solPrice }) {
   const [activeAlert, setActiveAlert] = useState(null)
@@ -66,10 +68,13 @@ export default function PriceAlert({ solPrice }) {
       })}
       {activeAlert && refPrice && change !== null && (
         <span style={{fontSize:'0.75rem', color: Math.abs(change) > activeAlert * 0.7 ? '#fb923c' : '#64748b'}}>
-          Ref: ${refPrice.toFixed(2)} | {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+          Ref: \${refPrice.toFixed(2)} | {change >= 0 ? '+' : ''}{change.toFixed(2)}%
           {saving ? ' ⟳' : ' ✅ aktiv'}
         </span>
       )}
     </div>
   )
 }
+`
+fs.writeFileSync('src/components/PriceAlert.jsx', comp)
+console.log('✅ PriceAlert mit 0.1% 0.5% + Pulsing')
