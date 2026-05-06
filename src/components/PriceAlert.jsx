@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 
 export default function PriceAlert({ solPrice }) {
-  const [activeAlert, setActiveAlert] = useState(null)
-  const [refPrice, setRefPrice] = useState(null)
+  const [activeAlert, setActiveAlert] = useState(() => { try { const s = localStorage.getItem('pf_alert'); return s ? JSON.parse(s).pct : null } catch { return null } })
+  const [refPrice, setRefPrice] = useState(() => { try { const s = localStorage.getItem('pf_alert'); return s ? JSON.parse(s).refPrice : null } catch { return null } })
   const [saving, setSaving] = useState(false)
   const [pulse, setPulse] = useState(false)
   const pulseRef = useRef(null)
@@ -21,12 +21,14 @@ export default function PriceAlert({ solPrice }) {
     if (activeAlert === pct) {
       setActiveAlert(null)
       setRefPrice(null)
+      localStorage.removeItem('pf_alert')
       setSaving(true)
       await fetch('/api/save-alert?pct=0&refPrice=0&active=false')
       setSaving(false)
     } else {
       setActiveAlert(pct)
       setRefPrice(solPrice)
+      localStorage.setItem('pf_alert', JSON.stringify({ pct, refPrice: solPrice }))
       setSaving(true)
       await fetch('/api/save-alert', {
         method: 'POST',
