@@ -71,7 +71,7 @@ export default function PoolDashboard() {
             <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Orbitron,monospace'}}>${pool.solPrice.toFixed(2)}</div>
           </div>
         )}
-        {totalClaim > 0 && (
+        {pool.solPrice && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(255,34,68,0.3)'}}>
             <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Claim</div>
             <div style={{fontSize:'1.4rem',fontWeight:700,color:'#ff2244',fontFamily:'Orbitron,monospace'}}>${totalClaim.toFixed(2)}</div>
