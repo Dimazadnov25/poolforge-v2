@@ -56,16 +56,16 @@ export default function PoolDashboard() {
         <WalletMultiButton />
       </header>
 
-      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',flexWrap:'wrap'}}>
+      <div style={{display:'flex',alignItems:'stretch',gap:'0.75rem'}}>
               {pool.solPrice && (
                 <div className="price-ticker">
                   SOL <strong style={{color:'#06b6d4',fontSize:'2rem'}}>${pool.solPrice.toFixed(2)}</strong>
                 </div>
               )}
               {solVolume != null && (
-                <div className="price-ticker" style={{fontSize:'1rem',padding:'0.5rem 1.2rem',display:'flex',flexDirection:'column',alignItems:'center',gap:'0.2rem'}}>
+                <div className="price-ticker" style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'0.2rem'}}>
                   <span style={{color:'#94a3b8',fontSize:'0.75rem',letterSpacing:'0.05em',textTransform:'uppercase'}}>Vol 24h</span>
-                  <strong style={{color:'#10b981',fontSize:'1.6rem'}}>
+                  <strong style={{color:'#10b981',fontSize:'2rem',fontWeight:'bold'}}>
                     ${solVolume>=1e9?(solVolume/1e9).toFixed(2)+'B':solVolume>=1e6?(solVolume/1e6).toFixed(1)+'M':solVolume.toFixed(0)}
                   </strong>
                 </div>
