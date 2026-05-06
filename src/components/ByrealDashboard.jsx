@@ -7,11 +7,11 @@ export default function ByrealDashboard({ solPrice }) {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!publicKey) return
+    // Byreal wallet hardcoded
     const load = async () => {
       setLoading(true)
       try {
-        const r = await fetch('/api/byreal-positions?wallet=' + publicKey.toBase58())
+        const r = await fetch('/api/byreal-positions?wallet=ESLvaL9rNoDFYoWwRGqpLZmLk9KgR9r5S3L5EvauHyAy')
         const d = await r.json()
         setPositions(d.positions || [])
       } catch(e) {} finally { setLoading(false) }
@@ -19,7 +19,7 @@ export default function ByrealDashboard({ solPrice }) {
     load()
     const iv = setInterval(load, 30000)
     return () => clearInterval(iv)
-  }, [publicKey])
+  }, [])
 
   if (!publicKey) return null
 
