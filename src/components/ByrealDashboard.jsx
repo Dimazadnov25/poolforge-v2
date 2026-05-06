@@ -60,7 +60,11 @@ export default function ByrealDashboard({ solPrice }) {
           </div>
           <div style={{marginTop:'0.6rem', paddingTop:'0.6rem', borderTop:'1px solid rgba(255,255,255,0.05)', display:'flex', justifyContent:'space-between', fontSize:'0.78rem', color:'#64748b'}}>
             <span>Ticks: {p.tickLower} / {p.tickUpper}</span>
-            <a href={`https://www.byreal.io/en/position/${p.positionPda}`} target="_blank" rel="noreferrer" style={{color:'#6366f1', textDecoration:'none'}}>↗ Byreal</a>
+            <a href={`https://www.byreal.io/en/position/${p.positionPda}`} target="_blank" rel="noreferrer" style={{
+    background:'rgba(99,102,241,0.15)', color:'#6366f1', textDecoration:'none',
+    padding:'0.3rem 0.9rem', borderRadius:'999px', fontWeight:600, fontSize:'0.8rem',
+    border:'1px solid rgba(99,102,241,0.3)'
+  }}>↗ Position öffnen</a>
           </div>
         </div>
       ))}
