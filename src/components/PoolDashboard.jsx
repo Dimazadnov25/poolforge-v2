@@ -110,6 +110,7 @@ export default function PoolDashboard() {
             </div>
           )}
                     <MeteoraDashboard solPrice={pool.solPrice} />
+            <ByrealDashboard solPrice={pool.solPrice} />
           <LendDashboard usdcBalance={pool.usdcBalance} />
           
           <SwapWidget solPrice={pool.solPrice} solBalance={pool.solBalance} usdcBalance={pool.usdcBalance} />
