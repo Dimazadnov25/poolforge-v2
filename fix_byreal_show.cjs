@@ -1,0 +1,5 @@
+const fs = require('fs')
+let c = fs.readFileSync('src/components/ByrealDashboard.jsx', 'utf8')
+c = c.replace("if (!publicKey) return null", "// wallet check removed - hardcoded")
+fs.writeFileSync('src/components/ByrealDashboard.jsx', c)
+console.log('✅ Fix applied')

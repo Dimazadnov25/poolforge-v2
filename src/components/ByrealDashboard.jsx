@@ -21,7 +21,7 @@ export default function ByrealDashboard({ solPrice }) {
     return () => clearInterval(iv)
   }, [])
 
-  if (!publicKey) return null
+  // wallet check removed - hardcoded
 
   return (
     <div style={{marginTop:'1.5rem', background:'var(--card-bg,#1e293b)', borderRadius:'1rem', padding:'1.25rem', border:'1px solid rgba(255,255,255,0.07)'}}>
