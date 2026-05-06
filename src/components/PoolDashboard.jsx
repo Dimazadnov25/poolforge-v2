@@ -7,6 +7,8 @@ import PositionDetails from './PositionDetails'
 import SwapWidget from './SwapWidget'
 import LendDashboard from './LendDashboard'
 import MeteoraDashboard from './MeteoraDashboard'
+import ByrealDashboard from './ByrealDashboard'
+import PriceAlert from './PriceAlert'
 
 export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
