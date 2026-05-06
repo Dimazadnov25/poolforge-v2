@@ -118,10 +118,7 @@ export default function PoolDashboard() {
         />
       ))}
 
-      {wallet.connected && pool.positions.length === 0 && (
-        <div style={{color:'#444',fontSize:'0.82rem',textAlign:'center',padding:'0.75rem',fontFamily:'Share Tech Mono,monospace'}}>// KEINE POSITIONEN</div>
-      )}
-
+      
       {!wallet.connected && (
         <div style={{textAlign:'center',padding:'1.5rem 1rem'}}>
           <p style={{color:'#444',marginBottom:'1rem',fontSize:'0.85rem',fontFamily:'Share Tech Mono,monospace'}}>// WALLET VERBINDEN</p>
