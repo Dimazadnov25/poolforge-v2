@@ -74,15 +74,7 @@ export default function PoolDashboard() {
             </div>
           </div>
         )}
-        {wallet.connected && (
-          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
-            <div style={{fontSize:'0.6rem',color:'#444',fontFamily:'Share Tech Mono,monospace'}}>SOL/USDC</div>
-            <div style={{fontSize:'1rem',fontWeight:600,color:'#e0e0e0',lineHeight:1.4,fontFamily:'Orbitron,monospace'}}>
-              {pool.solBalance != null ? pool.solBalance.toFixed(3) : '—'}<br/>
-              <span style={{color:'#888',fontSize:'0.85rem'}}>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : '—'}</span>
-            </div>
-          </div>
-        )}
+        
       </div>
 
       <PriceAlert solPrice={pool.solPrice} />
