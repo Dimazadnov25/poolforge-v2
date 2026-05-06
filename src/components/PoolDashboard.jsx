@@ -12,6 +12,9 @@ export default function PoolDashboard() {
   const [swapSuggest, setSwapSuggest] = useState(null)
   const [positionData, setPositionData] = useState({})
 
+  const wallet = useWallet()
+  const pool = usePool()
+
   useEffect(() => {
     const fetchVolume = async () => {
       try {
@@ -23,6 +26,20 @@ export default function PoolDashboard() {
     fetchVolume()
     const iv = setInterval(fetchVolume, 60000)
     return () => clearInterval(iv)
+  }, [])
+
+  useEffect(() => {
+    const iv = setInterval(() => {
+      if (pool.refreshBalances) pool.refreshBalances()
+    }, 3000)
+    return () => clearInterval(iv)
+  }, [pool.refreshBalances])
+
+  const handlePositionUpdate = useCallback((mint, details) => {
+    setPositionData(prev => ({ ...prev, [mint]: details }))
+  }, [])
+
+  return () => clearInterval(iv)
   }, [])
 
   // Balance alle 3 Sekunden aktualisieren
