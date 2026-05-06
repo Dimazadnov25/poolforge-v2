@@ -26,6 +26,7 @@ export default function PoolDashboard() {
   const wallet = useWallet()
   const pool = usePool()
   const [positionData, setPositionData] = useState({})
+  const [swapSuggest, setSwapSuggest] = useState(null)
 
   const handlePositionUpdate = useCallback((mint, details) => {
     setPositionData(prev => ({ ...prev, [mint]: details }))
@@ -98,7 +99,13 @@ export default function PoolDashboard() {
                   solPrice={pool.solPrice}
                   fetchPosition={pool.fetchPosition}
                   onClose={pool.closePosition}
-                  onCollect={pool.collectFees}
+                  onCollect={async (...args) => {
+                      await pool.collectFees(...args)
+                      await new Promise(r => setTimeout(r, 3000))
+                      const bal = pool.solBalance || 0
+                      const excess = parseFloat((bal - 0.01).toFixed(4))
+                      if (excess > 0.001) setSwapSuggest(excess)
+                    }}
                   onAddLiquidity={pool.addLiquidity}
                   onRebalance={pool.rebalancePosition}
                   onUpdateFees={pool.updateFees}
