@@ -1,4 +1,6 @@
-import { useWallet } from '@solana/wallet-adapter-react'
+const fs = require('fs')
+
+const newDashboard = `import { useWallet } from '@solana/wallet-adapter-react'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { useState, useCallback, useEffect } from 'react'
 import { usePool } from '../hooks/usePool'
@@ -59,14 +61,14 @@ export default function PoolDashboard() {
         {pool.solPrice && (
           <div style={{background:'#1e293b', borderRadius:'0.6rem', padding:'0.5rem 0.6rem', border:'1px solid rgba(255,255,255,0.07)'}}>
             <div style={{fontSize:'0.6rem', color:'#64748b', textTransform:'uppercase'}}>SOL</div>
-            <div style={{fontSize:'1.2rem', fontWeight:700, color:'#06b6d4'}}>${pool.solPrice.toFixed(2)}</div>
+            <div style={{fontSize:'1.2rem', fontWeight:700, color:'#06b6d4'}}>\${pool.solPrice.toFixed(2)}</div>
           </div>
         )}
         {solVolume != null && (
           <div style={{background:'#1e293b', borderRadius:'0.6rem', padding:'0.5rem 0.6rem', border:'1px solid rgba(255,255,255,0.07)'}}>
             <div style={{fontSize:'0.6rem', color:'#64748b', textTransform:'uppercase'}}>Vol 24h</div>
             <div style={{fontSize:'1.2rem', fontWeight:700, color:'#10b981'}}>
-              ${solVolume>=1e9?(solVolume/1e9).toFixed(1)+'B':solVolume>=1e6?(solVolume/1e6).toFixed(0)+'M':solVolume.toFixed(0)}
+              \${solVolume>=1e9?(solVolume/1e9).toFixed(1)+'B':solVolume>=1e6?(solVolume/1e6).toFixed(0)+'M':solVolume.toFixed(0)}
             </div>
           </div>
         )}
@@ -150,3 +152,7 @@ export default function PoolDashboard() {
     </div>
   )
 }
+`
+
+fs.writeFileSync('src/components/PoolDashboard.jsx', newDashboard)
+console.log('✅ Kompaktes Layout geschrieben')
