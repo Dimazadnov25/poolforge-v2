@@ -34,14 +34,14 @@ export default function PoolDashboard() {
     return () => clearInterval(iv)
   }, [pool.refreshBalances])
 
+  const handlePositionUpdate = useCallback((mint, details) => {
+    setPositionData(prev => ({ ...prev, [mint]: details }))
+  }, [])
+
   const totalClaim = Object.values(positionData).reduce((acc, d) => {
     if (!d) return acc
     return acc + (parseFloat(d.feeOwedA || 0) / 1e9) * (pool.solPrice || 0) + parseFloat(d.feeOwedB || 0) / 1e6
   }, 0)
-
-  const handlePositionUpdate = useCallback((mint, details) => {
-    setPositionData(prev => ({ ...prev, [mint]: details }))
-  }, [])
 
   return (
     <div style={{maxWidth:'430px',margin:'0 auto',padding:'0.6rem 0.75rem',background:'#080808',minHeight:'100dvh',display:'flex',flexDirection:'column',gap:'0.5rem'}}>
@@ -65,34 +65,10 @@ export default function PoolDashboard() {
       </div>
 
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0.4rem'}}>
-              {pool.solPrice && (
-                <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
-                  <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
-                  <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Orbitron,monospace'}}>${pool.solPrice.toFixed(2)}</div>
-                </div>
-              )}
-              {solVolume != null && (
-                <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
-                  <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Vol 24h</div>
-                  <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ff88',fontFamily:'Orbitron,monospace'}}>
-                    ${solVolume>=1e9?(solVolume/1e9).toFixed(1)+'B':solVolume>=1e6?(solVolume/1e6).toFixed(0)+'M':solVolume.toFixed(0)}
-                  </div>
-                </div>
-              )}
-              {Object.keys(positionData).length > 0 && totalClaim > 0 && (
-                <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(255,34,68,0.3)'}}>
-                  <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Claim</div>
-                  <div style={{fontSize:'1.4rem',fontWeight:700,color:'#ff2244',fontFamily:'Orbitron,monospace'}}>${totalClaim.toFixed(2)}</div>
-                </div>
-              )}
-            </div>
-            <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Orbitron,monospace'}}>${pool.solPrice.toFixed(2)}</div>
-          </div>
-        )}
         {pool.solPrice && (
-          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(255,34,68,0.3)'}}>
-            <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Claim</div>
-            <div style={{fontSize:'1.4rem',fontWeight:700,color:'#ff2244',fontFamily:'Orbitron,monospace'}}>${totalClaim.toFixed(2)}</div>
+          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
+            <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
+            <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Orbitron,monospace'}}>${pool.solPrice.toFixed(2)}</div>
           </div>
         )}
         {solVolume != null && (
@@ -103,11 +79,15 @@ export default function PoolDashboard() {
             </div>
           </div>
         )}
-        
+        {totalClaim > 0 && (
+          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(255,34,68,0.3)'}}>
+            <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Claim</div>
+            <div style={{fontSize:'1.4rem',fontWeight:700,color:'#ff2244',fontFamily:'Orbitron,monospace'}}>${totalClaim.toFixed(2)}</div>
+          </div>
+        )}
       </div>
 
       <PriceAlert solPrice={pool.solPrice} />
-
       <ByrealDashboard />
 
       {pool.error && <div style={{background:'rgba(255,34,68,0.1)',border:'1px solid rgba(255,34,68,0.3)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#ff2244',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.error}</div>}
@@ -139,7 +119,6 @@ export default function PoolDashboard() {
         />
       ))}
 
-      
       {!wallet.connected && (
         <div style={{textAlign:'center',padding:'1.5rem 1rem'}}>
           <p style={{color:'#444',marginBottom:'1rem',fontSize:'0.85rem',fontFamily:'Share Tech Mono,monospace'}}>// WALLET VERBINDEN</p>
@@ -147,13 +126,12 @@ export default function PoolDashboard() {
         </div>
       )}
 
-
       {swapSuggest && (
         <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.85)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000}}
           onClick={() => setSwapSuggest(null)}>
-          <div style={{background:'#111',borderRadius:'0.75rem',padding:'1.5rem',maxWidth:'340px',width:'90%',border:'1px solid rgba(0,255,255,0.3)',boxShadow:'0 0 40px rgba(0,255,255,0.15)'}}
+          <div style={{background:'#111',borderRadius:'0.75rem',padding:'1.5rem',maxWidth:'340px',width:'90%',border:'1px solid rgba(0,255,255,0.3)'}}
             onClick={e => e.stopPropagation()}>
-            <div style={{fontSize:'1rem',fontWeight:700,color:'#00ffff',marginBottom:'0.75rem',fontFamily:'Orbitron,monospace'}}>SOL → USDC</div>
+            <div style={{fontSize:'1rem',fontWeight:700,color:'#00ffff',marginBottom:'0.75rem',fontFamily:'Orbitron,monospace'}}>SOL USDC</div>
             <div style={{color:'#888',fontSize:'0.85rem',marginBottom:'1.25rem',fontFamily:'Share Tech Mono,monospace'}}>
               Überschuss: <strong style={{color:'#00ffff'}}>{swapSuggest} SOL</strong><br/>Jetzt tauschen?
             </div>
