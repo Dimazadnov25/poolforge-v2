@@ -5,8 +5,6 @@ import { usePool } from '../hooks/usePool'
 import PoolStats from './PoolStats'
 import PositionDetails from './PositionDetails'
 import SwapWidget from './SwapWidget'
-import LendDashboard from './LendDashboard'
-import MeteoraDashboard from './MeteoraDashboard'
 import ByrealDashboard from './ByrealDashboard'
 import PriceAlert from './PriceAlert'
 
@@ -109,9 +107,9 @@ export default function PoolDashboard() {
               ))}
             </div>
           )}
-                    <MeteoraDashboard solPrice={pool.solPrice} />
+                    
             <ByrealDashboard solPrice={pool.solPrice} />
-          <LendDashboard usdcBalance={pool.usdcBalance} />
+          
           
           <SwapWidget solPrice={pool.solPrice} solBalance={pool.solBalance} usdcBalance={pool.usdcBalance} />
         </div>
