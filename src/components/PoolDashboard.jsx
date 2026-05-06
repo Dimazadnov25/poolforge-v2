@@ -25,6 +25,14 @@ export default function PoolDashboard() {
     return () => clearInterval(iv)
   }, [])
 
+  // Balance alle 3 Sekunden aktualisieren
+  useEffect(() => {
+    const iv = setInterval(() => {
+      if (pool.refreshBalances) pool.refreshBalances()
+    }, 3000)
+    return () => clearInterval(iv)
+  }, [pool.refreshBalances])
+
   const wallet = useWallet()
   const pool = usePool()
 
@@ -59,13 +67,13 @@ export default function PoolDashboard() {
         {pool.solPrice && (
           <div style={{background:'#111111', borderRadius:'0.6rem', padding:'0.5rem 0.6rem', border:'1px solid rgba(255,255,255,0.07)'}}>
             <div style={{fontSize:'0.6rem', color:'#64748b', textTransform:'uppercase'}}>SOL</div>
-            <div style={{fontSize:'1.2rem', fontWeight:700, color:'#06b6d4'}}>${pool.solPrice.toFixed(2)}</div>
+            <div style={{fontSize:'1.5rem', fontWeight:700, color:'#06b6d4', fontFamily:'Orbitron, monospace'}}>${pool.solPrice.toFixed(2)}</div>
           </div>
         )}
         {solVolume != null && (
           <div style={{background:'#1e293b', borderRadius:'0.6rem', padding:'0.5rem 0.6rem', border:'1px solid rgba(255,255,255,0.07)'}}>
             <div style={{fontSize:'0.6rem', color:'#64748b', textTransform:'uppercase'}}>Vol 24h</div>
-            <div style={{fontSize:'1.2rem', fontWeight:700, color:'#10b981'}}>
+            <div style={{fontSize:'1.5rem', fontWeight:700, color:'#10b981', fontFamily:'Orbitron, monospace'}}>
               ${solVolume>=1e9?(solVolume/1e9).toFixed(1)+'B':solVolume>=1e6?(solVolume/1e6).toFixed(0)+'M':solVolume.toFixed(0)}
             </div>
           </div>
@@ -73,7 +81,7 @@ export default function PoolDashboard() {
         {wallet.connected && (
           <div style={{background:'#1e293b', borderRadius:'0.6rem', padding:'0.5rem 0.6rem', border:'1px solid rgba(255,255,255,0.07)'}}>
             <div style={{fontSize:'0.6rem', color:'#64748b'}}>SOL / USDC</div>
-            <div style={{fontSize:'0.8rem', fontWeight:600, color:'#e2e8f0', lineHeight:1.4}}>
+            <div style={{fontSize:'1rem', fontWeight:600, color:'#e2e8f0', lineHeight:1.4, fontFamily:'Orbitron, monospace'}}>
               {pool.solBalance != null ? pool.solBalance.toFixed(3) : '—'}<br/>
               <span style={{color:'#94a3b8'}}>{pool.usdcBalance != null ? pool.usdcBalance.toFixed(2) : '—'}</span>
             </div>
