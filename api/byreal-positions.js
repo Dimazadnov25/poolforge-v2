@@ -36,6 +36,7 @@ export default async function handler(req, res) {
       const tickLower = pd.readInt32LE(73)
       const tickUpper = pd.readInt32LE(77)
       const liquidity = pd.readBigUInt64LE(80)
+      const feeOwed = pd.readBigUInt64LE(216)
 
       // Pool aus Position (bytes 8-40)
       const poolPk = new PublicKey(pd.slice(8, 40))
@@ -56,6 +57,7 @@ export default async function handler(req, res) {
         tickUpper,
         liquidity: liquidity.toString(),
         priceLower: tickToPrice(tickLower).toFixed(2),
+        feeOwedUsdc: (Number(feeOwed) / 1e6).toFixed(4),
         priceUpper: tickToPrice(tickUpper).toFixed(2),
         currentTick,
         currentPrice: currentTick !== null ? tickToPrice(currentTick).toFixed(2) : null,
