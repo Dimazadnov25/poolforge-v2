@@ -36,10 +36,9 @@ export default async function handler(req, res) {
       const tickLower = pd.readInt32LE(73)
       const tickUpper = pd.readInt32LE(77)
       const liquidity = pd.readBigUInt64LE(80)
-      const feeOwedUsdc = pd.readBigUInt64LE(216)
-      const feeOwedSol = pd.readBigInt64LE ? Number(pd.readBigUInt64LE(83)) : 0
+      const feeOwedSol = Number(pd.readBigUInt64LE(83))
+      const feeOwedUsdc = Number(pd.readBigUInt64LE(216))
 
-      // Pool aus Position (bytes 8-40)
       const poolPk = new PublicKey(pd.slice(8, 40))
       const poolInfo = await conn.getAccountInfo(poolPk)
 
@@ -53,17 +52,15 @@ export default async function handler(req, res) {
       positions.push({
         positionPda: posPda.toBase58(),
         mint: mint.toBase58(),
-        pool: poolPk.toBase58(),
-        tickLower,
-        tickUpper,
+        tickLower, tickUpper,
         liquidity: liquidity.toString(),
         priceLower: tickToPrice(tickLower).toFixed(2),
-        feeOwedUsdc: (Number(feeOwedUsdc) / 1e6).toFixed(4),
-        feeOwedSol: (Number(feeOwedSol) / 1e9).toFixed(6),
         priceUpper: tickToPrice(tickUpper).toFixed(2),
         currentTick,
         currentPrice: currentTick !== null ? tickToPrice(currentTick).toFixed(2) : null,
         inRange,
+        feeOwedSol: (feeOwedSol / 1e9).toFixed(6),
+        feeOwedUsdc: (feeOwedUsdc / 1e6).toFixed(4),
       })
     }
 
