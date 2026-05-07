@@ -1,31 +1,22 @@
+import { Connection, PublicKey } from '@solana/web3.js'
+
+const RPC = 'https://mainnet.helius-rpc.com/?api-key=7802f08f-81ab-48e9-a7e7-edccb2357cf2'
+// Pyth SOL/USD Price Account on-chain
+const PYTH_SOL_USD = new PublicKey('H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG')
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Cache-Control', 's-maxage=30')
-  
-  const sources = [
-    async () => {
-      const r = await fetch('https://hermes.pyth.network/v2/updates/price/latest?ids[]=0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d')
-      const d = await r.json()
-      return Math.abs(d.parsed[0].price.price * Math.pow(10, d.parsed[0].price.expo))
-    },
-    async () => {
-      const r = await fetch('https://api.kraken.com/0/public/Ticker?pair=SOLUSD')
-      const d = await r.json()
-      return parseFloat(d.result.SOLUSD.c[0])
-    },
-    async () => {
-      const r = await fetch('https://api.coinbase.com/v2/prices/SOL-USD/spot')
-      const d = await r.json()
-      return parseFloat(d.data.amount)
-    }
-  ]
-  
-  for (const source of sources) {
-    try {
-      const price = await source()
-      if (price && price > 1) return res.json({ price })
-    } catch(e) {}
+  res.setHeader('Cache-Control', 's-maxage=10')
+  try {
+    const conn = new Connection(RPC, 'confirmed')
+    const info = await conn.getAccountInfo(PYTH_SOL_USD)
+    if (!info) return res.status(500).json({ error: 'Account not found' })
+    // Pyth price account layout: price at offset 208 (i64), expo at offset 20 (i32)
+    const price = Number(info.data.readBigInt64LE(208))
+    const expo = info.data.readInt32LE(20)
+    const solPrice = Math.abs(price * Math.pow(10, expo))
+    res.json({ price: solPrice })
+  } catch(e) {
+    res.status(500).json({ error: e.message })
   }
-  
-  res.status(500).json({ error: 'All price sources failed' })
 }
