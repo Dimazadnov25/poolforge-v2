@@ -1,6 +1,3 @@
-import fs from 'fs'
-import path from 'path'
-
 const NTFY = 'poolforge-dzad'
 
 async function sendAlert(title, msg, priority = 'urgent') {
@@ -29,10 +26,12 @@ export default async function handler(req, res) {
     }
     if (!currentPrice) return res.json({ ok: true, message: 'Price unavailable' })
 
-    // Alert Config lesen
-    const configPath = path.join(process.cwd(), 'alert-config.json')
+    // Alert Config von GitHub lesen
     let config = { active: false }
-    try { config = JSON.parse(fs.readFileSync(configPath, 'utf8')) } catch(e) {}
+    try {
+      const r = await fetch('https://raw.githubusercontent.com/Dimazadnov25/poolforge-v2/main/alert-config.json?t=' + Date.now())
+      config = await r.json()
+    } catch(e) {}
 
     if (config.active && config.pct && config.refPrice) {
       const change = (currentPrice - config.refPrice) / config.refPrice * 100
