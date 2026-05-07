@@ -13,9 +13,9 @@ export default async function handler(req, res) {
     // SOL Preis holen
     let currentPrice = null
     try {
-      const r = await fetch('https://price.jup.ag/v6/price?ids=SOL')
+      const r = await fetch('https://poolforge-v2.vercel.app/api/sol-price')
       const d = await r.json()
-      if (d?.data?.SOL?.price) currentPrice = d.data.SOL.price
+      if (d?.price) currentPrice = d.price
     } catch(e) {}
     if (!currentPrice) return res.json({ ok: true, message: 'Price unavailable' })
 
