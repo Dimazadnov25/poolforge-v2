@@ -38,11 +38,6 @@ export default function PoolDashboard() {
     setPositionData(prev => ({ ...prev, [mint]: details }))
   }, [])
 
-  const totalClaim = Object.values(positionData).reduce((acc, d) => {
-    if (!d) return acc
-    return acc + (parseFloat(d.feeOwedA || 0) / 1e9) * (pool.solPrice || 0) + parseFloat(d.feeOwedB || 0) / 1e6
-  }, 0)
-
   return (
     <div style={{maxWidth:'430px',margin:'0 auto',padding:'0.6rem 0.75rem',background:'#080808',minHeight:'100dvh',display:'flex',flexDirection:'column',gap:'0.5rem'}}>
 
@@ -64,7 +59,7 @@ export default function PoolDashboard() {
         <WalletMultiButton />
       </div>
 
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0.4rem'}}>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.4rem'}}>
         {pool.solPrice && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
             <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
@@ -79,13 +74,10 @@ export default function PoolDashboard() {
             </div>
           </div>
         )}
-        {true && (
-          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(255,34,68,0.3)'}}>
-            <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Claim</div>
-            <div style={{fontSize:'1.4rem',fontWeight:700,color:'#ff2244',fontFamily:'Orbitron,monospace'}}>${totalClaim.toFixed(4)} / pd:      </div>
+      </div>
 
       <PriceAlert solPrice={pool.solPrice} />
-      <ByrealDashboard solPrice={pool.solPrice} />
+      <ByrealDashboard />
 
       {pool.error && <div style={{background:'rgba(255,34,68,0.1)',border:'1px solid rgba(255,34,68,0.3)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#ff2244',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.error}</div>}
       {pool.txStatus && <div style={{background:'rgba(0,255,255,0.1)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#00ffff',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.txStatus}</div>}
