@@ -45,7 +45,7 @@ export default function PriceAlert({ solPrice }) {
   return (
     <div style={{marginTop:'0.75rem', display:'flex', alignItems:'center', gap:'0.5rem', flexWrap:'wrap'}}>
       <span style={{color:'#64748b', fontSize:'0.75rem'}}>🔔 ntfy:</span>
-      {[0.5, 1, 2, 3].map(pct => {
+      {[0.05, 0.5, 1, 2, 3].map(pct => {
         const isActive = activeAlert === pct
         return (
           <button key={pct} onClick={() => activateAlert(pct)} disabled={saving} style={{
