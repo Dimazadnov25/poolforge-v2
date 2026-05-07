@@ -1,42 +1,50 @@
-import{Connection,PublicKey}from"@solana/web3.js"
+import fs from 'fs'
+import path from 'path'
 
-const POS=new PublicKey("ANB4UpDv8GCBoXpmzCVpG8fadxbAtSR3XpfnrtYbEQAN")
-const NTFY="poolforge-dzad"
-const RPC="https://mainnet.helius-rpc.com/?api-key=7802f08f-81ab-48e9-a7e7-edccb2357cf2"
+const NTFY = 'poolforge-dzad'
 
-async function sendAlert(title,msg,priority="urgent"){
-  await fetch("https://ntfy.sh/"+NTFY,{method:"POST",headers:{"Title":title,"Priority":priority,"Tags":"warning"},body:msg})
+async function sendAlert(title, msg, priority = 'urgent') {
+  await fetch('https://ntfy.sh/' + NTFY, {
+    method: 'POST',
+    headers: { 'Title': title, 'Priority': priority, 'Tags': 'warning' },
+    body: msg
+  })
 }
 
-export default async function handler(req,res){
-  try{
-    const conn=new Connection(RPC,"confirmed")
-    const posInfo=await conn.getAccountInfo(POS)
-    if(!posInfo)return res.status(200).json({ok:true,message:"Position not found"})
-    const d=posInfo.data
-    const lbPair=new PublicKey(d.slice(8,40))
-    const poolInfo=await conn.getAccountInfo(lbPair)
-    if(!poolInfo)return res.status(200).json({ok:true,message:"Pool not found"})
-    const activeBin=poolInfo.data.readInt32LE(48)
-    const lowerBin=d.readInt32LE(7912)
-    const upperBin=d.readInt32LE(7916)
-    const totalBins=upperBin-lowerBin
-    const binsToLower=activeBin-lowerBin
-    const pct=totalBins>0?(binsToLower/totalBins*100):50
-    const inRange=activeBin>=lowerBin&&activeBin<=upperBin
-    if(!inRange){
-      await sendAlert("OUT OF RANGE!","Sofort rebalancen! https://poolforge-v2.vercel.app","urgent")
-    }else if(pct<20){
-      await sendAlert("AKTUELL "+pct.toFixed(1)+"%","Nahe unterem Rand! https://poolforge-v2.vercel.app","high")
-    }else if(pct>80){
-      await sendAlert("AKTUELL "+pct.toFixed(1)+"%","Nahe oberem Rand! https://poolforge-v2.vercel.app","high")
+export default async function handler(req, res) {
+  try {
+    // SOL Preis holen
+    const priceRes = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT')
+    const priceData = await priceRes.json()
+    const currentPrice = parseFloat(priceData.price)
+
+    if (isNaN(currentPrice)) {
+      // Fallback CoinGecko
+      const r2 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd')
+      const d2 = await r2.json()
+      if (!d2?.solana?.usd) return res.json({ ok: true, message: 'Price unavailable' })
     }
-    res.status(200).json({ok:true,pct:pct.toFixed(1),inRange,activeBin,lowerBin,upperBin})
-  }catch(e){
-    res.status(500).json({error:e.message})
+
+    // Alert Config lesen
+    const configPath = path.join(process.cwd(), 'alert-config.json')
+    let config = { active: false }
+    try { config = JSON.parse(fs.readFileSync(configPath, 'utf8')) } catch(e) {}
+
+    if (config.active && config.pct && config.refPrice) {
+      const change = (currentPrice - config.refPrice) / config.refPrice * 100
+      const absChange = Math.abs(change)
+      if (absChange >= config.pct) {
+        const dir = change > 0 ? '📈 gestiegen' : '📉 gefallen'
+        await sendAlert(
+          'PoolForge Alert',
+          'SOL ist ' + dir + ' um ' + absChange.toFixed(2) + '%!\nRef: $' + config.refPrice.toFixed(2) + ' → Jetzt: $' + currentPrice.toFixed(2) + '\nhttps://poolforge-v2.vercel.app'
+        )
+        return res.json({ ok: true, alerted: true, change: absChange.toFixed(2), currentPrice })
+      }
+    }
+
+    res.json({ ok: true, currentPrice, refPrice: config.refPrice, pct: config.pct, active: config.active })
+  } catch(e) {
+    res.status(500).json({ error: e.message })
   }
 }
-
-
-
-
