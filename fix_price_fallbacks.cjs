@@ -1,4 +1,7 @@
-export default async function handler(req, res) {
+const fs = require('fs')
+
+// sol-price.js mit mehreren Quellen
+const solPrice = `export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Cache-Control', 's-maxage=30')
   
@@ -29,3 +32,6 @@ export default async function handler(req, res) {
   
   res.status(500).json({ error: 'All price sources failed' })
 }
+`
+fs.writeFileSync('api/sol-price.js', solPrice)
+console.log('✅ sol-price.js mit 3 Fallbacks')
