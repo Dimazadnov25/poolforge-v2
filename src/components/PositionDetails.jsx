@@ -113,12 +113,12 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
           const liq=lam*sqrtP*sqrtPu/(sqrtPu-sqrtP);
           const usdcNeeded=liq*(sqrtP-sqrtPl)/1e6;
           const solNeeded=parseFloat(addAmount);
-          const hasSOL=(solBalance||0)>=solNeeded+0.01;
+          const hasSOL=(solBalance||0)>=solNeeded+0.03;
           const hasUSDC=(usdcBalance||0)>=usdcNeeded;
           const ok=hasSOL&&hasUSDC;
           return <div style={{marginBottom:'0.25rem',padding:'0.4rem',borderRadius:'8px',border:'2px solid '+(ok?'#22c55e':'#ef4444'),background:ok?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.1)',color:ok?'#22c55e':'#ef4444',fontSize:'0.75rem',textAlign:'center'}}>
             SOL: {solNeeded.toFixed(4)} {hasSOL?'?':'?'} | USDC: {usdcNeeded.toFixed(2)} {hasUSDC?'?':'?'}
-            {!hasSOL && <div style={{marginTop:'0.25rem'}}><button type="button" onClick={()=>doSwap('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v','So11111111111111111111111111111111111111112',(solNeeded+0.01-(solBalance||0)+0.005))} disabled={swapping} style={{padding:'0.2rem 0.5rem',borderRadius:'6px',background:'#ef4444',color:'white',border:'none',cursor:'pointer',fontSize:'0.7rem'}}>{swapping?'...':'USDC ? SOL swappen'}</button></div>}
+            {!hasSOL && <div style={{marginTop:'0.25rem'}}><button type="button" onClick={()=>doSwap('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v','So11111111111111111111111111111111111111112',(solNeeded+0.03-(solBalance||0)+0.005))} disabled={swapping} style={{padding:'0.2rem 0.5rem',borderRadius:'6px',background:'#ef4444',color:'white',border:'none',cursor:'pointer',fontSize:'0.7rem'}}>{swapping?'...':'USDC ? SOL swappen'}</button></div>}
             {!hasUSDC && <div style={{marginTop:'0.25rem'}}><button type="button" onClick={()=>doSwap('So11111111111111111111111111111111111111112','EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',(usdcNeeded-(usdcBalance||0))/( solPrice||86)*1.01)} disabled={swapping} style={{padding:'0.2rem 0.5rem',borderRadius:'6px',background:'#ef4444',color:'white',border:'none',cursor:'pointer',fontSize:'0.7rem'}}>{swapping?'...':'SOL ? USDC swappen'}</button></div>}
           </div>
         })()}
@@ -132,7 +132,7 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
         <button type="button" className="btn btn-green" onClick={() => onCollect && onCollect(position.mint)}>Collect Fees</button>
         <button type="button" className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.03)}>Rebalance 3%</button>
         <button type="button" className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.02)}>Rebalance 2%</button>
-        <button type="button" className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.01)}>Rebalance 1%</button>
+        <button type="button" className="btn btn-yellow" onClick={() => onRebalance && onRebalance(position.mint, 0.03)}>Rebalance 1%</button>
         <button type="button" className="btn btn-red" onClick={() => onClose && onClose(position.mint)}>Close Position</button>
       </div>
     </div>
