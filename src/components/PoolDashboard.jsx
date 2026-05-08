@@ -67,8 +67,8 @@ return (
               <linearGradient id="c" x1="-7" y1="155" x2="381" y2="155" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#9945FF"/><stop offset="1" stopColor="#14F195"/></linearGradient>
             </defs>
           </svg>
-          <span style={{fontWeight:700,fontSize:'0.95rem',color:'#e2e8f0',fontFamily:'Orbitron,monospace'}}>PoolForge</span>
-          <span style={{fontSize:'0.65rem',background:'rgba(0,255,255,0.1)',color:'#00ffff',padding:'0.1rem 0.35rem',borderRadius:'4px',fontFamily:'Share Tech Mono,monospace'}}>SOL/USDC</span>
+          <span style={{fontWeight:700,fontSize:'1.9rem',color:'#e2e8f0',fontFamily:'Orbitron,monospace'}}>PoolForge</span>
+          <span style={{fontSize:'1.3rem',background:'rgba(0,255,255,0.1)',color:'#00ffff',padding:'0.1rem 0.35rem',borderRadius:'4px',fontFamily:'Share Tech Mono,monospace'}}>SOL/USDC</span>
         </div>
         <WalletMultiButton />
       </div>
@@ -76,14 +76,14 @@ return (
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.4rem'}}>
         {pool.solPrice && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
-            <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
-            <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Orbitron,monospace'}}>${pool.solPrice.toFixed(2)}</div>
+            <div style={{fontSize:'1.2rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
+            <div style={{fontSize:'2.8rem',fontWeight:700,color:'#00ffff',fontFamily:'Orbitron,monospace'}}>${pool.solPrice.toFixed(2)}</div>
           </div>
         )}
         {solVolume != null && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
-            <div style={{fontSize:'0.6rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Vol 24h</div>
-            <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ff88',fontFamily:'Orbitron,monospace'}}>
+            <div style={{fontSize:'1.2rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Vol 24h</div>
+            <div style={{fontSize:'2.8rem',fontWeight:700,color:'#00ff88',fontFamily:'Orbitron,monospace'}}>
               ${solVolume>=1e9?(solVolume/1e9).toFixed(1)+'B':solVolume>=1e6?(solVolume/1e6).toFixed(0)+'M':solVolume.toFixed(0)}
             </div>
           </div>
@@ -97,14 +97,14 @@ return (
         display:'inline-flex', alignItems:'center', gap:'0.4rem', marginTop:'0.5rem',
         padding:'0.45rem 0.9rem', borderRadius:'6px', width:'50%', justifyContent:'center', textDecoration:'none',
         border:'1px solid rgba(99,102,241,0.35)', color:'rgba(99,102,241,0.8)',
-        fontSize:'0.9rem', fontWeight:700, fontFamily:'Share Tech Mono, monospace',
+        fontSize:'1.8rem', fontWeight:700, fontFamily:'Share Tech Mono, monospace',
         textTransform:'uppercase', letterSpacing:'0.08em',
         background:'rgba(99,102,241,0.07)'
       }}>↗ METEORA 10 BIN</a>
       </div>
       {solTrend !== null && (
         <div style={{
-          padding:'0.45rem 0.9rem', borderRadius:'6px', fontWeight:700, fontSize:'0.9rem',
+          padding:'0.45rem 0.9rem', borderRadius:'6px', fontWeight:700, fontSize:'1.8rem',
           fontFamily:'Share Tech Mono, monospace',
           border: solTrend >= 0 ? '2px solid rgba(0,255,136,0.4)' : '2px solid rgba(255,34,68,0.4)',
           background: solTrend >= 0 ? 'rgba(0,255,136,0.07)' : 'rgba(255,34,68,0.07)',
@@ -112,8 +112,8 @@ return (
         }}>{solTrend >= 0 ? '▲' : '▼'} {Math.abs(solTrend).toFixed(2)}%</div>
       )}
 
-      {pool.error && <div style={{background:'rgba(255,34,68,0.1)',border:'1px solid rgba(255,34,68,0.3)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#ff2244',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.error}</div>}
-      {pool.txStatus && <div style={{background:'rgba(0,255,255,0.1)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#00ffff',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.txStatus}</div>}
+      {pool.error && <div style={{background:'rgba(255,34,68,0.1)',border:'1px solid rgba(255,34,68,0.3)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#ff2244',fontSize:'1.56rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.error}</div>}
+      {pool.txStatus && <div style={{background:'rgba(0,255,255,0.1)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#00ffff',fontSize:'1.56rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.txStatus}</div>}
 
       <SwapWidget solPrice={pool.solPrice} solBalance={pool.solBalance} usdcBalance={pool.usdcBalance} />
 
@@ -143,7 +143,7 @@ return (
 
       {!wallet.connected && (
         <div style={{textAlign:'center',padding:'1.5rem 1rem'}}>
-          <p style={{color:'#444',marginBottom:'1rem',fontSize:'0.85rem',fontFamily:'Share Tech Mono,monospace'}}>// WALLET VERBINDEN</p>
+          <p style={{color:'#444',marginBottom:'1rem',fontSize:'1.7rem',fontFamily:'Share Tech Mono,monospace'}}>// WALLET VERBINDEN</p>
           <WalletMultiButton />
         </div>
       )}
@@ -153,8 +153,8 @@ return (
           onClick={() => setSwapSuggest(null)}>
           <div style={{background:'#111',borderRadius:'0.75rem',padding:'1.5rem',maxWidth:'340px',width:'90%',border:'1px solid rgba(0,255,255,0.3)'}}
             onClick={e => e.stopPropagation()}>
-            <div style={{fontSize:'1rem',fontWeight:700,color:'#00ffff',marginBottom:'0.75rem',fontFamily:'Orbitron,monospace'}}>SOL USDC</div>
-            <div style={{color:'#888',fontSize:'0.85rem',marginBottom:'1.25rem',fontFamily:'Share Tech Mono,monospace'}}>
+            <div style={{fontSize:'2rem',fontWeight:700,color:'#00ffff',marginBottom:'0.75rem',fontFamily:'Orbitron,monospace'}}>SOL USDC</div>
+            <div style={{color:'#888',fontSize:'1.7rem',marginBottom:'1.25rem',fontFamily:'Share Tech Mono,monospace'}}>
               Überschuss: <strong style={{color:'#00ffff'}}>{swapSuggest} SOL</strong><br/>Jetzt tauschen?
             </div>
             <div style={{display:'flex',gap:'0.75rem'}}>
