@@ -45,12 +45,11 @@ export default function PriceAlert({ solPrice }) {
   return (
     <div style={{marginTop:'0.75rem', display:'flex', alignItems:'center', gap:'0.5rem', flexWrap:'wrap'}}>
       <span style={{color:'#64748b', fontSize:'0.75rem'}}>🔔 ntfy:</span>
-      {[0.1, 0.5, 1, 2, 3].map(pct => {
+      {[0.5, 1, 2, 3].map(pct => {
         const isActive = activeAlert === pct
         return (
           <button key={pct} onClick={() => activateAlert(pct)} disabled={saving} style={{
-            padding:'0.3rem 0.75rem',
-            borderRadius:'999px',
+            padding:'0.5rem 1rem', borderRadius:'6px',
             border: isActive ? '1.5px solid #f59e0b' : '1.5px solid rgba(255,255,255,0.1)',
             background: isActive
               ? pulse ? 'rgba(245,158,11,0.35)' : 'rgba(245,158,11,0.15)'
