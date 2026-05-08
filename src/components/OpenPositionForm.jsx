@@ -96,13 +96,15 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
 
       <div style={{marginBottom:'0.75rem'}}>
         <div style={{color:'var(--muted)', fontSize:'0.75rem', marginBottom:'0.25rem'}}>Range</div>
-        <div style={{display:'flex', gap:'0.5rem', flexWrap:'wrap'}}>
-          {[0.5,1,2,3,5].map(r => (
-            <button type="button" key={r} onClick={() => setRange(r)}
-              className={range === r ? 'btn btn-blue' : 'btn btn-secondary'}
-              style={{padding:'0.25rem 0.5rem', fontSize:'0.8rem'}}>
-              {r}%
-            </button>
+        <div style={{display:'flex', gap:'0.4rem'}}>
+          {[1,2,3,5].map(r => (
+            <button type="button" key={r} onClick={() => setRange(r)} style={{
+              padding:'0.45rem 0.9rem', fontSize:'0.9rem', fontWeight:700,
+              borderRadius:'6px', border: range===r ? '2px solid #3b82f6' : '2px solid rgba(59,130,246,0.35)',
+              background: range===r ? 'rgba(59,130,246,0.25)' : 'rgba(59,130,246,0.07)',
+              color: range===r ? '#93c5fd' : '#6b99d6',
+              cursor:'pointer', transition:'all 0.15s'
+            }}>{r}%</button>
           ))}
         </div>
       </div>
