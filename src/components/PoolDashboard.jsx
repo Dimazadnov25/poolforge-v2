@@ -80,7 +80,7 @@ export default function PoolDashboard() {
       <ByrealDashboard />
       <a href="https://www.meteora.ag/dlmm/BGm1tav58oGcsQJehL9WXBFXF7D27vZsKefj4xJKD5Y?referrer=pools" target="_blank" rel="noreferrer" style={{
         display:'inline-flex', alignItems:'center', gap:'0.4rem', marginTop:'0.5rem',
-        padding:'0.45rem 0.9rem', borderRadius:'6px', textDecoration:'none',
+        padding:'0.45rem 0.9rem', borderRadius:'6px', width:'50%', justifyContent:'center', textDecoration:'none',
         border:'1px solid rgba(99,102,241,0.35)', color:'rgba(99,102,241,0.8)',
         fontSize:'0.9rem', fontWeight:700, fontFamily:'Share Tech Mono, monospace',
         textTransform:'uppercase', letterSpacing:'0.08em',
