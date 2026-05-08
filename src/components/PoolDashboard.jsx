@@ -78,7 +78,7 @@ export default function PoolDashboard() {
 
       <PriceAlert solPrice={pool.solPrice} />
       <ByrealDashboard />
-      <a href="https://app.meteora.ag/pools?token=So11111111111111111111111111111111111111112&token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" target="_blank" rel="noreferrer" style={{
+      <a href="https://www.meteora.ag/dlmm/BGm1tav58oGcsQJehL9WXBFXF7D27vZsKefj4xJKD5Y?referrer=pools" target="_blank" rel="noreferrer" style={{
         display:'inline-flex', alignItems:'center', gap:'0.4rem', marginTop:'0.5rem',
         padding:'0.5rem 1.3rem', borderRadius:'4px', textDecoration:'none',
         border:'1px solid rgba(99,102,241,0.35)', color:'rgba(99,102,241,0.8)',
