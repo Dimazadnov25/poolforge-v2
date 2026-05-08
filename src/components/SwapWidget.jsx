@@ -20,7 +20,7 @@ export default function SwapWidget({solBalance,usdcBalance}){
   const toToken=TOKENS[to]
 
   function getBalance(){
-    if(fromToken.symbol==="SOL")return Math.max(0,(solBalance||0)-0.01)
+    if(fromToken.symbol==="SOL")return Math.max(0,(solBalance||0)-0.03)
     if(fromToken.symbol==="USDC")return usdcBalance||0
     return 0
   }

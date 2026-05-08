@@ -1,0 +1,5 @@
+const fs = require('fs')
+let c = fs.readFileSync('src/components/SwapWidget.jsx', 'utf8')
+c = c.replace('(solBalance||0)-0.01', '(solBalance||0)-0.03')
+fs.writeFileSync('src/components/SwapWidget.jsx', c)
+console.log('✅ SwapWidget MAX fix:', c.includes('0.03'), '| 0.01 noch drin:', c.includes('0.01'))
