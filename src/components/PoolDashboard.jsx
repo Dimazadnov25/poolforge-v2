@@ -39,7 +39,20 @@ export default function PoolDashboard() {
     setPositionData(prev => ({ ...prev, [mint]: details }))
   }, [])
 
-  return (
+  
+  useEffect(() => {
+    const loadTrend = async () => {
+      try {
+        const r = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=SOLUSDT')
+        const d = await r.json()
+        setSolTrend(parseFloat(d.priceChangePercent))
+      } catch(e) {}
+    }
+    loadTrend()
+    const iv = setInterval(loadTrend, 60000)
+    return () => clearInterval(iv)
+  }, [])
+return (
     <div style={{maxWidth:'430px',margin:'0 auto',padding:'0.6rem 0.75rem',background:'#080808',minHeight:'100dvh',display:'flex',flexDirection:'column',gap:'0.5rem'}}>
 
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
@@ -80,6 +93,7 @@ export default function PoolDashboard() {
       <PriceAlert solPrice={pool.solPrice} />
       <ByrealDashboard />
       <div style={{display:'flex', gap:'0.4rem', alignItems:'center'}}>
+      <div style={{display:'flex',gap:'0.4rem',alignItems:'center'}}>
       <a href="https://www.meteora.ag/dlmm/BGm1tav58oGcsQJehL9WXBFXF7D27vZsKefj4xJKD5Y?referrer=pools" target="_blank" rel="noreferrer" style={{
         display:'inline-flex', alignItems:'center', gap:'0.4rem', marginTop:'0.5rem',
         padding:'0.45rem 0.9rem', borderRadius:'6px', width:'50%', justifyContent:'center', textDecoration:'none',
@@ -88,6 +102,16 @@ export default function PoolDashboard() {
         textTransform:'uppercase', letterSpacing:'0.08em',
         background:'rgba(99,102,241,0.07)'
       }}>↗ METEORA 10 BIN</a>
+      {solTrend !== null && (
+        <div style={{
+          padding:'0.45rem 0.9rem', borderRadius:'6px', fontWeight:700, fontSize:'0.9rem',
+          fontFamily:'Share Tech Mono, monospace',
+          border: solTrend >= 0 ? '2px solid rgba(0,255,136,0.4)' : '2px solid rgba(255,34,68,0.4)',
+          background: solTrend >= 0 ? 'rgba(0,255,136,0.07)' : 'rgba(255,34,68,0.07)',
+          color: solTrend >= 0 ? '#00ff88' : '#ff2244'
+        }}>{solTrend >= 0 ? '▲' : '▼'} {Math.abs(solTrend).toFixed(2)}%</div>
+      )}
+      </div>
       {solTrend !== null && (
         <div style={{
           padding:'0.45rem 0.9rem', borderRadius:'6px', fontWeight:700, fontSize:'0.9rem',
