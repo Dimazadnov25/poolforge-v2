@@ -43,8 +43,7 @@ export default function PriceAlert({ solPrice }) {
   const change = refPrice ? ((solPrice - refPrice) / refPrice * 100) : null
 
   return (
-    <div style={{marginTop:'0.75rem', display:'flex', alignItems:'center', gap:'0.5rem', flexWrap:'wrap'}}>
-      <span style={{color:'#64748b', fontSize:'0.75rem'}}>🔔 ntfy:</span>
+    <div style={{marginTop:'0.75rem', display:'flex', alignItems:'center', gap:'0.4rem'}}>
       {[0.5, 1, 2, 3].map(pct => {
         const isActive = activeAlert === pct
         return (
