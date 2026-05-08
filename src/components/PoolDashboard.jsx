@@ -9,6 +9,7 @@ import PriceAlert from './PriceAlert'
 
 export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
+  const [solTrend, setSolTrend] = useState(null)
   const [swapSuggest, setSwapSuggest] = useState(null)
   const [positionData, setPositionData] = useState({})
   const wallet = useWallet()
@@ -78,6 +79,7 @@ export default function PoolDashboard() {
 
       <PriceAlert solPrice={pool.solPrice} />
       <ByrealDashboard />
+      <div style={{display:'flex', gap:'0.4rem', alignItems:'center'}}>
       <a href="https://www.meteora.ag/dlmm/BGm1tav58oGcsQJehL9WXBFXF7D27vZsKefj4xJKD5Y?referrer=pools" target="_blank" rel="noreferrer" style={{
         display:'inline-flex', alignItems:'center', gap:'0.4rem', marginTop:'0.5rem',
         padding:'0.45rem 0.9rem', borderRadius:'6px', width:'50%', justifyContent:'center', textDecoration:'none',
@@ -86,6 +88,16 @@ export default function PoolDashboard() {
         textTransform:'uppercase', letterSpacing:'0.08em',
         background:'rgba(99,102,241,0.07)'
       }}>↗ METEORA 10 BIN</a>
+      {solTrend !== null && (
+        <div style={{
+          padding:'0.45rem 0.9rem', borderRadius:'6px', fontWeight:700, fontSize:'0.9rem',
+          fontFamily:'Share Tech Mono, monospace',
+          border: solTrend >= 0 ? '2px solid rgba(0,255,136,0.4)' : '2px solid rgba(255,34,68,0.4)',
+          background: solTrend >= 0 ? 'rgba(0,255,136,0.07)' : 'rgba(255,34,68,0.07)',
+          color: solTrend >= 0 ? '#00ff88' : '#ff2244'
+        }}>{solTrend >= 0 ? '▲' : '▼'} {Math.abs(solTrend).toFixed(2)}%</div>
+      )}
+      </div>
 
       {pool.error && <div style={{background:'rgba(255,34,68,0.1)',border:'1px solid rgba(255,34,68,0.3)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#ff2244',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.error}</div>}
       {pool.txStatus && <div style={{background:'rgba(0,255,255,0.1)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#00ffff',fontSize:'0.78rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.txStatus}</div>}
