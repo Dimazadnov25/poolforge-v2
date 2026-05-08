@@ -92,7 +92,6 @@ return (
 
       <PriceAlert solPrice={pool.solPrice} />
       <ByrealDashboard />
-      <div style={{display:'flex', gap:'0.4rem', alignItems:'center'}}>
       <div style={{display:'flex',gap:'0.4rem',alignItems:'center'}}>
       <a href="https://www.meteora.ag/dlmm/BGm1tav58oGcsQJehL9WXBFXF7D27vZsKefj4xJKD5Y?referrer=pools" target="_blank" rel="noreferrer" style={{
         display:'inline-flex', alignItems:'center', gap:'0.4rem', marginTop:'0.5rem',
