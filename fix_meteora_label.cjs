@@ -1,0 +1,5 @@
+const fs = require('fs')
+let c = fs.readFileSync('src/components/PoolDashboard.jsx', 'utf8')
+c = c.replace('↗ METEORA SOL/USDC POOLS', '↗ METEORA 10 BIN')
+fs.writeFileSync('src/components/PoolDashboard.jsx', c)
+console.log('✅ Label:', c.includes('METEORA 10 BIN'))
