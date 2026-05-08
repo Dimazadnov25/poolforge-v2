@@ -1,0 +1,5 @@
+const fs = require('fs')
+let c = fs.readFileSync('src/components/PriceAlert.jsx', 'utf8')
+c = c.replace('[0.05, 0.5, 1, 2, 3]', '[0.1, 0.5, 1, 2, 3]')
+fs.writeFileSync('src/components/PriceAlert.jsx', c)
+console.log('✅ 0.05 entfernt:', !c.includes('0.05,'))
