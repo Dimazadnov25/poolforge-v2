@@ -132,14 +132,6 @@ return (
       <PriceAlert solPrice={pool.solPrice} />
       <div style={{display:'flex',gap:'0.4rem',alignItems:'center'}}>
       <ByrealDashboard />
-      <a href="https://www.meteora.ag/dlmm/BGm1tav58oGcsQJehL9WXBFXF7D27vZsKefj4xJKD5Y?referrer=pools" target="_blank" rel="noreferrer" style={{
-        display:'inline-flex', alignItems:'center', gap:'0.4rem', marginTop:'0.5rem',
-        padding:'0.45rem 0.9rem', borderRadius:'6px', width:'50%', justifyContent:'center', textDecoration:'none',
-        border:'1px solid rgba(99,102,241,0.35)', color:'rgba(99,102,241,0.8)',
-        fontSize:'1.35rem', fontWeight:700, fontFamily:'Share Tech Mono, monospace',
-        textTransform:'uppercase', letterSpacing:'0.08em',
-        background:'rgba(99,102,241,0.07)'
-      }}>↗ METEORA 10 BIN</a>
       </div>
       {solTrend !== null && (
         <div style={{
