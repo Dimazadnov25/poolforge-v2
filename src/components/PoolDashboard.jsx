@@ -106,7 +106,7 @@ return (
 
       <PriceAlert solPrice={pool.solPrice} />
       <div style={{display:'flex',justifyContent:'center'}}>
-        <div style={{width:'100%',maxWidth:'400px'}}><ByrealDashboard /></div>
+        <ByrealDashboard />
       </div>
       {solTrend !== null && (
         <div style={{
