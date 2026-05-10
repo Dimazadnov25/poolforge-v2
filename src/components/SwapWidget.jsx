@@ -8,7 +8,7 @@ export default function SwapWidget({solBalance,usdcBalance}){
   const[loading,setLoading]=useState(false)
   const[status,setStatus]=useState("")
 
-  const maxSol=Math.max(0,(solBalance||0)-0.03)
+  const maxSol=Math.max(0,(solBalance||0)-0.01)
 
   async function doSwap(){
     if(!publicKey||maxSol<=0)return
