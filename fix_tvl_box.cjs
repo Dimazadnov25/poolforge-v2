@@ -1,89 +1,50 @@
 const fs = require('fs')
+let c = fs.readFileSync('src/components/PoolDashboard.jsx', 'utf8')
 
-const file = 'src/components/PoolDashboard.jsx'
-let c = fs.readFileSync(file, 'utf8')
+// TVL State hinzufuegen
+c = c.replace(
+  'const [solVolume, setSolVolume] = useState(null)',
+  'const [solVolume, setSolVolume] = useState(null)\n  const [tvl, setTvl] = useState(null)'
+)
 
-// 1) State für TVL hinzufügen — direkt nach dem ersten useState
-const stateSearch = c.indexOf('const [')
-const insertAfterLine = c.indexOf('\n', stateSearch) + 1
-c = c.slice(0, insertAfterLine) +
-  '  const [solTvl, setSolTvl] = React.useState(null)\n' +
-  c.slice(insertAfterLine)
-
-// 2) TVL Fetch in useEffect einbauen — am Anfang des ersten useEffect
-const useEffectIdx = c.indexOf('useEffect(')
-const useEffectBody = c.indexOf('{', useEffectIdx) + 1
-const fetchTvl = `
-    // TVL von DeFiLlama holen
-    const fetchTvl = async () => {
+// TVL fetch
+const tvlEffect = `
+  useEffect(() => {
+    const loadTvl = async () => {
       try {
-        const r = await fetch('https://api.llama.fi/v2/chains')
-        const chains = await r.json()
-        const sol = chains.find(ch => ch.name === 'Solana')
-        if (sol?.tvl) setSolTvl(sol.tvl)
-      } catch(e) { console.warn('TVL fetch error', e) }
+        const r = await fetch('https://api.orca.so/v2/solana/whirlpool/HJPjoWUrhoZzkNfRpHuieeFk9WcZWjwy6PBjZ81ngndJ')
+        const d = await r.json()
+        if (d.tvl) setTvl(parseFloat(d.tvl))
+      } catch(e) {}
     }
-    fetchTvl()
-    const tvlInterval = setInterval(fetchTvl, 60000)
-    return () => { clearInterval(tvlInterval) }
-`
-// Wir fügen es am Ende des bestehenden useEffect-Cleanups ein
-// Suche nach dem return () => in useEffect und erweitern
-// Einfacher: eigenes zweites useEffect am Ende der Komponente einfügen
-// Statt useEffect erweitern, ein neues hinzufügen — vor dem return
-
-const returnIdx = c.lastIndexOf('\n  return (')
-c = c.slice(0, returnIdx) +
-`
-  React.useEffect(() => {
-    const fetchTvl = async () => {
-      try {
-        const r = await fetch('https://api.llama.fi/v2/chains')
-        const chains = await r.json()
-        const sol = chains.find(ch => ch.name === 'Solana')
-        if (sol?.tvl) setSolTvl(sol.tvl)
-      } catch(e) { console.warn('TVL fetch error', e) }
-    }
-    fetchTvl()
-    const id = setInterval(fetchTvl, 60000)
-    return () => clearInterval(id)
+    loadTvl()
+    const iv = setInterval(loadTvl, 60000)
+    return () => clearInterval(iv)
   }, [])
-` +
-  c.slice(returnIdx)
+`
 
-// 3) TVL Kasten neben SOL-Preis einfügen
-// Suche den SOL-Preis-Kasten und füge TVL-Kasten danach ein
-const priceBlock = '{pool.solPrice && ('
-const priceIdx = c.indexOf(priceBlock)
-if (priceIdx === -1) { console.log('❌ SOL-Preis Block nicht gefunden'); process.exit(1) }
+c = c.replace(
+  'return (\n',
+  tvlEffect + 'return (\n'
+)
 
-// Finde das Ende dieses Blocks (schließendes )}) oder ähnliches)
-// Suche nach dem nächsten </div> nach dem Preisblock
-const closingTag = c.indexOf('</div>', priceIdx)
-const afterPriceBlock = c.indexOf('\n', closingTag) + 1
-
-const tvlBox = `        {solTvl && (
-          <div style={{
-            background: 'rgba(0,255,255,0.05)',
-            border: '1px solid rgba(0,255,255,0.3)',
-            borderRadius: '12px',
-            padding: '12px 20px',
-            display: 'inline-block',
-            marginLeft: '16px'
-          }}>
-            <div style={{color:'#ff2244', fontSize:'0.75rem', marginBottom:'4px'}}>SOLANA TVL</div>
-            <strong style={{color:'#00ffff', fontSize:'1.6rem'}}>
-              \${solTvl >= 1e9
-                ? (solTvl / 1e9).toFixed(2) + 'B'
-                : solTvl >= 1e6
-                  ? (solTvl / 1e6).toFixed(1) + 'M'
-                  : solTvl.toFixed(0)}
-            </strong>
+// TVL Kasten neben Byreal einfuegen
+c = c.replace(
+  '      <ByrealDashboard />',
+  `      <div style={{display:'flex',gap:'0.4rem',alignItems:'stretch'}}>
+        <div style={{flex:1}}><ByrealDashboard /></div>
+        {tvl !== null && (
+          <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
+            padding:'1rem 0.5rem',borderRadius:'6px',fontWeight:700,
+            border:'1px solid rgba(0,255,255,0.3)',background:'rgba(0,255,255,0.05)'}}>
+            <div style={{fontSize:'0.65rem',color:'#ff2244',fontFamily:'Share Tech Mono,monospace',textTransform:'uppercase'}}>TVL</div>
+            <div style={{fontSize:'1.3rem',color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>
+              {tvl>=1e6?'$'+(tvl/1e6).toFixed(1)+'M':'$'+tvl.toFixed(0)}
+            </div>
           </div>
         )}
-`
+      </div>`
+)
 
-c = c.slice(0, afterPriceBlock) + tvlBox + c.slice(afterPriceBlock)
-
-fs.writeFileSync(file, c, 'utf8')
-console.log('✅ TVL Kasten eingebaut')
+fs.writeFileSync('src/components/PoolDashboard.jsx', c)
+console.log('✅ TVL Kasten neben Byreal')
