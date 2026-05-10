@@ -10,7 +10,6 @@ import PriceAlert from './PriceAlert'
 export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
   const [solTvl, setSolTvl] = React.useState(null)
-  const [solTvl, setSolTvl] = React.useState(null)
   const [solTrend, setSolTrend] = useState(null)
   const [swapSuggest, setSwapSuggest] = useState(null)
   const [positionData, setPositionData] = useState({})
