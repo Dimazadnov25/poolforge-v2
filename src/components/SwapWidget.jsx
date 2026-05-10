@@ -37,7 +37,7 @@ export default function SwapWidget({solBalance,usdcBalance}){
   }
 
   return(
-    <div style={{display:"flex",alignItems:"center",gap:"0.4rem",marginTop:"0.5rem"}}>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"0.4rem",marginTop:"0.5rem"}}>
       <span style={{fontSize:"0.75rem",color:"#64748b",fontFamily:"Share Tech Mono,monospace"}}>SOL→USDC</span>
       <span style={{fontSize:"0.85rem",color:"#94a3b8",fontFamily:"Share Tech Mono,monospace"}}>{maxSol.toFixed(4)}</span>
       <button onClick={doSwap} disabled={loading||!publicKey||maxSol<=0} style={{
