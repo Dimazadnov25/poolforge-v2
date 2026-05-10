@@ -9,6 +9,7 @@ import PriceAlert from './PriceAlert'
 
 export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
+  const [solTvl, setSolTvl] = React.useState(null)
   const [solTrend, setSolTrend] = useState(null)
   const [swapSuggest, setSwapSuggest] = useState(null)
   const [positionData, setPositionData] = useState({})
@@ -75,9 +76,28 @@ return (
 
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.4rem'}}>
         {pool.solPrice && (
-          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
-            <div style={{fontSize:'0.9rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
-            <div style={{fontSize:'2.1rem',fontWeight:700,color:'#00ffff',fontFamily:'Orbitron,monospace'}}>${pool.solPrice.toFixed(2)}</div>
+          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
+            <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
+        {solTvl && (
+          <div style={{
+            background: 'rgba(0,255,255,0.05)',
+            border: '1px solid rgba(0,255,255,0.3)',
+            borderRadius: '12px',
+            padding: '12px 20px',
+            display: 'inline-block',
+            marginLeft: '16px'
+          }}>
+            <div style={{color:'#ff2244', fontSize:'0.75rem', marginBottom:'4px'}}>SOLANA TVL</div>
+            <strong style={{color:'#00ffff', fontSize:'1.6rem'}}>
+              ${solTvl >= 1e9
+                ? (solTvl / 1e9).toFixed(2) + 'B'
+                : solTvl >= 1e6
+                  ? (solTvl / 1e6).toFixed(1) + 'M'
+                  : solTvl.toFixed(0)}
+            </strong>
+          </div>
+        )}
+            <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>${pool.solPrice.toFixed(2)}</div>
           </div>
         )}
         {solVolume != null && (
@@ -166,4 +186,18 @@ return (
       )}
     </div>
   )
+
+  React.useEffect(() => {
+    const fetchTvl = async () => {
+      try {
+        const r = await fetch('https://api.llama.fi/v2/chains')
+        const chains = await r.json()
+        const sol = chains.find(ch => ch.name === 'Solana')
+        if (sol?.tvl) setSolTvl(sol.tvl)
+      } catch(e) { console.warn('TVL fetch error', e) }
+    }
+    fetchTvl()
+    const id = setInterval(fetchTvl, 60000)
+    return () => clearInterval(id)
+  }, [])
 }
