@@ -37,15 +37,19 @@ export default function SwapWidget({solBalance,usdcBalance}){
   }
 
   return(
-    <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"0.4rem",marginTop:"0.5rem"}}>
-      <span style={{fontSize:"0.75rem",color:"#64748b",fontFamily:"Share Tech Mono,monospace"}}>SOL→USDC</span>
-      <span style={{fontSize:"0.85rem",color:"#94a3b8",fontFamily:"Share Tech Mono,monospace"}}>{maxSol.toFixed(4)}</span>
-      <button onClick={doSwap} disabled={loading||!publicKey||maxSol<=0} style={{
-        padding:"0.3rem 0.8rem",borderRadius:"6px",border:"1px solid rgba(99,102,241,0.4)",
-        background:"rgba(99,102,241,0.1)",color:"#818cf8",fontWeight:700,
-        fontSize:"0.8rem",cursor:"pointer",fontFamily:"Share Tech Mono,monospace"
-      }}>{loading?"...":"MAX SOL"}</button>
-      {status&&<span style={{fontSize:"0.8rem"}}>{status}</span>}
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
+      padding:"0.6rem 0.9rem",borderRadius:"6px",
+      border:"1px solid rgba(99,102,241,0.35)",background:"rgba(99,102,241,0.05)"}}>
+      <div style={{fontSize:"0.65rem",color:"#ff2244",textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"Share Tech Mono,monospace",marginBottom:"0.3rem"}}>SOL ? USDC</div>
+      <div style={{display:"flex",alignItems:"center",gap:"0.6rem"}}>
+        <span style={{fontSize:"1.35rem",fontWeight:700,color:"#818cf8",fontFamily:"Rajdhani,sans-serif"}}>{maxSol.toFixed(4)}</span>
+        <button onClick={doSwap} disabled={loading||!publicKey||maxSol<=0} style={{
+          padding:"0.25rem 0.75rem",borderRadius:"4px",border:"1px solid rgba(99,102,241,0.6)",
+          background:"rgba(99,102,241,0.15)",color:"#818cf8",fontWeight:700,
+          fontSize:"0.8rem",cursor:"pointer",fontFamily:"Share Tech Mono,monospace"
+        }}>{loading?"...":"MAX SOL"}</button>
+        {status&&<span style={{fontSize:"0.8rem",color:"#818cf8"}}>{status}</span>}
+      </div>
     </div>
   )
 }
