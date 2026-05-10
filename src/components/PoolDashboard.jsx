@@ -78,47 +78,23 @@ return (
         {pool.solPrice && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
             <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
-        {solTvl && (
-          <div style={{
-            background: 'rgba(0,255,255,0.05)',
-            border: '1px solid rgba(0,255,255,0.3)',
-            borderRadius: '12px',
-            padding: '12px 20px',
-            display: 'inline-block',
-            marginLeft: '16px'
-          }}>
-            <div style={{color:'#ff2244', fontSize:'0.75rem', marginBottom:'4px'}}>SOLANA TVL</div>
-            <strong style={{color:'#00ffff', fontSize:'1.6rem'}}>
-              ${solTvl >= 1e9
-                ? (solTvl / 1e9).toFixed(2) + 'B'
-                : solTvl >= 1e6
-                  ? (solTvl / 1e6).toFixed(1) + 'M'
-                  : solTvl.toFixed(0)}
-            </strong>
-          </div>
-        )}
-        {solTvl && (
-          <div style={{
-            background: 'rgba(0,255,255,0.05)',
-            border: '1px solid rgba(0,255,255,0.3)',
-            borderRadius: '12px',
-            padding: '12px 20px',
-            display: 'inline-block',
-            marginLeft: '16px'
-          }}>
-            <div style={{color:'#ff2244', fontSize:'0.75rem', marginBottom:'4px'}}>SOLANA TVL</div>
-            <strong style={{color:'#00ffff', fontSize:'1.6rem'}}>
-              ${solTvl >= 1e9
-                ? (solTvl / 1e9).toFixed(2) + 'B'
-                : solTvl >= 1e6
-                  ? (solTvl / 1e6).toFixed(1) + 'M'
-                  : solTvl.toFixed(0)}
-            </strong>
-          </div>
-        )}
             <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>${pool.solPrice.toFixed(2)}</div>
           </div>
         )}
+        {solTvl && (
+          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
+            <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOLANA TVL</div>
+            <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>${solTvl >= 1e9 ? (solTvl/1e9).toFixed(2)+'B' : (solTvl/1e6).toFixed(1)+'M'}</div>
+          </div>
+        )}
+        {pool.usdcBalance !== undefined && (
+          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
+            <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>USDC Wallet</div>
+            <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>${parseFloat(pool.usdcBalance||0).toFixed(2)}</div>
+          </div>
+        )}
+      </div>
+
         {solVolume != null && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
             <div style={{fontSize:'0.9rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Vol 24h</div>
@@ -127,7 +103,6 @@ return (
             </div>
           </div>
         )}
-      </div>
 
       <PriceAlert solPrice={pool.solPrice} />
       <div style={{display:'flex',gap:'0.4rem',alignItems:'center'}}>
