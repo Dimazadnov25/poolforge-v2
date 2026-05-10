@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useWallet, useConnection } from '@solana/wallet-adapter-react'
 
-export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
+export default function OpenPositionForm({ pool, solPrice, onOpen, loading, solBalance, usdcBalance }) {
   const [solAmount, setSolAmount] = useState('')
   const [range, setRange] = useState(3)
   const [swapping, setSwapping] = useState(false)
@@ -56,7 +56,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
   const handleMaxSol = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    const max = Math.max(0, (pool?.solBalance || 0) - 0.01)
+    const max = Math.max(0, (solBalance || 0) - 0.01)
     setSolAmount(max.toFixed(4))
   }
 
@@ -71,7 +71,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
     const sqrtP = Math.sqrt(p * 1e-3)
     const sqrtPl = Math.sqrt(pl * 1e-3)
     const sqrtPu = Math.sqrt(pu * 1e-3)
-    const solAvail = Math.max(0, (pool?.solBalance || 0) - 0.01)
+    const solAvail = Math.max(0, (solBalance || 0) - 0.01)
     const solFromUsdc = usdcAvailable / currentPrice
     setSolAmount(Math.min(solFromUsdc, solAvail).toFixed(4))
   }
@@ -90,7 +90,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
     <div className="card" style={{marginTop:'1rem'}}>
       <h3 style={{marginBottom:'0.5rem'}}>Open Position</h3>
       <div style={{display:'flex',gap:'1rem',marginBottom:'0.75rem',padding:'0.5rem',borderRadius:'8px',background:'var(--surface)',fontSize:'0.8rem'}}>
-        <span style={{color:'var(--muted)'}}>SOL: <span style={{color:'var(--text)',fontWeight:'bold'}}>{(pool?.solBalance||0).toFixed(4)}</span></span>
+        <span style={{color:'var(--muted)'}}>SOL: <span style={{color:'var(--text)',fontWeight:'bold'}}>{(solBalance||0).toFixed(4)}</span></span>
         <span style={{color:'var(--muted)'}}>USDC: <span style={{color:'var(--text)',fontWeight:'bold'}}>{(pool?.usdcBalance||0).toFixed(2)}</span></span>
       </div>
 
