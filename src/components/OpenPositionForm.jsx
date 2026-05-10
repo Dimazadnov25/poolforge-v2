@@ -56,7 +56,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
   const handleMaxSol = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    const max = Math.max(0, (pool?.solBalance || 0) - 0.03)
+    const max = Math.max(0, (pool?.solBalance || 0) - 0.01)
     setSolAmount(max.toFixed(4))
   }
 
@@ -71,7 +71,7 @@ export default function OpenPositionForm({ pool, solPrice, onOpen, loading }) {
     const sqrtP = Math.sqrt(p * 1e-3)
     const sqrtPl = Math.sqrt(pl * 1e-3)
     const sqrtPu = Math.sqrt(pu * 1e-3)
-    const solAvail = Math.max(0, (pool?.solBalance || 0) - 0.03)
+    const solAvail = Math.max(0, (pool?.solBalance || 0) - 0.01)
     const solFromUsdc = usdcAvailable / currentPrice
     setSolAmount(Math.min(solFromUsdc, solAvail).toFixed(4))
   }
