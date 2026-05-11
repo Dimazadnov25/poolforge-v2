@@ -1,7 +1,7 @@
 export default function ByrealDashboard() {
   return (
     <a href="https://www.byreal.io/en/portfolio" target="_blank" rel="noreferrer" style={{
-      display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+      display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", width:"100%",
       padding:"0.6rem 0.9rem", borderRadius:"6px", textDecoration:"none",
       border:"1px solid rgba(0,255,255,0.3)", background:"rgba(0,255,255,0.05)"
     }}>
