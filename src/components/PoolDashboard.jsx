@@ -114,7 +114,7 @@ return (
           fontFamily:'Share Tech Mono, monospace',
           border: solTrend >= 0 ? '2px solid rgba(0,255,136,0.4)' : '2px solid rgba(255,34,68,0.4)',
           background: solTrend >= 0 ? 'rgba(0,255,136,0.07)' : 'rgba(255,34,68,0.07)',
-          color: solTrend >= 0 ? '#00ff88' : '#ff2244'
+          color: solTrend >= 0 ? '#00ff88' : '#ff2244', textAlign:'center', width:'100%'
         }}>{solTrend >= 0 ? '▲' : '▼'} {Math.abs(solTrend).toFixed(2)}%</div>
       )}
 
