@@ -1,0 +1,1 @@
+const fs=require("fs");let c=fs.readFileSync("api/raydium.js","utf8");c=c.replace("const liq const sqrtC","const sqrtC");fs.writeFileSync("api/raydium.js",c);console.log("ok:",!c.includes("const liq const"));
