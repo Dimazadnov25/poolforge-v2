@@ -1,0 +1,1 @@
+const fs=require("fs");let c=fs.readFileSync("api/raydium.js","utf8");c=c.replace("getAssociatedTokenAddressSync } from","getAssociatedTokenAddressSync, createInitializeMintInstruction } from");fs.writeFileSync("api/raydium.js",c);console.log("ok:",c.includes("createInitializeMintInstruction } from"));
