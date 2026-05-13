@@ -1,0 +1,1 @@
+const fs=require("fs");let c=fs.readFileSync("src/components/RaydiumDashboard.jsx","utf8");c=c.replace("setLoading(true);setSt(\"TX1...\")","setLoading(true);setSt(\"TX1...\");console.log(\"DEBUG sol:\",sol,\"usdc:\",usdc,\"ps:\",ps)");fs.writeFileSync("src/components/RaydiumDashboard.jsx",c);console.log("ok:",c.includes("DEBUG sol"));
