@@ -1,0 +1,1 @@
+const fs=require("fs");let c=fs.readFileSync("api/raydium.js","utf8");const idx=c.indexOf("sqrtC=Math.sqrt");if(idx<0){console.log("NICHT DA")}else{const before=c.substring(0,idx);const after=c.substring(idx);const fixed="const "+after;c=before+fixed;fs.writeFileSync("api/raydium.js",c);console.log("ok:",c.includes("const sqrtC"))}
