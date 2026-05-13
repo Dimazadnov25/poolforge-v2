@@ -12,7 +12,8 @@ const METADATA_PROG = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s
 const disc = name => crypto.createHash('sha256').update('global:' + name).digest().slice(0, 8)
 
 function getTickArrayPDA(poolId, startIndex) {
-  const buf = Buffer.alloc(4); buf.writeInt32LE(startIndex, 0)
+  const buf = Buffer.alloc(4)
+  buf.writeInt32LE(startIndex, 0)
   const [pda] = PublicKey.findProgramAddressSync([Buffer.from('tick_array'), poolId.toBuffer(), buf], CLMM_PROGRAM)
   return pda
 }
@@ -35,126 +36,228 @@ async function poolState(conn) {
   return { tickSpacing, tickCurrent, price, vaultA, vaultB }
 }
 
+function calcLiquidity(ps, tickLower, tickUpper, amount0Max, amount1Max) {
+  const sqrtC = Math.sqrt(Math.pow(1.0001, ps.tickCurrent))
+  const sqrtL = Math.sqrt(Math.pow(1.0001, tickLower))
+  const sqrtU = Math.sqrt(Math.pow(1.0001, tickUpper))
+  const a0 = parseFloat(amount0Max || 0) / 1e9
+  const a1 = parseFloat(amount1Max || 0) / 1e6
+  let liqN
+  if (ps.tickCurrent <= tickLower) {
+    liqN = a0 * (sqrtL * sqrtU) / (sqrtU - sqrtL) * 1e6
+  } else if (ps.tickCurrent >= tickUpper) {
+    liqN = a1 / (sqrtU - sqrtL) * 1e6
+  } else {
+    const l0 = a0 * (sqrtC * sqrtU) / (sqrtU - sqrtC) * 1e6
+    const l1 = a1 / (sqrtC - sqrtL) * 1e6
+    liqN = Math.min(l0, l1)
+  }
+  return BigInt(Math.max(Math.floor(liqN || 0), 100000))
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   if (req.method === 'OPTIONS') return res.status(200).end()
 
   const conn = new Connection(RPC, 'confirmed')
 
-  // GET = pool state lesen
+  // GET = pool state
   if (req.method === 'GET') {
     try {
       const ps = await poolState(conn)
-      return res.json({ pool: SOL_USDC_POOL.toBase58(), ...ps, vaultA: ps.vaultA.toBase58(), vaultB: ps.vaultB.toBase58() })
+      return res.json({
+        pool: SOL_USDC_POOL.toBase58(),
+        tickSpacing: ps.tickSpacing,
+        tickCurrent: ps.tickCurrent,
+        price: ps.price,
+        vaultA: ps.vaultA.toBase58(),
+        vaultB: ps.vaultB.toBase58()
+      })
     } catch(e) { return res.status(500).json({ error: e.message }) }
   }
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST required' })
 
-  const { action, wallet, nftMint, positionPDA, tickLower, tickUpper, liquidityAmount, amount0Max, amount1Max } = req.body
+  const { action, wallet, nftMint, positionPDA, tickLower, tickUpper, amount0Max, amount1Max } = req.body
 
   try {
     const walletPK = new PublicKey(wallet)
     const ps = await poolState(conn)
-    let tx = new Transaction()
+    const tx = new Transaction()
     const { blockhash } = await conn.getLatestBlockhash()
     tx.recentBlockhash = blockhash
     tx.feePayer = walletPK
 
+    // ── openPosition ──────────────────────────────────────────────
     if (action === 'openPosition') {
       const nftMintPK = new PublicKey(nftMint)
+
+      // 1) Mint Account erstellen
+      const mintRent = await conn.getMinimumBalanceForRentExemption(82)
+      tx.add(SystemProgram.createAccount({
+        fromPubkey: walletPK,
+        newAccountPubkey: nftMintPK,
+        lamports: mintRent,
+        space: 82,
+        programId: TOKEN_PROGRAM_ID
+      }))
+      tx.add(createInitializeMintInstruction(nftMintPK, 0, walletPK, null))
+
+      // 2) PDAs
       const [posPDA] = PublicKey.findProgramAddressSync([Buffer.from('position'), nftMintPK.toBuffer()], CLMM_PROGRAM)
       const [protoPDA] = PublicKey.findProgramAddressSync(
-        [Buffer.from('position'), SOL_USDC_POOL.toBuffer(), (() => { const b=Buffer.alloc(8); b.writeInt32LE(tickLower,0); b.writeInt32LE(tickUpper,4); return b })()],
+        [Buffer.from('position'), SOL_USDC_POOL.toBuffer(), (() => { const b = Buffer.alloc(8); b.writeInt32LE(tickLower, 0); b.writeInt32LE(tickUpper, 4); return b })()],
         CLMM_PROGRAM)
       const tickArrayLower = getTickArrayPDA(SOL_USDC_POOL, getStartTick(tickLower, ps.tickSpacing))
       const tickArrayUpper = getTickArrayPDA(SOL_USDC_POOL, getStartTick(tickUpper, ps.tickSpacing))
       const nftAta = getAssociatedTokenAddressSync(nftMintPK, walletPK)
-      const [metaPDA] = PublicKey.findProgramAddressSync([Buffer.from('metadata'), METADATA_PROG.toBuffer(), nftMintPK.toBuffer()], METADATA_PROG)
-      const data = Buffer.alloc(16); disc('open_position').copy(data,0); data.writeInt32LE(tickLower,8); data.writeInt32LE(tickUpper,12)
-      const mintRent=await conn.getMinimumBalanceForRentExemption(82)
-      const createMintIx=SystemProgram.createAccount({fromPubkey:walletPK,newAccountPubkey:nftMintPK,lamports:mintRent,space:82,programId:TOKEN_PROGRAM_ID})
-      const initMintIx=createInitializeMintInstruction(nftMintPK,0,walletPK,null)
-      tx.add(createMintIx)
-      tx.add(initMintIx)
-      tx.add(new TransactionInstruction({ programId: CLMM_PROGRAM, data, keys: [
-        {pubkey:walletPK,isSigner:true,isWritable:true},{pubkey:SOL_USDC_POOL,isSigner:false,isWritable:true},
-        {pubkey:protoPDA,isSigner:false,isWritable:true},{pubkey:nftMintPK,isSigner:true,isWritable:true},
-        {pubkey:nftAta,isSigner:false,isWritable:true},{pubkey:posPDA,isSigner:false,isWritable:true},
-        {pubkey:tickArrayLower,isSigner:false,isWritable:true},{pubkey:tickArrayUpper,isSigner:false,isWritable:true},
-        {pubkey:metaPDA,isSigner:false,isWritable:true},{pubkey:SystemProgram.programId,isSigner:false,isWritable:false},
-        {pubkey:TOKEN_PROGRAM_ID,isSigner:false,isWritable:false},{pubkey:ASSOCIATED_TOKEN_PROGRAM_ID,isSigner:false,isWritable:false},
-        {pubkey:METADATA_PROG,isSigner:false,isWritable:false},{pubkey:SYSVAR_RENT_PUBKEY,isSigner:false,isWritable:false},
-      ]}))
-      const serialized = tx.serialize({requireAllSignatures:false,verifySignatures:false})
-      return res.json({ tx: Buffer.from(serialized).toString('base64'), positionPDA: posPDA.toBase58(), tickArrayLower: tickArrayLower.toBase58(), tickArrayUpper: tickArrayUpper.toBase58(), tickSpacing: ps.tickSpacing })
+      const [metaPDA] = PublicKey.findProgramAddressSync(
+        [Buffer.from('metadata'), METADATA_PROG.toBuffer(), nftMintPK.toBuffer()], METADATA_PROG)
+
+      // 3) Instruction
+      const data = Buffer.alloc(16)
+      disc('open_position').copy(data, 0)
+      data.writeInt32LE(tickLower, 8)
+      data.writeInt32LE(tickUpper, 12)
+
+      tx.add(new TransactionInstruction({
+        programId: CLMM_PROGRAM, data,
+        keys: [
+          { pubkey: walletPK,           isSigner: true,  isWritable: true  },
+          { pubkey: SOL_USDC_POOL,      isSigner: false, isWritable: true  },
+          { pubkey: protoPDA,           isSigner: false, isWritable: true  },
+          { pubkey: nftMintPK,          isSigner: true,  isWritable: true  },
+          { pubkey: nftAta,             isSigner: false, isWritable: true  },
+          { pubkey: posPDA,             isSigner: false, isWritable: true  },
+          { pubkey: tickArrayLower,     isSigner: false, isWritable: true  },
+          { pubkey: tickArrayUpper,     isSigner: false, isWritable: true  },
+          { pubkey: metaPDA,            isSigner: false, isWritable: true  },
+          { pubkey: SystemProgram.programId,     isSigner: false, isWritable: false },
+          { pubkey: TOKEN_PROGRAM_ID,            isSigner: false, isWritable: false },
+          { pubkey: ASSOCIATED_TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: METADATA_PROG,               isSigner: false, isWritable: false },
+          { pubkey: SYSVAR_RENT_PUBKEY,          isSigner: false, isWritable: false },
+        ]
+      }))
+
+      const serialized = tx.serialize({ requireAllSignatures: false, verifySignatures: false })
+      return res.json({
+        tx: Buffer.from(serialized).toString('base64'),
+        positionPDA: posPDA.toBase58(),
+        tickSpacing: ps.tickSpacing
+      })
     }
 
+    // ── addLiquidity ──────────────────────────────────────────────
     if (action === 'addLiquidity') {
-      const nftMintPK = new PublicKey(nftMint)
+      const nftMintPK  = new PublicKey(nftMint)
       const positionPK = new PublicKey(positionPDA)
+
       const [protoPDA] = PublicKey.findProgramAddressSync(
-        [Buffer.from('position'), SOL_USDC_POOL.toBuffer(), (() => { const b=Buffer.alloc(8); b.writeInt32LE(tickLower,0); b.writeInt32LE(tickUpper,4); return b })()],
+        [Buffer.from('position'), SOL_USDC_POOL.toBuffer(), (() => { const b = Buffer.alloc(8); b.writeInt32LE(tickLower, 0); b.writeInt32LE(tickUpper, 4); return b })()],
         CLMM_PROGRAM)
-      const tickArrayLower   = getTickArrayPDA(SOL_USDC_POOL, getStartTick(tickLower, ps.tickSpacing))
-      const tickArrayUpper   = getTickArrayPDA(SOL_USDC_POOL, getStartTick(tickUpper, ps.tickSpacing))
+      const tickArrayLower   = getTickArrayPDA(SOL_USDC_POOL, getStartTick(tickLower,      ps.tickSpacing))
+      const tickArrayUpper   = getTickArrayPDA(SOL_USDC_POOL, getStartTick(tickUpper,      ps.tickSpacing))
       const tickArrayCurrent = getTickArrayPDA(SOL_USDC_POOL, getStartTick(ps.tickCurrent, ps.tickSpacing))
       const nftAta  = getAssociatedTokenAddressSync(nftMintPK, walletPK)
       const ataSOL  = getAssociatedTokenAddressSync(SOL_MINT,  walletPK)
       const ataUSDC = getAssociatedTokenAddressSync(USDC_MINT, walletPK)
-      const sqrtC=Math.sqrt(Math.pow(1.0001,ps.tickCurrent)),sqrtL=Math.sqrt(Math.pow(1.0001,tickLower)),sqrtU=Math.sqrt(Math.pow(1.0001,tickUpper)),a0=parseFloat(amount0Max||0)/1e9,a1=parseFloat(amount1Max||0)/1e6;let liqN;if(ps.tickCurrent<=tickLower){liqN=a0*(sqrtL*sqrtU)/(sqrtU-sqrtL)*1e6}else if(ps.tickCurrent>=tickUpper){liqN=a1/(sqrtU-sqrtL)*1e6}else{const l0=a0*(sqrtC*sqrtU)/(sqrtU-sqrtC)*1e6,l1=a1/(sqrtC-sqrtL)*1e6;liqN=Math.min(l0,l1)}const liq=BigInt(Math.max(Math.floor(liqN||0),100000))
+
+      const liq  = calcLiquidity(ps, tickLower, tickUpper, amount0Max, amount1Max)
       const amt0 = BigInt(amount0Max || '999999999999')
       const amt1 = BigInt(amount1Max || '999999999999')
+
       const data = Buffer.alloc(41)
-      disc('increase_liquidity_v2').copy(data,0)
+      disc('increase_liquidity_v2').copy(data, 0)
       data.writeBigUInt64LE(liq & BigInt('0xFFFFFFFFFFFFFFFF'), 8)
       data.writeBigUInt64LE(liq >> BigInt(64), 16)
-      data.writeBigUInt64LE(amt0, 24); data.writeBigUInt64LE(amt1, 32); data.writeUInt8(0, 40)
-      tx.add(new TransactionInstruction({ programId: CLMM_PROGRAM, data, keys: [
-        {pubkey:walletPK,isSigner:true,isWritable:true},{pubkey:SOL_USDC_POOL,isSigner:false,isWritable:true},
-        {pubkey:protoPDA,isSigner:false,isWritable:true},{pubkey:positionPK,isSigner:false,isWritable:true},
-        {pubkey:tickArrayLower,isSigner:false,isWritable:true},{pubkey:tickArrayUpper,isSigner:false,isWritable:true},
-        {pubkey:nftAta,isSigner:false,isWritable:false},{pubkey:ataSOL,isSigner:false,isWritable:true},
-        {pubkey:ataUSDC,isSigner:false,isWritable:true},{pubkey:ps.vaultA,isSigner:false,isWritable:true},
-        {pubkey:ps.vaultB,isSigner:false,isWritable:true},{pubkey:tickArrayCurrent,isSigner:false,isWritable:true},
-        {pubkey:TOKEN_PROGRAM_ID,isSigner:false,isWritable:false},{pubkey:TOKEN_2022_PROGRAM_ID,isSigner:false,isWritable:false},
-      ]}))
-      const serialized = tx.serialize({requireAllSignatures:false,verifySignatures:false})
-      return res.json({ tx: Buffer.from(serialized).toString('base64'), tickCurrent: ps.tickCurrent })
+      data.writeBigUInt64LE(amt0, 24)
+      data.writeBigUInt64LE(amt1, 32)
+      data.writeUInt8(0, 40)
+
+      tx.add(new TransactionInstruction({
+        programId: CLMM_PROGRAM, data,
+        keys: [
+          { pubkey: walletPK,          isSigner: true,  isWritable: true  },
+          { pubkey: nftAta,            isSigner: false, isWritable: false },
+          { pubkey: SOL_USDC_POOL,     isSigner: false, isWritable: true  },
+          { pubkey: protoPDA,          isSigner: false, isWritable: true  },
+          { pubkey: positionPK,        isSigner: false, isWritable: true  },
+          { pubkey: tickArrayLower,    isSigner: false, isWritable: true  },
+          { pubkey: tickArrayUpper,    isSigner: false, isWritable: true  },
+          { pubkey: ataSOL,            isSigner: false, isWritable: true  },
+          { pubkey: ataUSDC,           isSigner: false, isWritable: true  },
+          { pubkey: ps.vaultA,         isSigner: false, isWritable: true  },
+          { pubkey: ps.vaultB,         isSigner: false, isWritable: true  },
+          { pubkey: tickArrayCurrent,  isSigner: false, isWritable: true  },
+          { pubkey: TOKEN_PROGRAM_ID,  isSigner: false, isWritable: false },
+          { pubkey: TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: SOL_MINT,          isSigner: false, isWritable: false },
+          { pubkey: USDC_MINT,         isSigner: false, isWritable: false },
+        ]
+      }))
+
+      const serialized = tx.serialize({ requireAllSignatures: false, verifySignatures: false })
+      return res.json({
+        tx: Buffer.from(serialized).toString('base64'),
+        liq: liq.toString(),
+        tickCurrent: ps.tickCurrent
+      })
     }
 
+    // ── collectFees ───────────────────────────────────────────────
     if (action === 'collectFees') {
-      const nftMintPK = new PublicKey(nftMint)
+      const nftMintPK  = new PublicKey(nftMint)
       const positionPK = new PublicKey(positionPDA)
       const nftAta  = getAssociatedTokenAddressSync(nftMintPK, walletPK)
       const ataSOL  = getAssociatedTokenAddressSync(SOL_MINT,  walletPK)
       const ataUSDC = getAssociatedTokenAddressSync(USDC_MINT, walletPK)
       const MAX = BigInt('18446744073709551615')
+
       const data = Buffer.alloc(24)
-      disc('collect_fee').copy(data,0)
-      data.writeBigUInt64LE(MAX,8); data.writeBigUInt64LE(MAX,16)
-      tx.add(new TransactionInstruction({ programId: CLMM_PROGRAM, data, keys: [
-        {pubkey:walletPK,isSigner:true,isWritable:true},{pubkey:SOL_USDC_POOL,isSigner:false,isWritable:true},
-        {pubkey:positionPK,isSigner:false,isWritable:true},{pubkey:nftAta,isSigner:false,isWritable:false},
-        {pubkey:ataSOL,isSigner:false,isWritable:true},{pubkey:ataUSDC,isSigner:false,isWritable:true},
-        {pubkey:ps.vaultA,isSigner:false,isWritable:true},{pubkey:ps.vaultB,isSigner:false,isWritable:true},
-        {pubkey:TOKEN_PROGRAM_ID,isSigner:false,isWritable:false},{pubkey:TOKEN_2022_PROGRAM_ID,isSigner:false,isWritable:false},
-      ]}))
-      const serialized = tx.serialize({requireAllSignatures:false,verifySignatures:false})
+      disc('collect_fee').copy(data, 0)
+      data.writeBigUInt64LE(MAX, 8)
+      data.writeBigUInt64LE(MAX, 16)
+
+      tx.add(new TransactionInstruction({
+        programId: CLMM_PROGRAM, data,
+        keys: [
+          { pubkey: walletPK,     isSigner: true,  isWritable: true  },
+          { pubkey: nftAta,       isSigner: false, isWritable: false },
+          { pubkey: SOL_USDC_POOL,isSigner: false, isWritable: true  },
+          { pubkey: positionPK,   isSigner: false, isWritable: true  },
+          { pubkey: ataSOL,       isSigner: false, isWritable: true  },
+          { pubkey: ataUSDC,      isSigner: false, isWritable: true  },
+          { pubkey: ps.vaultA,    isSigner: false, isWritable: true  },
+          { pubkey: ps.vaultB,    isSigner: false, isWritable: true  },
+          { pubkey: TOKEN_PROGRAM_ID,      isSigner: false, isWritable: false },
+          { pubkey: TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false },
+        ]
+      }))
+
+      const serialized = tx.serialize({ requireAllSignatures: false, verifySignatures: false })
       return res.json({ tx: Buffer.from(serialized).toString('base64') })
     }
 
+    // ── closePosition ─────────────────────────────────────────────
     if (action === 'closePosition') {
-      const nftMintPK = new PublicKey(nftMint)
+      const nftMintPK  = new PublicKey(nftMint)
       const positionPK = new PublicKey(positionPDA)
       const nftAta = getAssociatedTokenAddressSync(nftMintPK, walletPK)
-      const data = Buffer.from(disc('close_position'))
-      tx.add(new TransactionInstruction({ programId: CLMM_PROGRAM, data, keys: [
-        {pubkey:walletPK,isSigner:true,isWritable:true},{pubkey:positionPK,isSigner:false,isWritable:true},
-        {pubkey:nftMintPK,isSigner:false,isWritable:true},{pubkey:nftAta,isSigner:false,isWritable:true},
-        {pubkey:TOKEN_PROGRAM_ID,isSigner:false,isWritable:false},
-      ]}))
-      const serialized = tx.serialize({requireAllSignatures:false,verifySignatures:false})
+
+      tx.add(new TransactionInstruction({
+        programId: CLMM_PROGRAM,
+        data: Buffer.from(disc('close_position')),
+        keys: [
+          { pubkey: walletPK,   isSigner: true,  isWritable: true  },
+          { pubkey: positionPK, isSigner: false, isWritable: true  },
+          { pubkey: nftMintPK,  isSigner: false, isWritable: true  },
+          { pubkey: nftAta,     isSigner: false, isWritable: true  },
+          { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+        ]
+      }))
+
+      const serialized = tx.serialize({ requireAllSignatures: false, verifySignatures: false })
       return res.json({ tx: Buffer.from(serialized).toString('base64') })
     }
 
