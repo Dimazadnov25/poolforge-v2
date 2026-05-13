@@ -72,6 +72,8 @@ export default async function handler(req, res) {
       const nftAta = getAssociatedTokenAddressSync(nftMintPK, walletPK)
       const [metaPDA] = PublicKey.findProgramAddressSync([Buffer.from('metadata'), METADATA_PROG.toBuffer(), nftMintPK.toBuffer()], METADATA_PROG)
       const data = Buffer.alloc(16); disc('open_position').copy(data,0); data.writeInt32LE(tickLower,8); data.writeInt32LE(tickUpper,12)
+      tx.add(createMintIx)
+      tx.add(initMintIx)
       tx.add(new TransactionInstruction({ programId: CLMM_PROGRAM, data, keys: [
         {pubkey:walletPK,isSigner:true,isWritable:true},{pubkey:SOL_USDC_POOL,isSigner:false,isWritable:true},
         {pubkey:protoPDA,isSigner:false,isWritable:true},{pubkey:nftMintPK,isSigner:true,isWritable:true},
