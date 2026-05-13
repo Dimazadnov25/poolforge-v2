@@ -6,6 +6,7 @@ import PositionDetails from './PositionDetails'
 import SwapWidget from './SwapWidget'
 import ByrealDashboard from './ByrealDashboard'
 import PriceAlert from './PriceAlert'
+import RaydiumDashboard from './RaydiumDashboard'
 
 export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
