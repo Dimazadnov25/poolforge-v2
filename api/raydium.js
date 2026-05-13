@@ -102,7 +102,7 @@ export default async function handler(req, res) {
       const nftAta  = getAssociatedTokenAddressSync(nftMintPK, walletPK)
       const ataSOL  = getAssociatedTokenAddressSync(SOL_MINT,  walletPK)
       const ataUSDC = getAssociatedTokenAddressSync(USDC_MINT, walletPK)
-      const liq  = BigInt(liquidityAmount || '1000000')
+      const liq sqrtC=Math.sqrt(Math.pow(1.0001,ps.tickCurrent)),sqrtL=Math.sqrt(Math.pow(1.0001,tickLower)),sqrtU=Math.sqrt(Math.pow(1.0001,tickUpper)),a0=parseFloat(amount0Max||0)/1e9,a1=parseFloat(amount1Max||0)/1e6;let liqN;if(ps.tickCurrent<=tickLower){liqN=a0*(sqrtL*sqrtU)/(sqrtU-sqrtL)*1e6}else if(ps.tickCurrent>=tickUpper){liqN=a1/(sqrtU-sqrtL)*1e6}else{const l0=a0*(sqrtC*sqrtU)/(sqrtU-sqrtC)*1e6,l1=a1/(sqrtC-sqrtL)*1e6;liqN=Math.min(l0,l1)}const liq=BigInt(Math.max(Math.floor(liqN||0),100000))
       const amt0 = BigInt(amount0Max || '999999999999')
       const amt1 = BigInt(amount1Max || '999999999999')
       const data = Buffer.alloc(41)

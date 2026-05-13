@@ -1,0 +1,1 @@
+const fs=require("fs");let c=fs.readFileSync("api/raydium.js","utf8");const idx=c.indexOf("BigInt(liquidityAmount");console.log("idx:",idx);if(idx>0)console.log(JSON.stringify(c.substring(idx-10,idx+50)));
