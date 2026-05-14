@@ -14,6 +14,7 @@ export default function PoolDashboard() {
   const [solWalletTrend, setSolWalletTrend] = useState(null)
   const prevSolWalletValue = useRef(null)
   const wallet = useWallet()
+  const pool = usePool()
 
   useEffect(() => {
     if (pool.solBalance === undefined || !pool.solPrice) return
