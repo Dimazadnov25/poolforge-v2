@@ -42,6 +42,11 @@ export function usePool() {
         const jitoAmt = jitoAccounts.value[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
         setJitoSolBalance(jitoAmt)
       } catch(e) { setJitoSolBalance(0) }
+      try {
+        const r = await fetch('/api/jitosol-price')
+        const d = await r.json()
+        if (d.price) setJitoSolPrice(d.price)
+      } catch(e) {}
 
     } catch (e) {}
   }, [wallet, connection])
