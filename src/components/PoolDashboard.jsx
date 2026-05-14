@@ -1,12 +1,11 @@
 import { useWallet } from '@solana/wallet-adapter-react'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { usePool } from '../hooks/usePool'
 import PositionDetails from './PositionDetails'
 import SwapWidget from './SwapWidget'
 import ByrealDashboard from './ByrealDashboard'
 import PriceAlert from './PriceAlert'
-import RaydiumDashboard from './RaydiumDashboard'
 
 export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
@@ -14,7 +13,19 @@ export default function PoolDashboard() {
   const [solTrend, setSolTrend] = useState(null)
   const [swapSuggest, setSwapSuggest] = useState(null)
   const [positionData, setPositionData] = useState({})
+  const [solWalletTrend, setSolWalletTrend] = useState(null)
+  const prevSolWalletValue = useRef(null)
   const wallet = useWallet()
+
+  useEffect(() => {
+    if (pool.solBalance === undefined || !pool.solPrice) return
+    const current = parseFloat(pool.solBalance || 0) * pool.solPrice
+    if (prevSolWalletValue.current !== null && prevSolWalletValue.current !== 0) {
+      const pct = ((current - prevSolWalletValue.current) / prevSolWalletValue.current) * 100
+      setSolWalletTrend(pct)
+    }
+    prevSolWalletValue.current = current
+  }, [pool.solBalance, pool.solPrice])
   const pool = usePool()
 
   useEffect(() => {
