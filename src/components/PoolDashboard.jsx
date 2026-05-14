@@ -5,6 +5,7 @@ import { usePool } from '../hooks/usePool'
 import PositionDetails from './PositionDetails'
 import ByrealDashboard from './ByrealDashboard'
 import PriceAlert from './PriceAlert'
+import SendWidget from './SendWidget'
 
 export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
