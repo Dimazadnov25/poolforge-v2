@@ -20,6 +20,7 @@ export function usePool() {
   const [solBalance, setSolBalance] = useState(null)
   const [usdcBalance, setUsdcBalance] = useState(null)
   const [jitoSolBalance, setJitoSolBalance] = useState(null)
+  const [jitoSolPrice, setJitoSolPrice] = useState(null)
   const [positions, setPositions] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -40,6 +41,11 @@ export function usePool() {
         const jitoAccounts = await connection.getParsedTokenAccountsByOwner(wallet.publicKey, { mint: new PublicKey(JITOSOL_MINT) })
         const jitoAmt = jitoAccounts.value[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
         setJitoSolBalance(jitoAmt)
+        // JitoSOL Preis via Jupiter
+        const jitoPrice = await fetch('https://lite-api.jup.ag/price/v2?ids=J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn')
+        const jitoPriceData = await jitoPrice.json()
+        const jitoUsdPrice = parseFloat(jitoPriceData?.data?.['J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn']?.price || 0)
+        if (jitoUsdPrice > 0) setJitoSolPrice(jitoUsdPrice)
       } catch(e) { setJitoSolBalance(0) }
     } catch (e) {}
   }, [wallet, connection])
@@ -536,7 +542,7 @@ export function usePool() {
   }, [wallet, connection, poolState, closePosition, openPosition, refreshBalances])
 
   return {
-    poolState, solPrice, solBalance, usdcBalance, jitoSolBalance,
+    poolState, solPrice, solBalance, usdcBalance, jitoSolBalance, jitoSolPrice,
     positions, loading, error, txStatus,
     openPosition, addLiquidity, collectFees,
     decreaseLiquidity, closePosition, rebalancePosition,
