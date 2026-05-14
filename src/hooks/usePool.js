@@ -37,7 +37,7 @@ export function usePool() {
       // JitoSOL Balance
       const JITOSOL_MINT = 'J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn'
       try {
-        const jitoAccounts = await connection.getParsedTokenAccountsByOwner(wallet.publicKey, { mint: new (require('@solana/web3.js').PublicKey)(JITOSOL_MINT) })
+        const jitoAccounts = await connection.getParsedTokenAccountsByOwner(wallet.publicKey, { mint: new PublicKey(JITOSOL_MINT) })
         const jitoAmt = jitoAccounts.value[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
         setJitoSolBalance(jitoAmt)
       } catch(e) { setJitoSolBalance(0) }
