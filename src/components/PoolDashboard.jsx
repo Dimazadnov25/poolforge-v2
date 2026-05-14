@@ -19,11 +19,13 @@ export default function PoolDashboard() {
   useEffect(() => {
     if (pool.solBalance === undefined || !pool.solPrice) return
     const current = parseFloat(pool.solBalance || 0) * pool.solPrice
-    if (prevSolWalletValue.current !== null && prevSolWalletValue.current !== 0) {
+    if (current === 0) return
+    if (prevSolWalletValue.current === null) {
+      prevSolWalletValue.current = current
+    } else {
       const pct = ((current - prevSolWalletValue.current) / prevSolWalletValue.current) * 100
       setSolWalletTrend(pct)
     }
-    prevSolWalletValue.current = current
   }, [pool.solBalance, pool.solPrice])
 
   useEffect(() => {
