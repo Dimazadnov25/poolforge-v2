@@ -41,12 +41,14 @@ export function usePool() {
         const jitoAccounts = await connection.getParsedTokenAccountsByOwner(wallet.publicKey, { mint: new PublicKey(JITOSOL_MINT) })
         const jitoAmt = jitoAccounts.value[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
         setJitoSolBalance(jitoAmt)
-        // JitoSOL Preis via Jupiter
+      } catch(e) { setJitoSolBalance(0) }
+      // JitoSOL Preis via CoinGecko
+      try {
         const jitoPrice = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=jito-staked-sol&vs_currencies=usd')
         const jitoPriceData = await jitoPrice.json()
         const jitoUsdPrice = parseFloat(jitoPriceData?.['jito-staked-sol']?.usd || 0)
         if (jitoUsdPrice > 0) setJitoSolPrice(jitoUsdPrice)
-      } catch(e) { setJitoSolBalance(0) }
+      } catch(e) {}
     } catch (e) {}
   }, [wallet, connection])
 
