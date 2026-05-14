@@ -169,7 +169,7 @@ return (
     </div>
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchTvl = async () => {
       try {
         const r = await fetch('https://api.llama.fi/v2/chains')
