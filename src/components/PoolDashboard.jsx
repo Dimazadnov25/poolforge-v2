@@ -20,10 +20,13 @@ export default function PoolDashboard() {
     if (pool.solBalance === undefined || !pool.solPrice) return
     const current = parseFloat(pool.solBalance || 0) * pool.solPrice
     if (current === 0) return
-    if (prevSolWalletValue.current === null) {
+    const stored = parseFloat(localStorage.getItem('solWalletBaseline') || '0')
+    if (!stored || stored === 0) {
+      localStorage.setItem('solWalletBaseline', current.toString())
       prevSolWalletValue.current = current
     } else {
-      const pct = ((current - prevSolWalletValue.current) / prevSolWalletValue.current) * 100
+      prevSolWalletValue.current = stored
+      const pct = ((current - stored) / stored) * 100
       setSolWalletTrend(pct)
     }
   }, [pool.solBalance, pool.solPrice])
