@@ -171,7 +171,6 @@ return (
           </div>
         </div>
       )}
-    <RaydiumDashboard />
     </div>
   )
 
