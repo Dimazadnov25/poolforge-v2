@@ -13,6 +13,8 @@ export default function PoolDashboard() {
   const [positionData, setPositionData] = useState({})
   const [solWalletTrend, setSolWalletTrend] = useState(null)
   const prevSolWalletValue = useRef(null)
+  const [usdcWalletTrend, setUsdcWalletTrend] = useState(null)
+  const prevUsdcWalletValue = useRef(null)
   const wallet = useWallet()
   const pool = usePool()
 
@@ -30,6 +32,21 @@ export default function PoolDashboard() {
       setSolWalletTrend(pct)
     }
   }, [pool.solBalance, pool.solPrice])
+
+  useEffect(() => {
+    if (pool.usdcBalance === undefined) return
+    const current = parseFloat(pool.usdcBalance || 0)
+    if (current === 0) return
+    const stored = parseFloat(localStorage.getItem('usdcWalletBaseline') || '0')
+    if (!stored || stored === 0) {
+      localStorage.setItem('usdcWalletBaseline', current.toString())
+      prevUsdcWalletValue.current = current
+    } else {
+      prevUsdcWalletValue.current = stored
+      const pct = ((current - stored) / stored) * 100
+      setUsdcWalletTrend(pct)
+    }
+  }, [pool.usdcBalance])
 
   useEffect(() => {
     const fetchVolume = async () => {
@@ -105,7 +122,7 @@ return (
         {pool.usdcBalance !== undefined && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
             <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>USDC Wallet</div>
-            <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>${parseFloat(pool.usdcBalance||0).toFixed(2)}</div>
+            <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}><span>${parseFloat(pool.usdcBalance||0).toFixed(2)}</span>{usdcWalletTrend !== null && <span style={{fontSize:'0.85rem',fontWeight:700,marginLeft:'0.4rem',fontFamily:'Share Tech Mono,monospace',color:usdcWalletTrend>=0?'#00ff88':'#ff2244'}}>{usdcWalletTrend>=0?'+':''}{usdcWalletTrend.toFixed(2)}%</span>}</div>
           </div>
         )}
       </div>
