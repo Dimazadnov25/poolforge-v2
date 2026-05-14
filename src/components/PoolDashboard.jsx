@@ -24,7 +24,6 @@ export default function PoolDashboard() {
     }
     prevSolWalletValue.current = current
   }, [pool.solBalance, pool.solPrice])
-  const pool = usePool()
 
   useEffect(() => {
     const fetchVolume = async () => {
