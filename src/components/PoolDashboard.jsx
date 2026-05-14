@@ -158,10 +158,10 @@ return (
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <div style={{fontSize:'0.65rem',color:'#9945FF',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>JitoSOL</div>
               <button onClick={resetJitoBaseline} style={{fontSize:'0.55rem',padding:'0.1rem 0.3rem',borderRadius:'3px',border:'1px solid rgba(153,69,255,0.4)',background:'transparent',color:'#9945FF',cursor:'pointer',fontFamily:'Share Tech Mono,monospace'}}>RESET</button>
-              <button onClick={async()=>{
+              <button onClick={()=>{
                 const maxSol = Math.max(0, (parseFloat(pool.solBalance||0) - 0.03))
                 if(maxSol<=0) return
-                window.open('https://jup.ag/swap/SOL-JitoSOL?inAmount='+maxSol,'_blank')
+                window.location.href='https://jup.ag/swap/SOL-JitoSOL'
               }} style={{fontSize:'0.6rem',padding:'0.15rem 0.4rem',borderRadius:'3px',border:'1px solid #9945FF',background:'rgba(153,69,255,0.1)',color:'#9945FF',cursor:'pointer',fontFamily:'Share Tech Mono,monospace'}}>MAX SOL → JitoSOL</button>
             </div>
             <div style={{fontSize:'2.2rem',fontWeight:700,color:'#9945FF',fontFamily:'Rajdhani,sans-serif'}}>
