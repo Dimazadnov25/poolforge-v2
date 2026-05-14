@@ -1,20 +1,22 @@
 const fs = require('fs')
-const path = 'src/components/PoolDashboard.jsx'
-let c = fs.readFileSync(path, 'utf8')
+const file = 'src/components/PoolDashboard.jsx'
+let c = fs.readFileSync(file, 'utf8')
 
-// Finde den useEffect Block nach dem return
-const idx = c.indexOf('\n  React.useEffect(() => {')
-if (idx === -1) { console.log('Block nicht gefunden'); process.exit(1) }
+const tvlEffect = `\r\n  useEffect(() => {\r\n    const fetchTvl = async () => {\r\n      try {\r\n        const r = await fetch('https://api.llama.fi/v2/chains')\r\n        const chains = await r.json()\r\n        const sol = chains.find(ch => ch.name === 'Solana')\r\n        if (sol?.tvl) setSolTvl(sol.tvl)\r\n      } catch(e) { console.warn('TVL fetch error', e) }\r\n    }\r\n    fetchTvl()\r\n    const id = setInterval(fetchTvl, 60000)\r\n    return () => clearInterval(id)\r\n  }, [])\r\n`
 
-// Finde Ende des Blocks
-const endIdx = c.indexOf('\n  }, [])\n', idx) + '\n  }, [])\n'.length
-const block = c.substring(idx, endIdx)
+// Entferne den useEffect nach dem return
+const badBlock = `\r\n  useEffect(() => {\r\n    const fetchTvl = async () => {\r\n      try {\r\n        const r = await fetch('https://api.llama.fi/v2/chains')\r\n        const chains = await r.json()\r\n        const sol = chains.find(ch => ch.name === 'Solana')\r\n        if (sol?.tvl) setSolTvl(sol.tvl)\r\n      } catch(e) { console.warn('TVL fetch error', e) }\r\n    }\r\n    fetchTvl()\r\n    const id = setInterval(fetchTvl, 60000)\r\n    return () => clearInterval(id)\r\n  }, [])\r\n}`
 
-// Entferne aus nach-return Position
-c = c.substring(0, idx) + c.substring(endIdx)
+if (!c.includes(badBlock)) {
+  console.log('❌ Block nicht gefunden')
+  process.exit(1)
+}
 
-// Füge vor "return (" ein
-c = c.replace('\nreturn (', '\n' + block.trimStart().replace('React.useEffect', 'useEffect') + '\nreturn (')
+// Ersetze: useEffect nach return entfernen, nur } am Ende lassen
+c = c.replace(badBlock, '\r\n}')
 
-fs.writeFileSync(path, c)
+// Füge useEffect vor return ein
+c = c.replace('  return (\r\n    <div', tvlEffect + '  return (\r\n    <div')
+
+fs.writeFileSync(file, c)
 console.log('✅ useEffect vor return verschoben')

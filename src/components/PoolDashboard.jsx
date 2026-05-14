@@ -169,17 +169,4 @@ return (
     </div>
   )
 
-  useEffect(() => {
-    const fetchTvl = async () => {
-      try {
-        const r = await fetch('https://api.llama.fi/v2/chains')
-        const chains = await r.json()
-        const sol = chains.find(ch => ch.name === 'Solana')
-        if (sol?.tvl) setSolTvl(sol.tvl)
-      } catch(e) { console.warn('TVL fetch error', e) }
-    }
-    fetchTvl()
-    const id = setInterval(fetchTvl, 60000)
-    return () => clearInterval(id)
-  }, [])
 }
