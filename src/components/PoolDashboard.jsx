@@ -1,6 +1,6 @@
 import { useWallet } from '@solana/wallet-adapter-react'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import { useState, useCallback, useEffect, useRef } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { usePool } from '../hooks/usePool'
 import PositionDetails from './PositionDetails'
 import ByrealDashboard from './ByrealDashboard'
@@ -178,6 +178,7 @@ return (
 
       <PriceAlert solPrice={pool.solPrice} />
       <a href="https://www.hawkfi.ag/meteora/5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6?position=DEWFsMTF4uo5hNvyzchNziJxDfLsGG4fQum7jC4gSG1J" target="_blank" rel="noreferrer" style={{display:'block',textAlign:'center',padding:'0.6rem',borderRadius:'0.6rem',border:'1px solid rgba(0,255,255,0.3)',background:'#111',color:'#00ffff',fontFamily:'Orbitron,monospace',fontWeight:700,fontSize:'1rem',textDecoration:'none',letterSpacing:'0.1em'}}>HAWK</a>
+      <SendWidget wallet={wallet} onRefresh={pool.refreshBalances} />
       <div style={{display:'flex',justifyContent:'center'}}>
         <ByrealDashboard />
       </div>
