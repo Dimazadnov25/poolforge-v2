@@ -107,7 +107,7 @@ return (
         {pool.solBalance !== undefined && pool.solPrice && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
             <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL Wallet</div>
-            <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}><span>${(parseFloat(pool.solBalance||0)*pool.solPrice).toFixed(2)}</span>{solWalletTrend !== null && <span style={{fontSize:'0.85rem',fontWeight:700,marginLeft:'0.4rem',fontFamily:'Share Tech Mono,monospace',color:solWalletTrend>=0?'#00ff88':'#ff2244'}}>{solWalletTrend>=0?'+':''}{solWalletTrend.toFixed(2)}%</span>}</div>
+            <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}><span>${(parseFloat(pool.solBalance||0)*pool.solPrice).toFixed(2)}</span>{solTrend !== null && <span style={{fontSize:'0.85rem',fontWeight:700,marginLeft:'0.4rem',fontFamily:'Share Tech Mono,monospace',color:solTrend>=0?'#00ff88':'#ff2244'}}>{solTrend>=0?'+':''}{solTrend.toFixed(2)}%</span>}</div>
             <div style={{fontSize:'0.7rem',color:'#888',fontFamily:'Share Tech Mono,monospace'}}>{parseFloat(pool.solBalance||0).toFixed(4)} SOL</div>
           </div>
         )}
