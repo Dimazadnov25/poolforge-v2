@@ -19,6 +19,7 @@ export function usePool() {
   const [solPrice, setSolPrice] = useState(null)
   const [solBalance, setSolBalance] = useState(null)
   const [usdcBalance, setUsdcBalance] = useState(null)
+  const [jitoSolBalance, setJitoSolBalance] = useState(null)
   const [positions, setPositions] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -33,6 +34,13 @@ export function usePool() {
       const usdcInfo = await connection.getParsedAccountInfo(usdcATA)
       const usdcAmt = usdcInfo?.value?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
       setUsdcBalance(usdcAmt)
+      // JitoSOL Balance
+      const JITOSOL_MINT = 'J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn'
+      try {
+        const jitoAccounts = await connection.getParsedTokenAccountsByOwner(wallet.publicKey, { mint: new (require('@solana/web3.js').PublicKey)(JITOSOL_MINT) })
+        const jitoAmt = jitoAccounts.value[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
+        setJitoSolBalance(jitoAmt)
+      } catch(e) { setJitoSolBalance(0) }
     } catch (e) {}
   }, [wallet, connection])
 
@@ -528,7 +536,7 @@ export function usePool() {
   }, [wallet, connection, poolState, closePosition, openPosition, refreshBalances])
 
   return {
-    poolState, solPrice, solBalance, usdcBalance,
+    poolState, solPrice, solBalance, usdcBalance, jitoSolBalance,
     positions, loading, error, txStatus,
     openPosition, addLiquidity, collectFees,
     decreaseLiquidity, closePosition, rebalancePosition,

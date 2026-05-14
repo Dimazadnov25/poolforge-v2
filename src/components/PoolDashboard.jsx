@@ -15,6 +15,8 @@ export default function PoolDashboard() {
   const prevSolWalletValue = useRef(null)
   const [usdcWalletTrend, setUsdcWalletTrend] = useState(null)
   const prevUsdcWalletValue = useRef(null)
+  const [jitoSolTrend, setJitoSolTrend] = useState(null)
+  const prevJitoSolValue = useRef(null)
   const wallet = useWallet()
   const pool = usePool()
 
@@ -47,6 +49,21 @@ export default function PoolDashboard() {
       setUsdcWalletTrend(pct)
     }
   }, [pool.usdcBalance])
+
+  useEffect(() => {
+    if (pool.jitoSolBalance === undefined || !pool.solPrice) return
+    const current = pool.jitoSolBalance * pool.solPrice
+    if (current === 0) return
+    const stored = parseFloat(localStorage.getItem('jitoSolBaseline') || '0')
+    if (!stored || stored === 0) {
+      localStorage.setItem('jitoSolBaseline', current.toString())
+      prevJitoSolValue.current = current
+    } else {
+      prevJitoSolValue.current = stored
+      const pct = ((current - stored) / stored) * 100
+      setJitoSolTrend(pct)
+    }
+  }, [pool.jitoSolBalance, pool.solPrice])
 
   useEffect(() => {
     const fetchVolume = async () => {
@@ -131,6 +148,24 @@ return (
             <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL Wallet</div>
             <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}><span>${(parseFloat(pool.solBalance||0)*pool.solPrice).toFixed(2)}</span>{solWalletTrend !== null && <span style={{fontSize:'0.85rem',fontWeight:700,marginLeft:'0.4rem',fontFamily:'Share Tech Mono,monospace',color:solWalletTrend>=0?'#00ff88':'#ff2244'}}>{solWalletTrend>=0?'+':''}{solWalletTrend.toFixed(2)}%</span>}</div>
             <div style={{fontSize:'0.7rem',color:'#888',fontFamily:'Share Tech Mono,monospace'}}>{parseFloat(pool.solBalance||0).toFixed(4)} SOL</div>
+          </div>
+        )}
+
+        {pool.solPrice && (
+          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(153,69,255,0.4)'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div style={{fontSize:'0.65rem',color:'#9945FF',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>JitoSOL</div>
+              <button onClick={async()=>{
+                const maxSol = Math.max(0, (parseFloat(pool.solBalance||0) - 0.03))
+                if(maxSol<=0) return
+                window.open('https://jup.ag/swap/SOL-JitoSOL?inAmount='+maxSol,'_blank')
+              }} style={{fontSize:'0.6rem',padding:'0.15rem 0.4rem',borderRadius:'3px',border:'1px solid #9945FF',background:'rgba(153,69,255,0.1)',color:'#9945FF',cursor:'pointer',fontFamily:'Share Tech Mono,monospace'}}>MAX SOL → JitoSOL</button>
+            </div>
+            <div style={{fontSize:'2.2rem',fontWeight:700,color:'#9945FF',fontFamily:'Rajdhani,sans-serif'}}>
+              <span>{pool.jitoSolBalance ? (pool.jitoSolBalance * pool.solPrice).toFixed(2) : '0.00'}</span>
+              {jitoSolTrend !== null && <span style={{fontSize:'0.85rem',fontWeight:700,marginLeft:'0.4rem',fontFamily:'Share Tech Mono,monospace',color:jitoSolTrend>=0?'#00ff88':'#ff2244'}}>{jitoSolTrend>=0?'+':''}{jitoSolTrend.toFixed(2)}%</span>}
+            </div>
+            <div style={{fontSize:'0.7rem',color:'#888',fontFamily:'Share Tech Mono,monospace'}}>{pool.jitoSolBalance ? pool.jitoSolBalance.toFixed(4) : '0.0000'} JitoSOL</div>
           </div>
         )}
 
