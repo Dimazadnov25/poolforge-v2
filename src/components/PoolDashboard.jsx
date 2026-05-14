@@ -3,7 +3,6 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { usePool } from '../hooks/usePool'
 import PositionDetails from './PositionDetails'
-import SwapWidget from './SwapWidget'
 import ByrealDashboard from './ByrealDashboard'
 import PriceAlert from './PriceAlert'
 
@@ -11,7 +10,6 @@ export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
   const [solTvl, setSolTvl] = useState(null)
   const [solTrend, setSolTrend] = useState(null)
-  const [swapSuggest, setSwapSuggest] = useState(null)
   const [positionData, setPositionData] = useState({})
   const [solWalletTrend, setSolWalletTrend] = useState(null)
   const prevSolWalletValue = useRef(null)
@@ -140,8 +138,6 @@ return (
       {pool.error && <div style={{background:'rgba(255,34,68,0.1)',border:'1px solid rgba(255,34,68,0.3)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#ff2244',fontSize:'1.17rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.error}</div>}
       {pool.txStatus && <div style={{background:'rgba(0,255,255,0.1)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#00ffff',fontSize:'1.17rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.txStatus}</div>}
 
-      <SwapWidget solPrice={pool.solPrice} solBalance={pool.solBalance} usdcBalance={pool.usdcBalance} />
-
       {wallet.connected && pool.positions.length > 0 && pool.positions.map(p => (
         <PositionDetails
           key={p.mint}
@@ -155,9 +151,6 @@ return (
           onCollect={async (...args) => {
             await pool.collectFees(...args)
             await new Promise(r => setTimeout(r, 3000))
-            const bal = pool.solBalance || 0
-            const excess = parseFloat((bal - 0.01).toFixed(4))
-            if (excess > 0.001) setSwapSuggest(excess)
           }}
           onAddLiquidity={pool.addLiquidity}
           onRebalance={pool.rebalancePosition}
@@ -173,22 +166,6 @@ return (
         </div>
       )}
 
-      {swapSuggest && (
-        <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.85)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000}}
-          onClick={() => setSwapSuggest(null)}>
-          <div style={{background:'#111',borderRadius:'0.75rem',padding:'1.5rem',maxWidth:'340px',width:'90%',border:'1px solid rgba(0,255,255,0.3)'}}
-            onClick={e => e.stopPropagation()}>
-            <div style={{fontSize:'1.5rem',fontWeight:700,color:'#00ffff',marginBottom:'0.75rem',fontFamily:'Orbitron,monospace'}}>SOL USDC</div>
-            <div style={{color:'#888',fontSize:'1.275rem',marginBottom:'1.25rem',fontFamily:'Share Tech Mono,monospace'}}>
-              Überschuss: <strong style={{color:'#00ffff'}}>{swapSuggest} SOL</strong><br/>Jetzt tauschen?
-            </div>
-            <div style={{display:'flex',gap:'0.75rem'}}>
-              <button onClick={() => setSwapSuggest(null)} style={{flex:1,padding:'0.6rem',borderRadius:'4px',border:'1px solid #333',background:'transparent',color:'#444',cursor:'pointer',fontFamily:'Share Tech Mono,monospace'}}>NEIN</button>
-              <button onClick={async () => { setSwapSuggest(null); await pool.swapSolToUsdc(swapSuggest) }} style={{flex:1,padding:'0.6rem',borderRadius:'4px',border:'1px solid #00ffff',background:'rgba(0,255,255,0.1)',color:'#00ffff',cursor:'pointer',fontFamily:'Orbitron,monospace',fontWeight:700}}>JA</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 
