@@ -85,6 +85,14 @@ export default function PoolDashboard() {
     return () => clearInterval(iv)
   }, [pool.refreshBalances])
 
+  const resetJitoBaseline = useCallback(() => {
+    if (!pool.jitoSolBalance || !pool.jitoSolPrice) return
+    const current = pool.jitoSolBalance * pool.jitoSolPrice
+    localStorage.setItem('jitoSolBaseline', current.toString())
+    prevJitoSolValue.current = current
+    setJitoSolTrend(null)
+  }, [pool.jitoSolBalance, pool.jitoSolPrice])
+
   const handlePositionUpdate = useCallback((mint, details) => {
     setPositionData(prev => ({ ...prev, [mint]: details }))
   }, [])
@@ -149,7 +157,7 @@ return (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(153,69,255,0.4)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <div style={{fontSize:'0.65rem',color:'#9945FF',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>JitoSOL</div>
-              <button onClick={()=>{ localStorage.removeItem('jitoSolBaseline'); window.location.reload() }} style={{fontSize:'0.55rem',padding:'0.1rem 0.3rem',borderRadius:'3px',border:'1px solid rgba(153,69,255,0.4)',background:'transparent',color:'#9945FF',cursor:'pointer',fontFamily:'Share Tech Mono,monospace'}}>RESET</button>
+              <button onClick={resetJitoBaseline} style={{fontSize:'0.55rem',padding:'0.1rem 0.3rem',borderRadius:'3px',border:'1px solid rgba(153,69,255,0.4)',background:'transparent',color:'#9945FF',cursor:'pointer',fontFamily:'Share Tech Mono,monospace'}}>RESET</button>
               <button onClick={async()=>{
                 const maxSol = Math.max(0, (parseFloat(pool.solBalance||0) - 0.03))
                 if(maxSol<=0) return
