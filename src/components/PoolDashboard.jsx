@@ -157,7 +157,7 @@ return (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(153,69,255,0.4)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <div style={{fontSize:'0.65rem',color:'#9945FF',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>JitoSOL</div>
-              <button onClick={resetJitoBaseline} style={{fontSize:'0.55rem',padding:'0.1rem 0.3rem',borderRadius:'3px',border:'1px solid rgba(153,69,255,0.4)',background:'transparent',color:'#9945FF',cursor:'pointer',fontFamily:'Share Tech Mono,monospace'}}>RESET</button>
+              
               <button onClick={()=>{
                 const maxSol = Math.max(0, (parseFloat(pool.solBalance||0) - 0.03))
                 if(maxSol<=0) return
