@@ -161,7 +161,7 @@ return (
               <a href="https://jup.ag/swap/SOL-JitoSOL" target="_blank" rel="noreferrer" style={{fontSize:'0.6rem',padding:'0.15rem 0.4rem',borderRadius:'3px',border:'1px solid rgba(0,255,255,0.3)',background:'rgba(0,255,255,0.05)',color:'#00ffff',fontFamily:'Share Tech Mono,monospace',textDecoration:'none'}}>MAX SOL → JitoSOL</a>
             </div>
             <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>
-              <span>${pool.jitoSolBalance > 0 ? (pool.jitoSolBalance * (pool.jitoSolPrice || pool.solPrice)).toFixed(2) : '0.00'}</span>
+              <span>${pool.jitoSolBalance > 0 && pool.jitoSolPrice ? (pool.jitoSolBalance * pool.jitoSolPrice).toFixed(2) : pool.jitoSolBalance > 0 ? '...' : '0.00'}</span>
               {jitoSolTrend !== null && <span style={{fontSize:'0.85rem',fontWeight:700,marginLeft:'0.4rem',fontFamily:'Share Tech Mono,monospace',color:jitoSolTrend>=0?'#00ff88':'#ff2244'}}>{jitoSolTrend>=0?'+':''}{jitoSolTrend.toFixed(2)}%</span>}
             </div>
             <div style={{fontSize:'0.7rem',color:'#888',fontFamily:'Share Tech Mono,monospace'}}>{pool.jitoSolBalance > 0 ? pool.jitoSolBalance.toFixed(4) : '0.0000'} JitoSOL</div>
