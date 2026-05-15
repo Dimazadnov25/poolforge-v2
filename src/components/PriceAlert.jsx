@@ -44,7 +44,7 @@ export default function PriceAlert({ solPrice }) {
 
   return (
     <div style={{marginTop:'0.75rem', display:'flex', flexDirection:'column', gap:'0.4rem'}}>
-      <div style={{display:'flex',gap:'0.4rem'}}>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:'0.4rem'}}>
       {[0.5, 1, 2, 3].map(pct => {
         const isActive = activeAlert === pct
         return (
