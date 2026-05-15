@@ -169,10 +169,6 @@ return (
           </div>
         )}
 
-        
-            </div>
-          </div>
-        )}
 
       <SolChart />
       <PriceAlert solPrice={pool.solPrice} />
