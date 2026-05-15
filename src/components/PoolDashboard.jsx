@@ -168,11 +168,7 @@ return (
           </div>
         )}
 
-        {solVolume != null && (
-          <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem 0.6rem',border:'1px solid rgba(0,255,255,0.15)'}}>
-            <div style={{fontSize:'0.9rem',color:'#444',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>Vol 24h</div>
-            <div style={{fontSize:'2.1rem',fontWeight:700,color:'#00ff88',textAlign:'center',width:'100%',fontFamily:'Orbitron,monospace'}}>
-              ${solVolume>=1e9?(solVolume/1e9).toFixed(1)+'B':solVolume>=1e6?(solVolume/1e6).toFixed(0)+'M':solVolume.toFixed(0)}
+        
             </div>
           </div>
         )}
