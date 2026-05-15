@@ -177,14 +177,7 @@ return (
       <div style={{display:'flex',justifyContent:'center'}}>
         <ByrealDashboard />
       </div>
-      {solTrend !== null && (
-        <div style={{
-          padding:'0.45rem 0.9rem', borderRadius:'6px', fontWeight:700, fontSize:'1.35rem',
-          fontFamily:'Share Tech Mono, monospace',
-          border: solTrend >= 0 ? '2px solid rgba(0,255,136,0.4)' : '2px solid rgba(255,34,68,0.4)',
-          background: solTrend >= 0 ? 'rgba(0,255,136,0.07)' : 'rgba(255,34,68,0.07)',
-          color: solTrend >= 0 ? '#00ff88' : '#ff2244', textAlign:'center', width:'100%'
-        }}>{solTrend >= 0 ? '▲' : '▼'} {Math.abs(solTrend).toFixed(2)}%</div>
+      %</div>
       )}
 
       {pool.error && <div style={{background:'rgba(255,34,68,0.1)',border:'1px solid rgba(255,34,68,0.3)',borderRadius:'0.5rem',padding:'0.4rem 0.6rem',color:'#ff2244',fontSize:'1.17rem',fontFamily:'Share Tech Mono,monospace'}}>{pool.error}</div>}
