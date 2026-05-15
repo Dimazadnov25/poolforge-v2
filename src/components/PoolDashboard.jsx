@@ -135,19 +135,19 @@ return (
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.4rem'}}>
         {pool.solPrice && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
-            <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
+            <div style={{fontSize:'0.65rem',color:'#00ffff',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
             <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>${pool.solPrice.toFixed(2)}</div>
           </div>
         )}
         {solTvl && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
-            <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOLANA TVL</div>
+            <div style={{fontSize:'0.65rem',color:'#00ffff',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOLANA TVL</div>
             <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>${solTvl >= 1e9 ? (solTvl/1e9).toFixed(2)+'B' : (solTvl/1e6).toFixed(1)+'M'}</div>
           </div>
         )}
         {pool.usdcBalance !== undefined && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
-            <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>USDC Wallet</div>
+            <div style={{fontSize:'0.65rem',color:'#00ffff',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>USDC Wallet</div>
             <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}><span>${parseFloat(pool.usdcBalance||0).toFixed(2)}</span>{usdcWalletTrend !== null && <span style={{fontSize:'0.85rem',fontWeight:700,marginLeft:'0.4rem',fontFamily:'Share Tech Mono,monospace',color:usdcWalletTrend>=0?'#00ff88':'#ff2244'}}>{usdcWalletTrend>=0?'+':''}{usdcWalletTrend.toFixed(2)}%</span>}</div>
           </div>
         )}
@@ -157,7 +157,7 @@ return (
         {pool.solPrice && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <div style={{fontSize:'0.65rem',color:'#ff2244',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>JitoSOL</div>
+              <div style={{fontSize:'0.65rem',color:'#00ffff',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>JitoSOL</div>
               <a href="https://jup.ag/swap/SOL-JitoSOL" target="_blank" rel="noreferrer" style={{fontSize:'0.6rem',padding:'0.15rem 0.4rem',borderRadius:'3px',border:'1px solid rgba(0,255,255,0.3)',background:'rgba(0,255,255,0.05)',color:'#00ffff',fontFamily:'Share Tech Mono,monospace',textDecoration:'none'}}>MAX SOL → JitoSOL</a>
             </div>
             <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>
