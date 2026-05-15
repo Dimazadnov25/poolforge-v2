@@ -64,7 +64,6 @@ export default function PriceAlert({ solPrice }) {
           </button>
         )
       })}
-    </div>
       {activeAlert && refPrice && change !== null && (
         <div style={{marginTop:'0.4rem',padding:'0.75rem 1rem',borderRadius:'6px',border:'1px solid rgba(245,158,11,0.4)',background:'rgba(245,158,11,0.07)'}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
@@ -74,5 +73,6 @@ export default function PriceAlert({ solPrice }) {
           </div>
         </div>
       )}
+    </div>
   )
 }
