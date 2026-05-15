@@ -70,7 +70,7 @@ export default function PositionDetails({ position, poolState, solBalance, usdcB
         </span>
       </div>
 
-      <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.75rem'}}>
+      <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.75rem', maxWidth:'320px', margin:'0 auto 0.75rem auto'}}>
         <div style={{background:'var(--surface)', borderRadius:'8px', padding:'0.5rem'}}>
           <div style={{color:'var(--muted)', fontSize:'0.75rem'}}>Min Price</div>
           <span style={{color:'var(--text)', fontWeight:'bold'}}>${details.priceLower.toFixed(2)}</span>
