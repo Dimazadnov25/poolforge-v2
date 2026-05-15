@@ -5,6 +5,7 @@ import { usePool } from '../hooks/usePool'
 import PositionDetails from './PositionDetails'
 import ByrealDashboard from './ByrealDashboard'
 import PriceAlert from './PriceAlert'
+import SolChart from './SolChart'
 import SendWidget from './SendWidget'
 
 export default function PoolDashboard() {
@@ -173,6 +174,7 @@ return (
           </div>
         )}
 
+      <SolChart />
       <PriceAlert solPrice={pool.solPrice} />
       
       <SendWidget wallet={wallet} onRefresh={pool.refreshBalances} />
