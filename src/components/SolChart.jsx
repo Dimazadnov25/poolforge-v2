@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function SolChart() {
+export default function SolChart({ currentPrice }) {
   const [prices, setPrices] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -9,7 +9,7 @@ export default function SolChart() {
       try {
         const r = await fetch('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=1&interval=hourly')
         const d = await r.json()
-        setPrices(d.prices.map(p => p[1]))
+        const pts = d.prices.map(p => p[1]); if (currentPrice) pts.push(currentPrice); setPrices(pts)
       } catch(e) {}
       setLoading(false)
     }
@@ -19,7 +19,7 @@ export default function SolChart() {
   }, [])
 
   if (loading || prices.length < 2) return (
-    <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem',border:'1px solid rgba(0,255,255,0.15)',height:'80px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem',border:'1px solid rgba(0,255,255,0.15)',height:'120px',display:'flex',alignItems:'center',justifyContent:'center'}}>
       <span style={{color:'#444',fontFamily:'Share Tech Mono,monospace',fontSize:'0.7rem'}}>CHART LADEN...</span>
     </div>
   )
@@ -30,7 +30,7 @@ export default function SolChart() {
   const up = prices[prices.length-1] >= prices[0]
   const color = up ? '#00ff88' : '#ff2244'
 
-  const W = 380, H = 70, PAD = 4
+  const W = 380, H = 120, PAD = 4
   const points = prices.map((p, i) => {
     const x = PAD + (i / (prices.length - 1)) * (W - PAD * 2)
     const y = H - PAD - ((p - min) / range) * (H - PAD * 2)

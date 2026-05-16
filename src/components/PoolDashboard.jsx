@@ -170,7 +170,7 @@ return (
         )}
 
 
-      <SolChart />
+      <SolChart currentPrice={pool.solPrice} />
       <PriceAlert solPrice={pool.solPrice} />
       
       <SendWidget wallet={wallet} onRefresh={pool.refreshBalances} />
