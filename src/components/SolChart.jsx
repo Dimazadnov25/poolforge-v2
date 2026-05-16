@@ -56,6 +56,7 @@ export default function SolChart({ currentPrice }) {
         </defs>
         <polygon points={fillPoints} fill="url(#chartFill)"/>
         <polyline points={points} fill="none" stroke={color} strokeWidth="1.5"/>
+        {currentPrice && <text x={W-PAD} y={H-8} textAnchor="end" fill={color} fontSize="12" fontFamily="Share Tech Mono,monospace" fontWeight="bold">{"$" + currentPrice.toFixed(2)}</text>}
       </svg>
     </div>
   )
