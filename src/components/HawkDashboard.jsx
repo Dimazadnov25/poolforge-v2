@@ -1,9 +1,4 @@
 import { useState, useEffect } from 'react'
-import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
-
-const RPC = 'https://mainnet.helius-rpc.com/?api-key=7802f08f-81ab-48e9-a7e7-edccb2357cf2'
-const HAWK_WALLET = 'ESLvaL9rNoDFYoWwRGqpLZmLk9KgR9r5S3L5EvauHyAy'
-const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
 
 export default function HawkDashboard({ solPrice }) {
   const [data, setData] = useState(null)
@@ -12,15 +7,10 @@ export default function HawkDashboard({ solPrice }) {
   useEffect(() => {
     const load = async () => {
       try {
-        const conn = new Connection(RPC, 'confirmed')
-        const [solBal, tokenAccs] = await Promise.all([
-          conn.getBalance(new PublicKey(HAWK_WALLET)),
-          conn.getParsedTokenAccountsByOwner(new PublicKey(HAWK_WALLET), { mint: new PublicKey(USDC_MINT) })
-        ])
-        const sol = solBal / LAMPORTS_PER_SOL
-        const usdc = tokenAccs.value[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
-        const solVal = sol * (solPrice || 0)
-        setData({ sol, usdc, solVal, total: usdc + solVal })
+        const r = await fetch('/api/hawk-position')
+        const d = await r.json()
+        const solVal = d.sol * (solPrice || 0)
+        setData({ usdc: d.usdc, sol: d.sol, solVal, total: d.usdc + solVal })
       } catch(e) { console.error(e) }
       setLoading(false)
     }
@@ -33,7 +23,7 @@ export default function HawkDashboard({ solPrice }) {
     <a href="https://www.hawkfi.ag/dashboard" target="_blank" rel="noreferrer" style={{textDecoration:'none'}}>
       <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.75rem',border:'1px solid rgba(0,255,255,0.3)'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.3rem'}}>
-          <span style={{fontSize:'0.65rem',color:'#00ffff',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>HAWK</span>
+          <span style={{fontSize:'0.65rem',color:'#00ffff',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>HAWK POSITION</span>
           <span style={{fontSize:'0.6rem',color:'#444',fontFamily:'Share Tech Mono,monospace'}}>↗ dashboard</span>
         </div>
         {loading ? (
