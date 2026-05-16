@@ -5,6 +5,7 @@ import { usePool } from '../hooks/usePool'
 import PositionDetails from './PositionDetails'
 import ByrealDashboard from './ByrealDashboard'
 import PriceAlert from './PriceAlert'
+import HawkDashboard from './HawkDashboard'
 import SolChart from './SolChart'
 import SendWidget from './SendWidget'
 
@@ -168,7 +169,8 @@ return (
       <PriceAlert solPrice={pool.solPrice} />
       
       <SendWidget wallet={wallet} onRefresh={pool.refreshBalances} />
-      <a href="https://www.hawkfi.ag/dashboard" target="_blank" rel="noreferrer" style={{display:'block',textAlign:'center',padding:'0.6rem',borderRadius:'0.6rem',border:'1px solid rgba(0,255,255,0.3)',background:'#111',color:'#00ffff',fontFamily:'Orbitron,monospace',fontWeight:700,fontSize:'1rem',textDecoration:'none',letterSpacing:'0.1em'}}>HAWK</a>
+      <HawkDashboard solPrice={pool.solPrice} />
+      <a href="https://www.hawkfi.ag/dashboard" style={{display:"none"}} target="_blank" rel="noreferrer" style={{display:'block',textAlign:'center',padding:'0.6rem',borderRadius:'0.6rem',border:'1px solid rgba(0,255,255,0.3)',background:'#111',color:'#00ffff',fontFamily:'Orbitron,monospace',fontWeight:700,fontSize:'1rem',textDecoration:'none',letterSpacing:'0.1em'}}>HAWK</a>
       <div style={{display:'flex',justifyContent:'center'}}>
         <ByrealDashboard />
       </div>
