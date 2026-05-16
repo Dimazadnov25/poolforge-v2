@@ -133,7 +133,7 @@ return (
         <WalletMultiButton />
       </div>
 
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.4rem'}}>
+      <div style={{display:'grid',gridTemplateColumns:'1fr',gap:'0.4rem'}}>
         {solTvl && (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
             <div style={{fontSize:'0.65rem',color:'#00ffff',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SOLANA TVL</div>
