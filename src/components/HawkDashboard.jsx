@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 const RPC = 'https://mainnet.helius-rpc.com/?api-key=7802f08f-81ab-48e9-a7e7-edccb2357cf2'
 const HAWK_WALLET = 'ESLvaL9rNoDFYoWwRGqpLZmLk9KgR9r5S3L5EvauHyAy'
-const DLMM_PROGRAM = 'LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo'
 const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
 
 export default function HawkDashboard({ solPrice }) {
@@ -14,22 +13,14 @@ export default function HawkDashboard({ solPrice }) {
     const load = async () => {
       try {
         const conn = new Connection(RPC, 'confirmed')
-        const accounts = await conn.getParsedTokenAccountsByOwner(
-          new PublicKey(HAWK_WALLET),
-          { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
-        )
-        let totalUsdc = 0
-        let totalSolVal = 0
-        for (const acc of accounts.value) {
-          const info = acc.account.data.parsed?.info
-          if (!info) continue
-          const mint = info.mint
-          const amt = info.tokenAmount?.uiAmount || 0
-          if (mint === USDC_MINT) totalUsdc += amt
-        }
-        const solBal = await conn.getBalance(new PublicKey(HAWK_WALLET))
-        totalSolVal = (solBal / 1e9) * (solPrice || 0)
-        setData({ usdc: totalUsdc, solVal: totalSolVal, total: totalUsdc + totalSolVal })
+        const [solBal, tokenAccs] = await Promise.all([
+          conn.getBalance(new PublicKey(HAWK_WALLET)),
+          conn.getParsedTokenAccountsByOwner(new PublicKey(HAWK_WALLET), { mint: new PublicKey(USDC_MINT) })
+        ])
+        const sol = solBal / LAMPORTS_PER_SOL
+        const usdc = tokenAccs.value[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0
+        const solVal = sol * (solPrice || 0)
+        setData({ sol, usdc, solVal, total: usdc + solVal })
       } catch(e) { console.error(e) }
       setLoading(false)
     }
@@ -48,14 +39,18 @@ export default function HawkDashboard({ solPrice }) {
         {loading ? (
           <div style={{color:'#444',fontFamily:'Share Tech Mono,monospace',fontSize:'0.8rem'}}>laden...</div>
         ) : data ? (
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.4rem'}}>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0.4rem'}}>
             <div>
               <div style={{fontSize:'0.6rem',color:'#888',fontFamily:'Share Tech Mono,monospace'}}>USDC</div>
               <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>${data.usdc.toFixed(2)}</div>
             </div>
             <div>
-              <div style={{fontSize:'0.6rem',color:'#888',fontFamily:'Share Tech Mono,monospace'}}>SOL WERT</div>
-              <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>${data.solVal.toFixed(2)}</div>
+              <div style={{fontSize:'0.6rem',color:'#888',fontFamily:'Share Tech Mono,monospace'}}>SOL</div>
+              <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>{data.sol.toFixed(3)}</div>
+            </div>
+            <div>
+              <div style={{fontSize:'0.6rem',color:'#888',fontFamily:'Share Tech Mono,monospace'}}>GESAMT</div>
+              <div style={{fontSize:'1.4rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>${data.total.toFixed(2)}</div>
             </div>
           </div>
         ) : (
