@@ -10,7 +10,7 @@ export default function HawkDashboard({ solPrice }) {
         const r = await fetch('/api/hawk-position')
         const d = await r.json()
         const solVal = d.sol * (solPrice || 0)
-        setData({ usdc: d.usdc, sol: d.sol, solVal, total: d.usdc + solVal })
+        setData({ usdc: d.usdc||0, sol: d.sol||0, solVal: solVal||0, total: (d.usdc||0) + (solVal||0) })
       } catch(e) { console.error(e) }
       setLoading(false)
     }
