@@ -48,12 +48,7 @@ export default function SolChart({ currentPrice }) {
         <span style={{fontSize:'0.6rem',color:color,fontFamily:'Share Tech Mono,monospace'}}>${max.toFixed(2)} ↑ ${min.toFixed(2)} ↓</span>
       </div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{display:'block'}}>
-        <defs>
-          <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity="0.3"/>
-            <stop offset="100%" stopColor={color} stopOpacity="0"/>
-          </linearGradient>
-        </defs>
+
         <polygon points={fillPoints} fill="url(#chartFill)"/>
         <polyline points={points} fill="none" stroke={color} strokeWidth="1.5"/>
         {currentPrice && <text x={PAD+5} y={PAD+14} textAnchor="start" fill="#ffffff" fontSize="22" fontFamily="Share Tech Mono,monospace" fontWeight="bold">{"$" + currentPrice.toFixed(2)}</text>}
