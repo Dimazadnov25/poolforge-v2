@@ -40,7 +40,7 @@ export default function SolChart({ currentPrice }) {
     <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.5rem',border:'1px solid rgba(' + (up?'0,255,136':'255,34,68') + ',0.2)'}}>
       <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.2rem'}}>
         <span style={{fontSize:'0.6rem',color:'#444',fontFamily:'Share Tech Mono,monospace'}}>SOL 24H</span>
-        <span style={{fontSize:'0.6rem',color:up?'#00ff88':'#ff2244',fontFamily:'Share Tech Mono,monospace'}}>{'$'+max.toFixed(2)+' H  $'+min.toFixed(2)+' L'}</span>
+        <span style={{fontSize:'0.85rem',color:'#ffffff',fontFamily:'Share Tech Mono,monospace',fontWeight:'bold'}}>{'$'+max.toFixed(2)+' H  $'+min.toFixed(2)+' L'}</span>
       </div>
       <svg width="100%" viewBox={'0 0 '+W+' '+H} preserveAspectRatio="none" style={{display:'block'}}>
         {candles.map((c, i) => {
