@@ -1,4 +1,7 @@
-export default async function handler(req, res) {
+const fs = require('fs')
+const file = 'api/jupiter-stake.js'
+
+const newApi = `export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
   res.setHeader('Access-Control-Allow-Origin', '*')
   try {
@@ -43,4 +46,7 @@ export default async function handler(req, res) {
   } catch(e) {
     res.status(500).json({ error: e.message, stack: e.stack?.substring(0,300) })
   }
-}
+}`
+
+fs.writeFileSync(file, newApi)
+console.log('✅ Jupiter API neu geschrieben')
