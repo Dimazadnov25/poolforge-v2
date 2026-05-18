@@ -1,4 +1,7 @@
-export default async function handler(req, res) {
+const fs = require('fs')
+const file = 'api/jupiter-stake.js'
+
+const newApi = `export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
   try {
     const { inputMint, outputMint, amount, userPublicKey } = req.body
@@ -31,4 +34,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ swapTransaction: swap.swapTransaction })
   } catch(e) { res.status(500).json({ error: e.message }) }
-}
+}`
+
+fs.writeFileSync(file, newApi)
+console.log('✅ Jupiter v6 API eingebaut')
