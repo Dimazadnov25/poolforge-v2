@@ -171,7 +171,7 @@ return (
       <SendWidget wallet={wallet} onRefresh={pool.refreshBalances} />
       <div style={{display:'flex',justifyContent:'center'}}>
       {/* Meteora DLMM Kästen */}
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0.5rem',marginTop:'0.5rem'}}>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0.5rem',marginTop:'0.5rem',width:'100%'}}>
         {[
           { bins: '4-Bin',  url: 'https://app.meteora.ag/dlmm/5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6',  addr: '5rCf1D...HAS6' },
           { bins: '10-Bin', url: 'https://app.meteora.ag/dlmm/BGm1tav58oGcsQJehL9WXBFXF7D27vZsKefj4xJKD5Y',   addr: 'BGm1ta...D5Y'  },
