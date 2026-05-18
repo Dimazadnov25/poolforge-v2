@@ -22,27 +22,20 @@ function SwapButton() {
       const amountRaw = solBal - 30000000
       if (amountRaw <= 0) { setTxt('Zu wenig SOL'); setTimeout(()=>setTxt('MAX SOL → USDC'),3000); return }
       setTxt('Quote...')
-      const quoteResp = await fetch(
-        'https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=' + amountRaw + '&slippageBps=100'
-      )
-      const quote = await quoteResp.json()
-      if (quote.error) { setTxt('Quote: ' + quote.error.substring(0,20)); setTimeout(()=>setTxt('MAX SOL → USDC'),5000); return }
-      setTxt('TX bauen...')
-      const swapResp = await fetch('https://quote-api.jup.ag/v6/swap', {
+      const r = await fetch('/api/jupiter-stake', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          quoteResponse: quote,
-          userPublicKey: publicKey.toBase58(),
-          wrapAndUnwrapSol: true,
-          dynamicComputeUnitLimit: true,
-          prioritizationFeeLamports: 100000
+          inputMint: 'So11111111111111111111111111111111111111112',
+          outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+          amount: amountRaw,
+          userPublicKey: publicKey.toBase58()
         })
       })
-      const swap = await swapResp.json()
-      if (!swap.swapTransaction) { setTxt('No TX'); setTimeout(()=>setTxt('MAX SOL → USDC'),5000); return }
+      const d = await r.json()
+      if (d.error) { setTxt(d.error.substring(0,25)); setTimeout(()=>setTxt('MAX SOL → USDC'),5000); return }
       setTxt('Signieren...')
-      const tx = VersionedTransaction.deserialize(Buffer.from(swap.swapTransaction, 'base64'))
+      const tx = VersionedTransaction.deserialize(Buffer.from(d.swapTransaction, 'base64'))
       const sig = await sendTransaction(tx, connection)
       setTxt('Warten...')
       await connection.confirmTransaction(sig, 'confirmed')
