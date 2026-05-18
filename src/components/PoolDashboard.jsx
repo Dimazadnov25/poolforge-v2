@@ -13,37 +13,37 @@ import SendWidget from './SendWidget'
 function SwapButton() {
   const { publicKey, sendTransaction } = useWallet()
   const { connection } = useConnection()
-  const [txt, setTxt] = React.useState('MAX SOL → JitoSOL')
+  const [txt, setTxt] = React.useState('MAX SOL → USDC')
   async function doSwap() {
-    if (!publicKey) { setTxt('Wallet!'); setTimeout(()=>setTxt('MAX SOL → JitoSOL'),3000); return }
+    if (!publicKey) { setTxt('Wallet!'); setTimeout(()=>setTxt('MAX SOL → USDC'),3000); return }
     setTxt('Balance...')
     try {
       const solBal = await connection.getBalance(publicKey)
       const amountRaw = solBal - 30000000
-      if (amountRaw <= 0) { setTxt('Zu wenig SOL'); setTimeout(()=>setTxt('MAX SOL → JitoSOL'),3000); return }
+      if (amountRaw <= 0) { setTxt('Zu wenig SOL'); setTimeout(()=>setTxt('MAX SOL → USDC'),3000); return }
       setTxt('Quote...')
       const r = await fetch('/api/jupiter-stake', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           inputMint: 'So11111111111111111111111111111111111111112',
-          outputMint: 'J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn',
+          outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
           amount: amountRaw,
           userPublicKey: publicKey.toBase58()
         })
       })
       const d = await r.json()
-      if (d.error) { setTxt('API: ' + d.error.substring(0,20)); setTimeout(()=>setTxt('MAX SOL → JitoSOL'),5000); return }
+      if (d.error) { setTxt('API: ' + d.error.substring(0,20)); setTimeout(()=>setTxt('MAX SOL → USDC'),5000); return }
       setTxt('Signieren...')
       const tx = VersionedTransaction.deserialize(Buffer.from(d.swapTransaction, 'base64'))
       const sig = await sendTransaction(tx, connection)
       setTxt('Warten...')
       await connection.confirmTransaction(sig, 'confirmed')
       setTxt('✅ OK')
-      setTimeout(()=>{ setTxt('MAX SOL → JitoSOL'); window.location.reload() }, 2000)
+      setTimeout(()=>{ setTxt('MAX SOL → USDC'); window.location.reload() }, 2000)
     } catch(e) {
       setTxt(e.message.substring(0,25))
-      setTimeout(()=>setTxt('MAX SOL → JitoSOL'), 5000)
+      setTimeout(()=>setTxt('MAX SOL → USDC'), 5000)
     }
   }
   return (
