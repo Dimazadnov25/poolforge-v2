@@ -44,7 +44,7 @@ function SwapButton() {
       const sig = await sendTransaction(tx, connection)
       await connection.confirmTransaction(sig, 'confirmed')
       setStatus('✅'); setTimeout(() => { setStatus(''); window.location.reload() }, 2000)
-    } catch(e) { console.error('SWAP FEHLER:', e.message, e); alert('Swap Fehler: ' + e.message); setStatus('❌ ' + e.message) }
+    } catch(e) { setStatus('❌ ' + e.message.substring(0,40)); setTimeout(()=>setStatus(''),8000); console.error(e); const x = e.message) }
     setLoading(false)
   }
   return (
@@ -53,7 +53,7 @@ function SwapButton() {
       border:'1px solid rgba(0,255,255,0.3)',background:'rgba(0,255,255,0.05)',
       color:'#00ffff',fontFamily:'Share Tech Mono,monospace',cursor:'pointer'
     }}>
-      {loading ? status : 'MAX SOL → JitoSOL'}
+      {loading ? '...' : status && status.startsWith('❌') ? status : 'MAX SOL → JitoSOL'}
     </button>
   )
 }
