@@ -44,7 +44,7 @@ function SwapButton() {
       const sig = await sendTransaction(tx, connection)
       await connection.confirmTransaction(sig, 'confirmed')
       setStatus('✅'); setTimeout(() => { setStatus(''); window.location.reload() }, 2000)
-    } catch(e) { setStatus('❌ ' + e.message.substring(0,40)); setTimeout(()=>setStatus(''),8000); console.error(e); const x = e.message) }
+    } catch(e) { setStatus('ERR:' + e.message.substring(0,30)); setTimeout(()=>setStatus(''),8000) }
     setLoading(false)
   }
   return (
