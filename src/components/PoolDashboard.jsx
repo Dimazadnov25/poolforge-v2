@@ -35,7 +35,7 @@ function SwapButton() {
       })
       const d = await r.json()
       if (d.error) throw new Error(d.error)
-      const { VersionedTransaction } = await import('@solana/web3.js')
+      
       const tx = VersionedTransaction.deserialize(Buffer.from(d.swapTransaction, 'base64'))
       const sig = await sendTransaction(tx, connection)
       await connection.confirmTransaction(sig, 'confirmed')
