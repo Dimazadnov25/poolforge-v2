@@ -208,9 +208,6 @@ return (
             <div style={{fontSize:'0.7rem',color:'#888',fontFamily:'Share Tech Mono,monospace'}}>{pool.jitoSolBalance > 0 ? pool.jitoSolBalance.toFixed(4) : '0.0000'} JitoSOL</div>
           </div>
         )}
-
-
-      <SolChart currentPrice={pool.solPrice} />
       <PriceAlert solPrice={pool.solPrice} />
       
       <SendWidget wallet={wallet} onRefresh={pool.refreshBalances} />
