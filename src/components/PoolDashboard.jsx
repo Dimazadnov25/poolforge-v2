@@ -1,4 +1,4 @@
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useWallet, useConnection } from '@solana/wallet-adapter-react'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { usePool } from '../hooks/usePool'
