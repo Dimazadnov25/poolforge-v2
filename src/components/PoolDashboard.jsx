@@ -1,4 +1,5 @@
 import { useWallet, useConnection } from '@solana/wallet-adapter-react'
+import { VersionedTransaction } from '@solana/web3.js'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { usePool } from '../hooks/usePool'
