@@ -16,7 +16,8 @@ function SwapButton() {
   const [loading, setLoading] = React.useState(false)
   const [status, setStatus] = React.useState('')
   async function doSwap() {
-    if (!publicKey) return
+    console.log('doSwap called, publicKey:', publicKey?.toBase58())
+    if (!publicKey) { alert('Wallet nicht verbunden!'); return }
     setLoading(true); setStatus('...')
     try {
       const balResp = await fetch('/api/sol-price')
