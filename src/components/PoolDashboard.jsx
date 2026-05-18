@@ -13,20 +13,15 @@ import SendWidget from './SendWidget'
 function SwapButton() {
   const { publicKey, sendTransaction } = useWallet()
   const { connection } = useConnection()
-  const [loading, setLoading] = React.useState(false)
-  const [status, setStatus] = React.useState('')
+  const [txt, setTxt] = React.useState('MAX SOL → JitoSOL')
   async function doSwap() {
-    console.log('doSwap called, publicKey:', publicKey?.toBase58())
-    if (!publicKey) { alert('Wallet nicht verbunden!'); return }
-    setLoading(true); setStatus('...')
+    if (!publicKey) { setTxt('Wallet!'); setTimeout(()=>setTxt('MAX SOL → JitoSOL'),3000); return }
+    setTxt('Balance...')
     try {
-      console.log('STEP 1: getBalance...')
       const solBal = await connection.getBalance(publicKey)
-      console.log('STEP 2: solBal =', solBal)
-      const amountRaw = Math.max(0, solBal - 30000000)
-      console.log('STEP 3: amountRaw =', amountRaw)
-      if (amountRaw <= 0) { setStatus('❌ zu wenig SOL'); setLoading(false); return }
-      console.log('STEP 4: API call...')
+      const amountRaw = solBal - 30000000
+      if (amountRaw <= 0) { setTxt('Zu wenig SOL'); setTimeout(()=>setTxt('MAX SOL → JitoSOL'),3000); return }
+      setTxt('Quote...')
       const r = await fetch('/api/jupiter-stake', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -38,25 +33,29 @@ function SwapButton() {
         })
       })
       const d = await r.json()
-      if (d.error) throw new Error(d.error)
-      
+      if (d.error) { setTxt('API: ' + d.error.substring(0,20)); setTimeout(()=>setTxt('MAX SOL → JitoSOL'),5000); return }
+      setTxt('Signieren...')
       const tx = VersionedTransaction.deserialize(Buffer.from(d.swapTransaction, 'base64'))
       const sig = await sendTransaction(tx, connection)
+      setTxt('Warten...')
       await connection.confirmTransaction(sig, 'confirmed')
-      setStatus('✅'); setTimeout(() => { setStatus(''); window.location.reload() }, 2000)
-    } catch(e) { setStatus('ERR:' + e.message.substring(0,30)); setTimeout(()=>setStatus(''),8000) }
-    setLoading(false)
+      setTxt('✅ OK')
+      setTimeout(()=>{ setTxt('MAX SOL → JitoSOL'); window.location.reload() }, 2000)
+    } catch(e) {
+      setTxt(e.message.substring(0,25))
+      setTimeout(()=>setTxt('MAX SOL → JitoSOL'), 5000)
+    }
   }
   return (
-    <button onClick={doSwap} disabled={loading || !publicKey} style={{
+    <button onClick={doSwap} style={{
       fontSize:'0.6rem',padding:'0.15rem 0.4rem',borderRadius:'3px',
       border:'1px solid rgba(0,255,255,0.3)',background:'rgba(0,255,255,0.05)',
-      color:'#00ffff',fontFamily:'Share Tech Mono,monospace',cursor:'pointer'
-    }}>
-      {loading ? '...' : status && status.startsWith('❌') ? status : 'MAX SOL → JitoSOL'}
-    </button>
+      color:'#00ffff',fontFamily:'Share Tech Mono,monospace',cursor:'pointer',
+      minWidth:'120px'
+    }}>{txt}</button>
   )
 }
+
 
 export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
