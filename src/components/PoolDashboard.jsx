@@ -20,10 +20,13 @@ function SwapButton() {
     if (!publicKey) { alert('Wallet nicht verbunden!'); return }
     setLoading(true); setStatus('...')
     try {
-      const balResp = await fetch('/api/sol-price')
+      console.log('STEP 1: getBalance...')
       const solBal = await connection.getBalance(publicKey)
-      const amountRaw = Math.max(0, solBal - 30000000) // 0.03 SOL Reserve
+      console.log('STEP 2: solBal =', solBal)
+      const amountRaw = Math.max(0, solBal - 30000000)
+      console.log('STEP 3: amountRaw =', amountRaw)
       if (amountRaw <= 0) { setStatus('❌ zu wenig SOL'); setLoading(false); return }
+      console.log('STEP 4: API call...')
       const r = await fetch('/api/jupiter-stake', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
