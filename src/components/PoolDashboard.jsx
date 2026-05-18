@@ -200,6 +200,10 @@ return (
       <PriceAlert solPrice={pool.solPrice} />
       
       <SendWidget wallet={wallet} onRefresh={pool.refreshBalances} />
+      <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)',display:'flex',flexDirection:'column',alignItems:'center',gap:'0.4rem'}}>
+        <div style={{fontSize:'0.65rem',color:'#00ffff',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>SWAP</div>
+        <SwapButton />
+      </div>
       <div style={{display:'flex',justifyContent:'center'}}>
       {/* Meteora DLMM Kästen */}
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0.5rem',marginTop:'0.5rem',width:'100%'}}>
