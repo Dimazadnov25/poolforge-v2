@@ -9,6 +9,51 @@ import HawkDashboard from './HawkDashboard'
 import SolChart from './SolChart'
 import SendWidget from './SendWidget'
 
+
+function SwapButton() {
+  const { publicKey, sendTransaction } = useWallet()
+  const { connection } = useConnection()
+  const [loading, setLoading] = React.useState(false)
+  const [status, setStatus] = React.useState('')
+  async function doSwap() {
+    if (!publicKey) return
+    setLoading(true); setStatus('...')
+    try {
+      const balResp = await fetch('/api/sol-price')
+      const solBal = await connection.getBalance(publicKey)
+      const amountRaw = Math.max(0, solBal - 30000000) // 0.03 SOL Reserve
+      if (amountRaw <= 0) { setStatus('❌ zu wenig SOL'); setLoading(false); return }
+      const r = await fetch('/api/jupiter-stake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          inputMint: 'So11111111111111111111111111111111111111112',
+          outputMint: 'J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn',
+          amount: amountRaw,
+          userPublicKey: publicKey.toBase58()
+        })
+      })
+      const d = await r.json()
+      if (d.error) throw new Error(d.error)
+      const { VersionedTransaction } = await import('@solana/web3.js')
+      const tx = VersionedTransaction.deserialize(Buffer.from(d.swapTransaction, 'base64'))
+      const sig = await sendTransaction(tx, connection)
+      await connection.confirmTransaction(sig, 'confirmed')
+      setStatus('✅'); setTimeout(() => { setStatus(''); window.location.reload() }, 2000)
+    } catch(e) { setStatus('❌ ' + e.message) }
+    setLoading(false)
+  }
+  return (
+    <button onClick={doSwap} disabled={loading || !publicKey} style={{
+      fontSize:'0.6rem',padding:'0.15rem 0.4rem',borderRadius:'3px',
+      border:'1px solid rgba(0,255,255,0.3)',background:'rgba(0,255,255,0.05)',
+      color:'#00ffff',fontFamily:'Share Tech Mono,monospace',cursor:'pointer'
+    }}>
+      {loading ? status : 'MAX SOL → JitoSOL'}
+    </button>
+  )
+}
+
 export default function PoolDashboard() {
   const [solVolume, setSolVolume] = useState(null)
   const [solTvl, setSolTvl] = useState(null)
@@ -154,7 +199,7 @@ return (
           <div style={{background:'#111',borderRadius:'0.6rem',padding:'0.6rem 0.5rem',border:'1px solid rgba(0,255,255,0.3)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <div style={{fontSize:'0.65rem',color:'#00ffff',textTransform:'uppercase',fontFamily:'Share Tech Mono,monospace'}}>JitoSOL</div>
-              <a href="https://jup.ag/swap/SOL-JitoSOL" target="_blank" rel="noreferrer" style={{fontSize:'0.6rem',padding:'0.15rem 0.4rem',borderRadius:'3px',border:'1px solid rgba(0,255,255,0.3)',background:'rgba(0,255,255,0.05)',color:'#00ffff',fontFamily:'Share Tech Mono,monospace',textDecoration:'none'}}>MAX SOL → JitoSOL</a>
+              <SwapButton />
             </div>
             <div style={{fontSize:'2.2rem',fontWeight:700,color:'#00ffff',fontFamily:'Rajdhani,sans-serif'}}>
               <span>${pool.jitoSolBalance > 0 && pool.jitoSolPrice ? (pool.jitoSolBalance * pool.jitoSolPrice).toFixed(2) : pool.jitoSolBalance > 0 ? '...' : '0.00'}</span>
