@@ -32,9 +32,9 @@ export default async function handler(req, res) {
     const activeBinId = poolInfo.data.readInt32LE(76)
 
     // Position suchen
+    // Alle Positionen der Wallet suchen - verschiedene Größen probieren
     const accounts = await connection.getProgramAccounts(DLMM_PROGRAM, {
       filters: [
-        { dataSize: 8016 },
         { memcmp: { offset: 8, bytes: wallet.toBase58() } }
       ]
     })
