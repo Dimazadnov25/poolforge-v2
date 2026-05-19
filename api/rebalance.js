@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     // Alle Positionen der Wallet suchen - verschiedene Größen probieren
     const accounts = await connection.getProgramAccounts(DLMM_PROGRAM, {
       filters: [
-        { memcmp: { offset: 8, bytes: wallet.toBase58() } }
+        { memcmp: { offset: 40, bytes: wallet.toBase58() } }
       ]
     })
 
