@@ -9,9 +9,7 @@ const THRESHOLD_PCT = 0.01
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
-  if (req.method !== 'POST') return res.status(405).end()
-
-  const { secret } = req.body
+  const secret = req.body?.secret || req.query?.secret
   if (secret !== process.env.CRON_SECRET) return res.status(401).json({ error: 'Unauthorized' })
 
   try {
